@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ผลการวัดความแม่นยำของระบบตรวจสอบ — ชุดทดสอบที่ผู้วิจัยพัฒนา</title>
+<style>
+  :root {
+    --ink:#1b1b1f; --muted:#55555f; --line:#d5d5dd; --bg:#ffffff; --panel:#f6f6f9;
+    --good:#0f6d3f; --good-bg:#e6f4ec; --bad:#a3161d; --bad-bg:#fbeaea; --warn:#7a4a00; --warn-bg:#fdf3e2;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px; font-family:"Sarabun","Noto Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+         color:var(--ink); background:var(--bg); line-height:1.65; font-size:16px; }
+  main { max-width:1080px; margin:0 auto; }
+  h1 { font-size:1.6rem; margin:0 0 4px; }
+  h2 { font-size:1.2rem; margin:32px 0 8px; padding-bottom:6px; border-bottom:2px solid var(--line); }
+  h3 { font-size:1.02rem; margin:20px 0 6px; }
+  p.sub { color:var(--muted); margin:0 0 20px; }
+  table { border-collapse:collapse; width:100%; margin:10px 0 6px; font-size:0.94rem; }
+  caption { text-align:left; font-weight:700; padding:6px 0; }
+  th, td { border:1px solid var(--line); padding:7px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--panel); }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .tag { display:inline-block; padding:1px 8px; border-radius:999px; font-size:0.82rem; font-weight:700; border:1px solid transparent; }
+  .tag.good { color:var(--good); background:var(--good-bg); border-color:#b6ddc7; }
+  .tag.bad  { color:var(--bad);  background:var(--bad-bg);  border-color:#e8b9bb; }
+  .tag.warn { color:var(--warn); background:var(--warn-bg); border-color:#e8d3aa; }
+  .banner { padding:12px 16px; border-radius:8px; border:1px solid; margin:16px 0; font-weight:700; }
+  .banner.good { color:var(--good); background:var(--good-bg); border-color:#b6ddc7; }
+  .banner.bad  { color:var(--bad);  background:var(--bad-bg);  border-color:#e8b9bb; }
+  details { margin:8px 0; border:1px solid var(--line); border-radius:6px; padding:8px 12px; background:var(--panel); }
+  summary { cursor:pointer; font-weight:700; }
+  pre { overflow-x:auto; background:#fff; border:1px solid var(--line); padding:10px; border-radius:6px;
+        font-size:0.82rem; line-height:1.5; }
+  footer { margin-top:40px; color:var(--muted); font-size:0.88rem; border-top:1px solid var(--line); padding-top:12px; }
+  ul { margin:6px 0 6px 20px; padding:0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>ผลการวัดความแม่นยำของระบบตรวจสอบ</h1>
+  <p class="sub">
+    รันกฎตรวจในบทที่ 2.5 กับชุดทดสอบที่ผู้วิจัยพัฒนา (บทที่ 3.4.2) แล้วเปรียบเทียบกับค่าอ้างอิง (Ground Truth)
+    ที่ฝังไว้ล่วงหน้าในแต่ละองค์ประกอบ คำนวณ Precision, Recall และ F1-score ตามสูตรในบทที่ 3.7.1
+  </p>
+  <div id="output" role="status">กำลังรัน…</div>
+</main>
+
+<script src="../analyzer.js"></script>
+<script src="./suites.js"></script>
+<script>
+(function () {
+  'use strict';
+  var A = window.WcagAnalyzer, T = window.WcagTestSuites;
+  var S = A.STATUS;
+  var REPEATS = 5;           /* จำนวนรอบที่รันซ้ำเพื่อยืนยันผลคงที่ (บทที่ 3.6.2) */
+  var TARGET_F1 = 0.90;      /* เกณฑ์ความสำเร็จด้านความถูกต้อง (บทที่ 3.9) */
+
+  function esc(s) { return A.escapeHtml(s); }
+  function fmt(n, d) { return (n === null || n === undefined || isNaN(n)) ? '—' : Number(n).toFixed(d === undefined ? 3 : d); }
+
+  /* ---------- ตรวจหนึ่งชุดทดสอบ ---------- */
+  function runSuite(suite) {
+    var timings = [];
+    var result = null;
+    for (var r = 0; r < REPEATS; r++) {
+      var t0 = performance.now();
+      result = A.analyze(suite.html, { source: 'test:' + suite.id });
+      timings.push(performance.now() - t0);
+    }
+
+    var doc = A.parseHtml(suite.html);
+    var annotated = doc.querySelectorAll('[data-gt]');
+
+    /* ค่าอ้างอิงต่อองค์ประกอบ (อ้างอิงด้วยลำดับใน document เพื่อจับคู่กับ el ของแต่ละ pair) */
+    var perCriterion = {};
+    A.CRITERIA_ORDER.forEach(function (sc) {
+      perCriterion[sc] = { sc: sc, tp: 0, fp: 0, fn: 0, tn: 0, strictMatch: 0, strictTotal: 0 };
+    });
+    var problems = [];
+    var seenElements = new Set();
+
+    result.pairs.forEach(function (pair) {
+      if (!pair.el) return;                       /* คู่จากแบบประเมิน Checklist ไม่มีองค์ประกอบ */
+      var gtAttr = pair.el.getAttribute('data-gt');
+      var gtMap = T.parseGroundTruth(gtAttr);
+      var expected = Object.prototype.hasOwnProperty.call(gtMap, pair.ruleId) ? gtMap[pair.ruleId] : gtMap['*'];
+      seenElements.add(pair.el);
+
+      if (!expected) {
+        problems.push({ kind: 'ไม่มีค่าอ้างอิง', detail: pair.ruleId + ' บน ' + pair.path + ' — ' + esc(pair.snippet) });
+        return;
+      }
+
+      var c = perCriterion[pair.sc];
+      c.strictTotal++;
+      if (expected === pair.status) c.strictMatch++;
+      else problems.push({
+        kind: 'สถานะไม่ตรงค่าอ้างอิง',
+        detail: pair.ruleId + ' บน ' + pair.path + ' — คาดว่า "' + expected + '" แต่ระบบให้ "' + pair.status + '" (' + esc(pair.snippet) + ')'
+      });
+
+      /* นับ TP/FP/FN เฉพาะคู่ที่ทั้งค่าอ้างอิงและผลระบบเป็นผ่านหรือไม่ผ่าน (บทที่ 3.6.2) */
+      var countable = (expected === S.PASS || expected === S.FAIL) && (pair.status === S.PASS || pair.status === S.FAIL);
+      if (!countable) return;
+      if (expected === S.FAIL && pair.status === S.FAIL) c.tp++;
+      else if (expected === S.PASS && pair.status === S.FAIL) c.fp++;
+      else if (expected === S.FAIL && pair.status === S.PASS) c.fn++;
+      else c.tn++;
+    });
+
+    /* องค์ประกอบที่มีค่าอ้างอิงแต่ระบบไม่สร้างคู่ตรวจให้เลย */
+    for (var i = 0; i < annotated.length; i++) {
+      var el = annotated[i];
+      var map = T.parseGroundTruth(el.getAttribute('data-gt'));
+      if (Object.keys(map).length === 0) continue;   /* ประกาศไว้ว่าไม่ควรเกิดคู่ตรวจ */
+      var matched = false;
+      result.pairs.forEach(function (p) {
+        if (p.el && p.el.isEqualNode && p.el.getAttribute('data-gt') === el.getAttribute('data-gt')) matched = true;
+      });
+      if (!matched) {
+        problems.push({ kind: 'ระบบไม่สร้างคู่ตรวจ', detail: esc(el.outerHTML.slice(0, 120)) });
+      }
+    }
+
+    var avg = timings.reduce(function (a, b) { return a + b; }, 0) / timings.length;
+    return {
+      suite: suite,
+      result: result,
+      perCriterion: perCriterion,
+      problems: problems,
+      elementCount: result.elementCount,
+      pairCount: result.pairs.length,
+      timeAvg: avg,
+      timeMin: Math.min.apply(null, timings),
+      timeMax: Math.max.apply(null, timings)
+    };
+  }
+
+  function prf(c) {
+    var precision = (c.tp + c.fp) === 0 ? null : c.tp / (c.tp + c.fp);
+    var recall = (c.tp + c.fn) === 0 ? null : c.tp / (c.tp + c.fn);
+    var f1 = (precision === null || recall === null || (precision + recall) === 0)
+      ? null : 2 * (precision * recall) / (precision + recall);
+    return { precision: precision, recall: recall, f1: f1 };
+  }
+
+  function aggregate(runs) {
+    var totals = {};
+    A.CRITERIA_ORDER.forEach(function (sc) { totals[sc] = { sc: sc, tp: 0, fp: 0, fn: 0, tn: 0, strictMatch: 0, strictTotal: 0 }; });
+    runs.forEach(function (run) {
+      A.CRITERIA_ORDER.forEach(function (sc) {
+        var s = run.perCriterion[sc], t = totals[sc];
+        t.tp += s.tp; t.fp += s.fp; t.fn += s.fn; t.tn += s.tn;
+        t.strictMatch += s.strictMatch; t.strictTotal += s.strictTotal;
+      });
+    });
+    A.CRITERIA_ORDER.forEach(function (sc) { Object.assign(totals[sc], prf(totals[sc])); });
+    return totals;
+  }
+
+  /* ---------- ตรวจสอบสูตรคะแนนกับตัวอย่างการคำนวณในบทที่ 3.7.2 ---------- */
+  function verifyScoringExample() {
+    var byCriterion = {
+      'SC 1.1.1': { weight: 3, counted: 4, fail: 2, failureRate: 2 / 4 },
+      'SC 1.3.1': { weight: 2, counted: 5, fail: 2, failureRate: 2 / 5 },
+      'SC 1.4.3': { weight: 2, counted: 3, fail: 1, failureRate: 1 / 3 }
+    };
+    var out = A.computeScore(byCriterion);
+    return { expected: 57.62, actual: out.score, ok: Math.abs(out.score - 57.62) < 0.01, detail: out };
+  }
+
+  /* ---------- ตรวจสอบตัวหารเป็นศูนย์ (บทที่ 3.7.2) ---------- */
+  function verifyZeroDenominator() {
+    var res = A.analyze('<!DOCTYPE html><html><body><p>ไม่มีองค์ประกอบที่ตรวจได้เลย</p></body></html>');
+    return { score: res.score, ok: res.score === 100, counted: A.CRITERIA_ORDER.map(function (sc) { return res.byCriterion[sc].counted; }) };
+  }
+
+  /* ---------- ตรวจสอบมาตรการความปลอดภัยของลิงก์ (บทที่ 3.3.2) ---------- */
+  function verifyUrlSecurity() {
+    var cases = [
+      { url: 'file:///etc/passwd', expect: 'reject', label: 'โพรโทคอล file' },
+      { url: 'javascript:alert(1)', expect: 'reject', label: 'โพรโทคอล javascript' },
+      { url: 'ftp://example.com/x', expect: 'reject', label: 'โพรโทคอล ftp' },
+      { url: 'http://localhost:8080/admin', expect: 'reject', label: 'localhost' },
+      { url: 'http://127.0.0.1/', expect: 'reject', label: '127.0.0.1' },
+      { url: 'http://10.0.0.5/', expect: 'reject', label: '10.x.x.x' },
+      { url: 'http://172.16.4.9/', expect: 'reject', label: '172.16-31.x.x (ขอบล่าง)' },
+      { url: 'http://172.31.255.1/', expect: 'reject', label: '172.16-31.x.x (ขอบบน)' },
+      { url: 'http://192.168.1.1/', expect: 'reject', label: '192.168.x.x' },
+      { url: 'http://169.254.169.254/latest/meta-data/', expect: 'reject', label: '169.254.x.x (metadata)' },
+      { url: 'http://printer.local/', expect: 'reject', label: 'โดเมน .local' },
+      { url: 'http://wiki.internal/', expect: 'reject', label: 'โดเมน .internal' },
+      { url: 'ไม่ใช่ลิงก์', expect: 'reject', label: 'ข้อความที่ไม่ใช่ลิงก์' },
+      { url: 'https://www.w3.org/WAI/', expect: 'accept', label: 'ลิงก์ภายนอกปกติ (https)' },
+      { url: 'http://example.com/page', expect: 'accept', label: 'ลิงก์ภายนอกปกติ (http)' },
+      { url: 'http://172.32.0.1/', expect: 'accept', label: '172.32.x.x อยู่นอกช่วงสงวน' }
+    ];
+    return cases.map(function (c) {
+      var v = A.validateTargetUrl(c.url);
+      var actual = v.ok ? 'accept' : 'reject';
+      return { url: c.url, label: c.label, expect: c.expect, actual: actual, ok: actual === c.expect, reason: v.reason || '' };
+    });
+  }
+
+  /* ---------- แสดงผล ---------- */
+  function render() {
+    var runs = T.SUITES.map(runSuite);
+    var dev = runs.filter(function (r) { return r.suite.group === 'development'; });
+    var hold = runs.filter(function (r) { return r.suite.group === 'holdout'; });
+    var devTotals = aggregate(dev), holdTotals = aggregate(hold);
+
+    var scoringCheck = verifyScoringExample();
+    var zeroCheck = verifyZeroDenominator();
+    var security = verifyUrlSecurity();
+
+    var allProblems = runs.reduce(function (n, r) { return n + r.problems.length; }, 0);
+    var holdF1 = A.CRITERIA_ORDER.map(function (sc) { return holdTotals[sc].f1; });
+    var holdMeetsTarget = holdF1.every(function (f) { return f !== null && f >= TARGET_F1; });
+    var securityOk = security.every(function (c) { return c.ok; });
+    var overallOk = allProblems === 0 && holdMeetsTarget && scoringCheck.ok && zeroCheck.ok && securityOk;
+
+    var h = [];
+    h.push('<div class="banner ' + (overallOk ? 'good' : 'bad') + '">' +
+      (overallOk ? 'ผ่านทุกเกณฑ์การตรวจรับในบทที่ 3.9' : 'ยังไม่ผ่านเกณฑ์การตรวจรับ — ดูรายละเอียดด้านล่าง') + '</div>');
+
+    function prfTable(title, totals, note) {
+      var rows = A.CRITERIA_ORDER.map(function (sc) {
+        var c = totals[sc];
+        var meets = c.f1 !== null && c.f1 >= TARGET_F1;
+        return '<tr><th scope="row">' + sc + '</th>' +
+          '<td class="num">' + c.tp + '</td><td class="num">' + c.fp + '</td><td class="num">' + c.fn + '</td><td class="num">' + c.tn + '</td>' +
+          '<td class="num">' + fmt(c.precision) + '</td><td class="num">' + fmt(c.recall) + '</td>' +
+          '<td class="num">' + fmt(c.f1) + '</td>' +
+          '<td><span class="tag ' + (meets ? 'good' : 'bad') + '">' + (meets ? 'ผ่านเป้าหมาย' : 'ยังไม่ถึงเป้าหมาย') + '</span></td></tr>';
+      }).join('');
+      return '<table><caption>' + title + '</caption>' +
+        '<thead><tr><th scope="col">หลักเกณฑ์</th><th scope="col" class="num">TP</th><th scope="col" class="num">FP</th>' +
+        '<th scope="col" class="num">FN</th><th scope="col" class="num">TN</th><th scope="col" class="num">Precision</th>' +
+        '<th scope="col" class="num">Recall</th><th scope="col" class="num">F1-score</th><th scope="col">การแปลผล</th></tr></thead>' +
+        '<tbody>' + rows + '</tbody></table>' + (note ? '<p class="sub">' + note + '</p>' : '');
+    }
+
+    h.push('<h2>1. ความแม่นยำบนชุดประเมินผลสุดท้าย (F–I)</h2>');
+    h.push('<p>ค่าที่ใช้ตัดสินผลการวิจัยตามบทที่ 3.7.1 เกณฑ์ความสำเร็จคือ F1-score ไม่ต่ำกว่า ' + TARGET_F1.toFixed(2) + ' ในทุกหลักเกณฑ์</p>');
+    h.push(prfTable('ชุดประเมินผลสุดท้าย (Held-out Evaluation Set: F, G, H, I)', holdTotals,
+      'นับเฉพาะคู่องค์ประกอบ–กฎตรวจที่ทั้งค่าอ้างอิงและผลของระบบมีสถานะผ่านหรือไม่ผ่านเท่านั้น'));
+
+    h.push('<h2>2. ความแม่นยำบนชุดใช้พัฒนากฎ (A–E)</h2>');
+    h.push('<p>รายงานไว้เพื่อความโปร่งใส ไม่ใช้ตัดสินผลการวิจัย เพราะเป็นชุดเดียวกับที่ใช้ปรับแก้กฎระหว่างพัฒนา</p>');
+    h.push(prfTable('ชุดใช้พัฒนากฎ (Development Set: A, B, C, D, E)', devTotals));
+
+    h.push('<h2>3. ผลรายชุดทดสอบ</h2>');
+    h.push('<table><caption>สรุปรายชุด</caption><thead><tr>' +
+      '<th scope="col">ชุด</th><th scope="col">กลุ่ม</th><th scope="col">ลักษณะ</th>' +
+      '<th scope="col" class="num">องค์ประกอบ</th><th scope="col" class="num">คู่ตรวจ</th>' +
+      '<th scope="col" class="num">เวลาเฉลี่ย (มิลลิวินาที)</th><th scope="col" class="num">ต่ำสุด–สูงสุด</th>' +
+      '<th scope="col" class="num">คะแนน</th><th scope="col">ตรงค่าอ้างอิง</th></tr></thead><tbody>');
+    runs.forEach(function (r) {
+      var strictMatch = 0, strictTotal = 0;
+      A.CRITERIA_ORDER.forEach(function (sc) { strictMatch += r.perCriterion[sc].strictMatch; strictTotal += r.perCriterion[sc].strictTotal; });
+      var clean = r.problems.length === 0;
+      h.push('<tr><th scope="row">' + r.suite.id + '</th>' +
+        '<td>' + (r.suite.group === 'holdout' ? 'ประเมินผลสุดท้าย' : 'พัฒนากฎ') + '</td>' +
+        '<td>' + esc(r.suite.title) + '</td>' +
+        '<td class="num">' + r.elementCount + '</td>' +
+        '<td class="num">' + r.pairCount + '</td>' +
+        '<td class="num">' + fmt(r.timeAvg, 2) + '</td>' +
+        '<td class="num">' + fmt(r.timeMin, 2) + '–' + fmt(r.timeMax, 2) + '</td>' +
+        '<td class="num">' + fmt(r.result.score, 2) + '</td>' +
+        '<td><span class="tag ' + (clean ? 'good' : 'bad') + '">' + strictMatch + '/' + strictTotal + '</span></td></tr>');
+    });
+    h.push('</tbody></table>');
+    h.push('<p class="sub">เวลาที่รายงานเป็นเวลาวิเคราะห์โครงสร้างโค้ดหลังได้รับ HTML แล้ว ไม่รวมเวลาเชื่อมต่อเครือข่าย ' +
+      'วัดจากการรันซ้ำ ' + REPEATS + ' รอบต่อชุดตามบทที่ 3.6.2</p>');
+
+    if (allProblems > 0) {
+      h.push('<h3>รายการที่ผลไม่ตรงค่าอ้างอิง</h3>');
+      runs.forEach(function (r) {
+        if (!r.problems.length) return;
+        h.push('<details open><summary>ชุด ' + r.suite.id + ' — ' + r.problems.length + ' รายการ</summary><ul>');
+        r.problems.forEach(function (p) { h.push('<li><strong>' + esc(p.kind) + ':</strong> ' + p.detail + '</li>'); });
+        h.push('</ul></details>');
+      });
+    }
+
+    h.push('<h2>4. การตรวจสอบสูตรคำนวณคะแนน</h2>');
+    h.push('<table><caption>เทียบผลของโปรแกรมกับการคำนวณด้วยมือ</caption><thead><tr>' +
+      '<th scope="col">กรณีทดสอบ</th><th scope="col">ค่าที่คำนวณด้วยมือ</th><th scope="col">ค่าที่โปรแกรมคำนวณ</th><th scope="col">ผล</th></tr></thead><tbody>');
+    h.push('<tr><td>ตัวอย่างการคำนวณทีละขั้นในบทที่ 3.7.2<br><span class="sub">SC 1.1.1 นับได้ 4 ไม่ผ่าน 2 / SC 1.3.1 นับได้ 5 ไม่ผ่าน 2 / SC 1.4.3 นับได้ 3 ไม่ผ่าน 1</span></td>' +
+      '<td class="num">57.62</td><td class="num">' + fmt(scoringCheck.actual, 2) + '</td>' +
+      '<td><span class="tag ' + (scoringCheck.ok ? 'good' : 'bad') + '">' + (scoringCheck.ok ? 'ตรงกัน' : 'ไม่ตรงกัน') + '</span></td></tr>');
+    h.push('<tr><td>ตัวหารเป็นศูนย์ (ไม่มีองค์ประกอบที่ตรวจได้เลย)<br><span class="sub">FailureRate ต้องเท่ากับ 0 จึงไม่หักคะแนน</span></td>' +
+      '<td class="num">100.00</td><td class="num">' + fmt(zeroCheck.score, 2) + '</td>' +
+      '<td><span class="tag ' + (zeroCheck.ok ? 'good' : 'bad') + '">' + (zeroCheck.ok ? 'ตรงกัน' : 'ไม่ตรงกัน') + '</span></td></tr>');
+    h.push('</tbody></table>');
+
+    h.push('<h2>5. การตรวจสอบมาตรการความปลอดภัยของลิงก์</h2>');
+    h.push('<p>ทดสอบเฉพาะรูปแบบที่อยู่ต้องห้ามที่ระบุไว้ในบทที่ 3.3.2 เท่านั้น ไม่สรุปเกินขอบเขตว่าระบบปลอดภัยจากการโจมตีทุกรูปแบบ</p>');
+    h.push('<table><caption>ผลการทดสอบรายกรณี</caption><thead><tr>' +
+      '<th scope="col">กรณี</th><th scope="col">ลิงก์ทดสอบ</th><th scope="col">ผลที่คาดหวัง</th><th scope="col">ผลที่ได้</th><th scope="col">สรุป</th></tr></thead><tbody>');
+    security.forEach(function (c) {
+      h.push('<tr><td>' + esc(c.label) + '</td><td><code>' + esc(c.url) + '</code></td>' +
+        '<td>' + (c.expect === 'reject' ? 'ปฏิเสธ' : 'อนุญาต') + '</td>' +
+        '<td>' + (c.actual === 'reject' ? 'ปฏิเสธ' : 'อนุญาต') + (c.reason ? '<br><span class="sub">' + esc(c.reason) + '</span>' : '') + '</td>' +
+        '<td><span class="tag ' + (c.ok ? 'good' : 'bad') + '">' + (c.ok ? 'ผ่าน' : 'ไม่ผ่าน') + '</span></td></tr>');
+    });
+    h.push('</tbody></table>');
+
+    h.push('<h2>6. โค้ดของแต่ละชุดทดสอบ</h2>');
+    runs.forEach(function (r) {
+      h.push('<details><summary>ชุด ' + r.suite.id + ' — ' + esc(r.suite.title) + ' (' + esc(r.suite.purpose) + ')</summary><pre>' +
+        esc(r.suite.html) + '</pre></details>');
+    });
+
+    h.push('<footer>สภาพแวดล้อมการทดสอบ: ' + esc(navigator.userAgent) + '<br>' +
+      'รันเมื่อ ' + new Date().toLocaleString('th-TH') + ' — รันซ้ำชุดละ ' + REPEATS + ' รอบ</footer>');
+
+    document.getElementById('output').innerHTML = h.join('\n');
+
+    /* เปิดผลลัพธ์ให้เครื่องมืออัตโนมัติภายนอกอ่านได้ */
+    window.__RESULTS__ = {
+      overallOk: overallOk,
+      holdout: holdTotals, development: devTotals,
+      scoringCheck: { ok: scoringCheck.ok, expected: scoringCheck.expected, actual: scoringCheck.actual },
+      zeroCheck: zeroCheck,
+      securityOk: securityOk,
+      security: security,
+      problems: runs.map(function (r) { return { suite: r.suite.id, problems: r.problems }; }),
+      suites: runs.map(function (r) {
+        return {
+          id: r.suite.id, group: r.suite.group, elements: r.elementCount, pairs: r.pairCount,
+          timeAvg: r.timeAvg, timeMin: r.timeMin, timeMax: r.timeMax, score: r.result.score,
+          problemCount: r.problems.length
+        };
+      })
+    };
+    document.documentElement.setAttribute('data-testrun', 'done');
+  }
+
+  try { render(); }
+  catch (e) {
+    document.getElementById('output').innerHTML =
+      '<div class="banner bad">เกิดข้อผิดพลาดระหว่างรัน: ' + A.escapeHtml(e && e.message) + '</div><pre>' +
+      A.escapeHtml(e && e.stack) + '</pre>';
+    window.__RESULTS__ = { overallOk: false, error: String(e && e.stack || e) };
+    document.documentElement.setAttribute('data-testrun', 'error');
+  }
+})();
+</script>
+</body>
+</html>
