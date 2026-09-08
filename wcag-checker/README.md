@@ -29,6 +29,8 @@ npx http-server -p 8080 .    # แล้วเปิด http://localhost:8080/in
 | `tests/suites.js` | ชุดทดสอบ A–I พร้อมค่าอ้างอิง (Ground Truth) ที่ฝังไว้ล่วงหน้า | 3.4.2 |
 | `tests/runner.html` | โปรแกรมวัด Precision, Recall, F1-score และตรวจสอบสูตรคะแนนกับมาตรการความปลอดภัย | 3.7.1, 3.9 |
 | `apps-script/Code.gs` | ระบบหลังบ้านแบบ Serverless สำหรับบันทึกประวัติลง Google Sheets | 3.3.3 |
+| `docs/apps-script-setup.md` | ขั้นตอนติดตั้งระบบหลังบ้านทีละข้อ พร้อมตารางแก้ปัญหา | 3.3.3 |
+| `docs/real-site-findings.md` | ผลการสาธิตการใช้งานกับเว็บไซต์จริง | 1.2, 3.4.2 |
 
 ## กฎตรวจที่ระบบใช้
 
@@ -179,7 +181,7 @@ PreliminaryScore = 100 × [ 1 − ( Σ wᵢ × FailureRate(i) ) / Σ wᵢ ]
 
 ## การติดตั้งระบบหลังบ้าน
 
-ดูขั้นตอนโดยละเอียดในหัวข้อคำอธิบายส่วนหัวของไฟล์ `apps-script/Code.gs` โดยสรุปคือ
+ขั้นตอนแบบทำตามได้ทีละข้อพร้อมวิธีแก้ปัญหาอยู่ในไฟล์ [`docs/apps-script-setup.md`](docs/apps-script-setup.md) โดยสรุปคือ
 สร้าง Google Sheets ใหม่ เปิด Apps Script วางโค้ดจากไฟล์ดังกล่าว แล้ว Deploy เป็น Web app
 โดยตั้งค่า Execute as เป็นบัญชีผู้ดูแลระบบ และ Who has access เป็น Anyone
 จากนั้นนำลิงก์ที่ลงท้ายด้วย `/exec` ไปวางในช่อง "ที่อยู่ Web App" ของหน้าเว็บ

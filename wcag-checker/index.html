@@ -469,7 +469,7 @@
   </section>
 
   <!-- ============ ขั้นที่ 4 : บันทึกและออกรายงาน ============ -->
-  <section id="history-section" class="hidden no-print" aria-labelledby="h-history">
+  <section id="history-section" class="no-print" aria-labelledby="h-history">
     <h2 id="h-history"><span class="step" aria-hidden="true">4</span>บันทึกประวัติและออกรายงาน</h2>
     <p class="lead">
       ระบบส่งเฉพาะค่าสรุปเชิงตัวเลขไปบันทึกใน Google Sheets ผ่าน Google Apps Script
@@ -480,12 +480,14 @@
         <label for="endpoint-input">ที่อยู่ Web App ของ Google Apps Script</label>
         <span class="hint" id="endpoint-hint">
           วางลิงก์ที่ได้จากการ Deploy สคริปต์ในโฟลเดอร์ apps-script ระบบจำค่านี้ไว้ในเบราว์เซอร์ของคุณเท่านั้น
-          หากเว้นว่างไว้ ปุ่มบันทึกจะถูกปิดการใช้งาน
+          กด &ldquo;ทดสอบการเชื่อมต่อ&rdquo; ก่อนบันทึกครั้งแรก เพื่อยืนยันว่าติดตั้งสคริปต์สำเร็จ
+          ขั้นตอนติดตั้งโดยละเอียดอยู่ในไฟล์ docs/apps-script-setup.md
         </span>
         <input type="url" id="endpoint-input" aria-describedby="endpoint-hint" placeholder="https://script.google.com/macros/s/…/exec">
       </div>
       <div class="actions">
         <button type="button" id="btn-save">บันทึกผลการประเมิน</button>
+        <button type="button" class="secondary" id="btn-test">ทดสอบการเชื่อมต่อ</button>
         <button type="button" class="secondary" id="btn-print">พิมพ์รายงาน / บันทึกเป็น PDF</button>
         <span id="save-status" class="status-line" role="status" aria-live="polite"></span>
       </div>

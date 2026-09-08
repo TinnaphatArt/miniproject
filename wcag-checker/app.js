@@ -307,7 +307,6 @@
 
     renderResults(result, highlighted);
     $('results-section').classList.remove('hidden');
-    $('history-section').classList.remove('hidden');
     updatePayloadPreview();
     setStatus($('input-status'), 'ตรวจสอบเรียบร้อย', 'good');
 
@@ -433,18 +432,77 @@
     $('payload-preview').textContent = payload ? JSON.stringify(payload, null, 2) : '';
   }
 
-  function onSaveClick() {
-    var status = $('save-status');
+  /** อ่านและจำที่อยู่ Web App ที่ผู้ใช้กรอก */
+  function readEndpoint(statusEl) {
     var endpoint = $('endpoint-input').value.trim();
     if (!endpoint) {
-      setStatus(status, 'กรุณาระบุที่อยู่ Web App ของ Google Apps Script ก่อน', 'bad');
+      setStatus(statusEl, 'กรุณาระบุที่อยู่ Web App ของ Google Apps Script ก่อน', 'bad');
       $('endpoint-input').focus();
-      return;
+      return null;
     }
+    if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(endpoint)) {
+      setStatus(statusEl, 'ที่อยู่ไม่ตรงรูปแบบของ Apps Script Web App ' +
+        'ต้องขึ้นต้นด้วย https://script.google.com/macros/s/ และลงท้ายด้วย /exec', 'bad');
+      $('endpoint-input').focus();
+      return null;
+    }
+    try { localStorage.setItem(STORAGE_ENDPOINT, endpoint); } catch (e) { /* โหมดส่วนตัวอาจปิดการเก็บข้อมูล */ }
+    return endpoint;
+  }
+
+  /** แปลคำตอบที่ไม่ใช่ JSON ให้เป็นสาเหตุที่ผู้ใช้เข้าใจได้ */
+  function explainNonJson(text) {
+    if (/accounts\.google\.com|ลงชื่อเข้าใช้|Sign in/i.test(text)) {
+      return 'สคริปต์ยังต้องให้ผู้ใช้ลงชื่อเข้าใช้ Google ก่อน ' +
+        'ให้ Deploy ใหม่โดยตั้ง "Who has access" เป็น Anyone (ไม่ใช่ Anyone with Google account)';
+    }
+    if (/Script function not found|doGet|doPost/i.test(text)) {
+      return 'ปลายทางตอบว่าไม่พบฟังก์ชันที่เรียก ตรวจว่าวางโค้ดจากไฟล์ apps-script/Code.gs ครบทั้งไฟล์แล้วหรือไม่';
+    }
+    if (/<html|<!DOCTYPE/i.test(text)) {
+      return 'ปลายทางตอบกลับเป็นหน้าเว็บแทน JSON มักเกิดจากลิงก์ผิด หรือยังไม่ได้ Deploy เป็น Web app';
+    }
+    return 'คำตอบจากปลายทางไม่ใช่ JSON: ' + A.truncate(text, 120);
+  }
+
+  /** ทดสอบว่าปลายทางติดตั้งถูกต้องหรือไม่ ก่อนบันทึกจริง */
+  function onTestClick() {
+    var status = $('save-status');
+    var endpoint = readEndpoint(status);
+    if (!endpoint) return;
+
+    var btn = $('btn-test');
+    btn.disabled = true;
+    status.innerHTML = '<span class="spinner" aria-hidden="true"></span>กำลังทดสอบการเชื่อมต่อ…';
+
+    fetch(endpoint, { method: 'GET' })
+      .then(function (res) { return res.text().then(function (t) { return { ok: res.ok, status: res.status, text: t }; }); })
+      .then(function (out) {
+        btn.disabled = false;
+        var parsed = null;
+        try { parsed = JSON.parse(out.text); } catch (e) { /* ไม่ใช่ JSON */ }
+        if (parsed && parsed.status === 'ok') {
+          setStatus(status, 'เชื่อมต่อสำเร็จ ปลายทางพร้อมบันทึกข้อมูล ' +
+            'ขณะนี้มีประวัติที่บันทึกไว้แล้ว ' + (parsed.records || 0) + ' รายการ', 'good');
+        } else if (parsed && parsed.message) {
+          setStatus(status, 'ปลายทางตอบกลับว่ามีข้อผิดพลาด: ' + parsed.message, 'bad');
+        } else {
+          setStatus(status, explainNonJson(out.text), 'bad');
+        }
+      })
+      .catch(function (err) {
+        btn.disabled = false;
+        setStatus(status, 'เชื่อมต่อไม่สำเร็จ: ' + err.message +
+          ' — ตรวจว่าลิงก์ถูกต้องและ Deploy โดยตั้ง "Who has access" เป็น Anyone แล้วหรือไม่', 'bad');
+      });
+  }
+
+  function onSaveClick() {
+    var status = $('save-status');
+    var endpoint = readEndpoint(status);
+    if (!endpoint) return;
     var payload = buildPayload();
     if (!payload) { setStatus(status, 'ยังไม่มีผลการประเมินให้บันทึก', 'bad'); return; }
-
-    try { localStorage.setItem(STORAGE_ENDPOINT, endpoint); } catch (e) { /* โหมดส่วนตัวอาจปิดการเก็บข้อมูล */ }
 
     var btn = $('btn-save');
     btn.disabled = true;
@@ -461,10 +519,12 @@
         btn.disabled = false;
         var parsed = null;
         try { parsed = JSON.parse(out.text); } catch (e) { /* คำตอบไม่ใช่ JSON */ }
-        if (out.ok && (!parsed || parsed.status !== 'error')) {
-          setStatus(status, 'บันทึกลง Google Sheets เรียบร้อยแล้ว' + (parsed && parsed.row ? ' (แถวที่ ' + parsed.row + ')' : ''), 'good');
+        if (parsed && parsed.status === 'ok') {
+          setStatus(status, 'บันทึกลง Google Sheets เรียบร้อยแล้ว' + (parsed.row ? ' (แถวที่ ' + parsed.row + ')' : ''), 'good');
+        } else if (parsed && parsed.message) {
+          setStatus(status, 'บันทึกไม่สำเร็จ: ' + parsed.message, 'bad');
         } else {
-          setStatus(status, 'บันทึกไม่สำเร็จ: ' + ((parsed && parsed.message) || out.text || 'ไม่ทราบสาเหตุ'), 'bad');
+          setStatus(status, 'บันทึกไม่สำเร็จ — ' + explainNonJson(out.text), 'bad');
         }
       })
       .catch(function (err) {
@@ -519,6 +579,7 @@
 
     $('btn-analyze').addEventListener('click', onAnalyzeClick);
     $('btn-save').addEventListener('click', onSaveClick);
+    $('btn-test').addEventListener('click', onTestClick);
     $('btn-print').addEventListener('click', function () { window.print(); });
     $('btn-clear').addEventListener('click', function () {
       $('html-input').value = '';
