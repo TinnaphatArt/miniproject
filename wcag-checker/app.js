@@ -119,18 +119,29 @@
     var h = [];
     var interp = result.interpretation;
 
-    /* ---- การ์ดคะแนน ---- */
+    /* ---- การ์ดคะแนน: วงแหวนแสดงสัดส่วน อ่านค่าได้จากตัวเลขกลางวงเสมอ ---- */
+    var C = 2 * Math.PI * 54;                       /* เส้นรอบวงของรัศมี 54 */
+    var arc = C * Math.max(0, Math.min(100, result.score)) / 100;
     h.push('<div class="scorecard">' +
-      '<div><div class="scorenum">' + result.score.toFixed(2) + '<small> / 100</small></div>' +
-      '<p style="margin-top:6px"><span class="badge ' + interp.tone + '">' + esc(interp.band) + '</span></p></div>' +
+      '<div class="gauge">' +
+      '<svg viewBox="0 0 128 128" aria-hidden="true" focusable="false">' +
+      '<circle class="track" cx="64" cy="64" r="54" fill="none" stroke-width="13"></circle>' +
+      '<circle class="fill ' + interp.tone + '" cx="64" cy="64" r="54" fill="none" stroke-width="13" ' +
+      'stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + (C - arc).toFixed(1) + '"></circle>' +
+      '</svg>' +
+      '<span class="gauge-label"><b>' + result.score.toFixed(2) + '</b><span>จาก 100 คะแนน</span></span>' +
+      '</div>' +
       '<div class="scoremeta">' +
-      '<p><strong>คะแนนผลการตรวจเบื้องต้นตามรายการที่กำหนด</strong></p>' +
-      '<p>' + esc(interp.text) + '</p>' +
-      '<p class="muted">พบจุดที่ต้องแก้ ' + result.issueCount + ' จุด และจุดที่ต้องตรวจเพิ่มด้วยตนเอง ' +
-      result.needsReviewCount + ' จุด จากองค์ประกอบทั้งหมด ' + result.elementCount + ' รายการ</p>' +
-      '<p class="muted">แหล่งข้อมูล: ' + esc(state.sourceLabel || 'วางโค้ดเอง') +
-      ' · เวลาวิเคราะห์โครงสร้างโค้ด ' + result.analysisMs.toFixed(2) + ' มิลลิวินาที' +
-      (state.fetchMs !== null ? ' · เวลาดึงข้อมูลผ่านบริการตัวกลาง ' + state.fetchMs + ' มิลลิวินาที' : '') +
+      '<p class="title">คะแนนผลการตรวจเบื้องต้นตามรายการที่กำหนด</p>' +
+      '<p><span class="badge ' + interp.tone + '">' + esc(interp.band) + '</span> ' + esc(interp.text) + '</p>' +
+      '<div class="stats">' +
+      '<div class="stat"><b>' + result.issueCount + '</b><span>จุดที่ต้องแก้</span></div>' +
+      '<div class="stat"><b>' + result.needsReviewCount + '</b><span>ต้องตรวจเพิ่ม</span></div>' +
+      '<div class="stat"><b>' + result.elementCount + '</b><span>องค์ประกอบทั้งหมด</span></div>' +
+      '</div>' +
+      '<p class="muted" style="margin-top:12px">แหล่งข้อมูล: ' + esc(state.sourceLabel || 'วางโค้ดเอง') +
+      ' · วิเคราะห์โครงสร้างโค้ด ' + result.analysisMs.toFixed(2) + ' มิลลิวินาที' +
+      (state.fetchMs !== null ? ' · ดึงข้อมูลผ่านบริการตัวกลาง ' + state.fetchMs + ' มิลลิวินาที' : '') +
       '</p></div></div>');
 
     h.push('<div class="note info" role="note"><p>' +
@@ -140,6 +151,36 @@
 
     /* ---- ตารางความครอบคลุมรายหลักเกณฑ์ ---- */
     h.push('<h3>ความครอบคลุมและอัตราไม่ผ่านรายหลักเกณฑ์</h3>');
+
+    /* แถบสัดส่วนช่วยให้เห็นทันทีว่าคะแนนมาจากการตรวจได้กี่จุด ไม่ใช่ดูแต่ตัวเลขคะแนน */
+    h.push('<div class="coverage">');
+    A.CRITERIA_ORDER.forEach(function (sc) {
+      var c = result.byCriterion[sc];
+      var seg = function (n, cls, label) {
+        if (!n) return '';
+        return '<span class="' + cls + '" style="width:' + (n / c.related * 100).toFixed(2) + '%" ' +
+          'title="' + esc(label + ' ' + n + ' จุด') + '"></span>';
+      };
+      h.push('<div class="cov' + (c.counted === 0 ? ' empty' : '') + '">' +
+        '<div class="cov-head"><strong>' + esc(sc) + ' <span class="sc-name">' + esc(c.name) + '</span></strong>' +
+        '<span class="cov-nums">ตรวจได้ ' + c.counted + ' จาก ' + c.related + ' จุด' +
+        (c.counted ? ' · อัตราไม่ผ่าน ' + c.failureRate.toFixed(3) : '') +
+        ' · น้ำหนัก ' + c.weight + '</span></div>' +
+        (c.related
+          ? '<div class="bar">' + seg(c.pass, 'b-pass', 'ผ่าน') + seg(c.fail, 'b-fail', 'ไม่ผ่าน') +
+            seg(c.needsReview, 'b-rev', 'ต้องตรวจเพิ่ม') + seg(c.notApplicable, 'b-na', 'ไม่เกี่ยวข้อง') + '</div>' +
+            '<div class="legend">' +
+            (c.pass ? '<span><i style="background:var(--good)"></i>ผ่าน ' + c.pass + '</span>' : '') +
+            (c.fail ? '<span><i style="background:var(--bad)"></i>ไม่ผ่าน ' + c.fail + '</span>' : '') +
+            (c.needsReview ? '<span><i style="background:var(--warn)"></i>ต้องตรวจเพิ่ม ' + c.needsReview + '</span>' : '') +
+            (c.notApplicable ? '<span><i style="background:var(--border-strong)"></i>ไม่เกี่ยวข้อง ' + c.notApplicable + '</span>' : '') +
+            '</div>'
+          : '<p class="muted" style="margin:0">ไม่พบองค์ประกอบที่เกี่ยวข้องกับหลักเกณฑ์นี้ในโค้ดชุดนี้</p>') +
+        '</div>');
+    });
+    h.push('</div>');
+
+    h.push('<details><summary>ตารางตัวเลขรายหลักเกณฑ์</summary>');
     h.push('<div class="table-scroll"><table>' +
       '<caption>รายงานจำนวนคู่องค์ประกอบ–กฎตรวจควบคู่กับคะแนน ตามข้อกำหนดในบทที่ 3.7.2</caption>' +
       '<thead><tr>' +
@@ -163,7 +204,7 @@
         '<td class="num">' + (c.counted === 0 ? '—' : c.failureRate.toFixed(3)) + '</td>' +
         '<td class="num">' + c.weight + '</td></tr>');
     });
-    h.push('</tbody></table></div>');
+    h.push('</tbody></table></div></details>');
 
     var zeroed = A.CRITERIA_ORDER.filter(function (sc) { return result.byCriterion[sc].counted === 0; });
     if (zeroed.length) {
