@@ -181,7 +181,8 @@ PreliminaryScore = 100 × [ 1 − ( Σ wᵢ × FailureRate(i) ) / Σ wᵢ ]
 
 ## การติดตั้งระบบหลังบ้าน
 
-ขั้นตอนแบบทำตามได้ทีละข้อพร้อมวิธีแก้ปัญหาอยู่ในไฟล์ [`docs/apps-script-setup.md`](docs/apps-script-setup.md) โดยสรุปคือ
+ขั้นตอนแบบทำตามได้ทีละข้อพร้อมวิธีแก้ปัญหาอยู่ในไฟล์ [`docs/apps-script-setup.md`](docs/apps-script-setup.md)
+(เส้นทางเต็มจากรากรีโพคือ `wcag-checker/docs/apps-script-setup.md`) โดยสรุปคือ
 สร้าง Google Sheets ใหม่ เปิด Apps Script วางโค้ดจากไฟล์ดังกล่าว แล้ว Deploy เป็น Web app
 โดยตั้งค่า Execute as เป็นบัญชีผู้ดูแลระบบ และ Who has access เป็น Anyone
 จากนั้นนำลิงก์ที่ลงท้ายด้วย `/exec` ไปวางในช่อง "ที่อยู่ Web App" ของหน้าเว็บ
