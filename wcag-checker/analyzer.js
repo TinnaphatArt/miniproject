@@ -33,24 +33,48 @@
   /* ระดับความรุนแรงตามที่ระบุใน "เงื่อนไขไม่ผ่าน" ของแต่ละกฎ */
   var SEVERITY = { CRITICAL: 'critical', SHOULD_FIX: 'should_fix', ADVISORY: 'advisory' };
 
+  /* ระดับคำตอบของแบบประเมิน Checklist สามระดับตามบทที่ 3.8 */
+  var CHECKLIST_LEVELS = { PASS: 'pass', IMPROVE: 'improve', FAIL: 'fail' };
+  var CHECKLIST_LEVEL_LABEL = {
+    pass: 'ผ่าน',
+    improve: 'ควรปรับปรุง',
+    fail: 'ไม่ผ่าน'
+  };
+
+  /* คำถาม เกณฑ์ตัดสินสามระดับ และตัวอย่างประกอบ ตามที่บทที่ 3.8 กำหนดไว้ล่วงหน้า */
   var CHECKLIST_QUESTIONS = [
     {
       id: 'CL-1.1.1',
       sc: 'SC 1.1.1',
-      question: 'ข้อความ alt ที่มีอยู่ในหน้านี้ สื่อความหมายของภาพได้ตรงจริงหรือไม่ (รวมถึงภาพที่ตั้ง alt เป็นค่าว่าง เป็นภาพตกแต่งจริงหรือไม่)',
-      help: 'ระบบตรวจได้เพียงว่า "มี" แอตทริบิวต์ alt หรือไม่ แต่ตรวจไม่ได้ว่าข้อความนั้นบรรยายภาพได้ตรงหรือไม่'
+      question: 'ข้อความ alt ของภาพในหน้านี้ สื่อความหมายหรือหน้าที่ของภาพได้ตรงกับบริบทที่ปรากฏหรือไม่ (พิจารณาเฉพาะภาพที่ระบบตรวจพบว่ามีการประกาศแอตทริบิวต์ alt ไว้แล้วเท่านั้น)',
+      help: 'ระบบตรวจได้เพียงว่า "มี" แอตทริบิวต์ alt หรือไม่ แต่ตรวจไม่ได้ว่าข้อความนั้นบรรยายภาพได้ตรงหรือไม่',
+      levels: {
+        pass: 'ข้อความ alt สื่อความหมายหรือหน้าที่ของภาพได้ตรงกับบริบท เช่น alt="โลโก้บริษัท"',
+        improve: 'มีข้อความ alt แต่คลุมเครือหรือไม่เจาะจง เช่น alt="รูปภาพ" หรือ alt="image1"',
+        fail: 'ข้อความ alt ไม่ตรงกับภาพหรือทำให้เข้าใจผิด เช่น ปุ่ม "ยกเลิกคำสั่งซื้อ" ที่กำหนด alt="ยืนยัน"'
+      }
     },
     {
       id: 'CL-1.3.1',
       sc: 'SC 1.3.1',
-      question: 'ลำดับการอ่านเนื้อหาจากบนลงล่างเป็นเหตุเป็นผลเมื่ออ่านด้วยโปรแกรมอ่านหน้าจอ และป้ายกำกับแต่ละช่องสื่อความหมายเหมาะสมกับช่องกรอกนั้นหรือไม่',
-      help: 'ตามบทที่ 2.5.3 คำถามของกฎ R-HEAD-01 และ R-LABEL-01 รวมเป็นข้อเดียว เพราะอยู่ภายใต้หลักเกณฑ์ SC 1.3.1 เดียวกัน'
+      question: 'เมื่ออ่านเนื้อหาของหน้านี้ตามลำดับหัวข้อ (h1-h6) และป้ายกำกับของช่องกรอกข้อมูลด้วยโปรแกรมอ่านหน้าจอ ลำดับดังกล่าวสื่อความหมายและนำทางได้อย่างเป็นเหตุเป็นผลหรือไม่',
+      help: 'ตามบทที่ 2.5.3 คำถามของกฎ R-HEAD-01 และ R-LABEL-01 รวมเป็นข้อเดียว เพราะอยู่ภายใต้หลักเกณฑ์ SC 1.3.1 เดียวกัน',
+      levels: {
+        pass: 'ลำดับหัวข้อไม่กระโดดข้ามระดับ และทุกช่องกรอกมีป้ายกำกับที่สื่อความหมายตรงกับข้อมูลที่ต้องกรอก',
+        improve: 'ลำดับหัวข้อถูกต้อง แต่ป้ายกำกับบางช่องสื่อความหมายไม่ชัดเจน เช่น "ช่องที่ 1"',
+        fail: 'ลำดับหัวข้อกระโดดข้ามระดับจนสับสน หรือมีช่องกรอกที่ไม่มีป้ายกำกับสื่อความหมายเลย'
+      }
     },
     {
       id: 'CL-1.4.3',
       sc: 'SC 1.4.3',
-      question: 'ข้อความที่วางบนภาพพื้นหลังหรือสีไล่ระดับ ซึ่งระบบตรวจแทนไม่ได้ ยังอ่านได้ชัดเจนหรือไม่',
-      help: 'ระบบอ่านค่าสีได้เฉพาะที่เขียนไว้ในแอตทริบิวต์ style เท่านั้น ไม่เห็นภาพพื้นหลังหรือ gradient'
+      question: 'ข้อความที่วางทับบนภาพพื้นหลังหรือสีไล่ระดับ ซึ่งระบบไม่สามารถคำนวณอัตราส่วนความคมชัดให้โดยอัตโนมัติ ยังคงอ่านได้ชัดเจนในทุกตำแหน่งที่ข้อความปรากฏหรือไม่',
+      help: 'ระบบอ่านค่าสีได้เฉพาะที่เขียนไว้ในแอตทริบิวต์ style เท่านั้น ไม่เห็นภาพพื้นหลังหรือ gradient',
+      levels: {
+        pass: 'อ่านได้ชัดเจนในทุกตำแหน่งที่ข้อความซ้อนทับพื้นหลัง',
+        improve: 'อ่านได้ยากเฉพาะบางตำแหน่ง เช่น บริเวณสีอ่อนของภาพไล่ระดับ',
+        fail: 'ข้อความกลืนกับพื้นหลังจนอ่านไม่ออกในบางตำแหน่ง'
+      }
     }
   ];
 
@@ -254,6 +278,7 @@
       status: o.status,
       severity: o.severity || null,
       tag: o.tag,
+      checklistLevel: o.checklistLevel || null,
       path: o.path,
       snippet: o.snippet,
       message: o.message,
@@ -484,9 +509,13 @@
 
   /**
    * รวมคำตอบจากแบบประเมิน Checklist เข้ากับผลตรวจอัตโนมัติ
-   *  - คำตอบ 'yes'     -> เพิ่มคู่สถานะผ่านหนึ่งคู่ และเปลี่ยนคู่ "ต้องตรวจเพิ่ม" ของหลักเกณฑ์นั้นเป็นผ่าน
-   *  - คำตอบ 'no'      -> เพิ่มคู่สถานะไม่ผ่านหนึ่งคู่ และเปลี่ยนคู่ "ต้องตรวจเพิ่ม" เป็นไม่ผ่าน
-   *  - ไม่ตอบ/ไม่แน่ใจ -> ไม่เพิ่มคู่ใด และคู่ "ต้องตรวจเพิ่ม" ถูกตัดออกจากทั้งตัวเศษและตัวหาร
+   * แบบประเมินมีเกณฑ์ตัดสินสามระดับตามบทที่ 3.8
+   *  - 'pass'    -> ผ่าน: เพิ่มคู่สถานะผ่านหนึ่งคู่ และเปลี่ยนคู่ "ต้องตรวจเพิ่ม" ของหลักเกณฑ์นั้นเป็นผ่าน
+   *  - 'improve' -> ควรปรับปรุง: คงสถานะ "ต้องตรวจเพิ่ม" ไว้ จึงไม่ถูกนับในตัวหารของคะแนน
+   *                 ตามบทที่ 3.6.1 ที่กำหนดว่าเมื่อข้อมูลไม่พอตัดสิน ห้ามถือว่าผ่านโดยอัตโนมัติ
+   *                 คำตอบยังถูกบันทึกไว้เป็นข้อสังเกตให้ผู้ใช้เห็น แต่ไม่กระทบคะแนน
+   *  - 'fail'    -> ไม่ผ่าน: เพิ่มคู่สถานะไม่ผ่านหนึ่งคู่ และเปลี่ยนคู่ "ต้องตรวจเพิ่ม" เป็นไม่ผ่าน
+   *  - ไม่ตอบ    -> ไม่เพิ่มคู่ใด และคู่ "ต้องตรวจเพิ่ม" ถูกตัดออกจากทั้งตัวเศษและตัวหาร
    */
   function applyChecklist(pairs, answers) {
     answers = answers || {};
@@ -494,28 +523,39 @@
 
     CHECKLIST_QUESTIONS.forEach(function (q) {
       var answer = answers[q.id];
-      if (answer !== 'yes' && answer !== 'no') return;
-      var newStatus = answer === 'yes' ? STATUS.PASS : STATUS.FAIL;
+      if (answer !== CHECKLIST_LEVELS.PASS &&
+          answer !== CHECKLIST_LEVELS.IMPROVE &&
+          answer !== CHECKLIST_LEVELS.FAIL) return;
+
+      var isImprove = answer === CHECKLIST_LEVELS.IMPROVE;
+      var isFail = answer === CHECKLIST_LEVELS.FAIL;
+      var newStatus = isImprove ? STATUS.NEEDS_REVIEW
+        : isFail ? STATUS.FAIL
+        : STATUS.PASS;
+      var verdict = CHECKLIST_LEVEL_LABEL[answer];
 
       resolved.forEach(function (p) {
-        if (p.sc === q.sc && p.status === STATUS.NEEDS_REVIEW) {
-          p.status = newStatus;
-          p.resolvedByChecklist = q.id;
-          p.message = p.message + ' — ผู้ประเมินยืนยันว่า' + (answer === 'yes' ? 'เหมาะสมแล้ว' : 'ยังไม่เหมาะสม') + ' ผ่านแบบประเมิน Checklist';
-          if (answer === 'no' && !p.severity) p.severity = SEVERITY.SHOULD_FIX;
-        }
+        if (p.sc !== q.sc || p.status !== STATUS.NEEDS_REVIEW) return;
+        p.status = newStatus;
+        p.resolvedByChecklist = q.id;
+        p.checklistLevel = answer;
+        p.message = p.message + ' — ผู้ประเมินตอบแบบประเมิน Checklist ว่า "' + verdict + '"' +
+          (isImprove ? ' จึงคงสถานะต้องตรวจเพิ่มไว้ ไม่นำมาคิดคะแนน' : '');
+        if (isFail && !p.severity) p.severity = SEVERITY.SHOULD_FIX;
       });
 
       resolved.push(makePair({
         ruleId: q.id,
         sc: q.sc,
         status: newStatus,
-        severity: answer === 'no' ? SEVERITY.SHOULD_FIX : null,
+        severity: isFail ? SEVERITY.SHOULD_FIX : null,
         tag: 'checklist',
+        checklistLevel: answer,
         path: '(แบบประเมิน Checklist)',
         snippet: q.question,
-        message: 'ผู้ประเมินตอบว่า "' + (answer === 'yes' ? 'ใช่ / เหมาะสมแล้ว' : 'ไม่ใช่ / ยังไม่เหมาะสม') + '"',
-        suggestion: answer === 'no' ? q.help : null
+        message: 'ผู้ประเมินตอบว่า "' + verdict + '" — ' + q.levels[answer] +
+          (isImprove ? ' จึงไม่นับในตัวหารของคะแนน ตามบทที่ 3.6.1' : ''),
+        suggestion: answer === CHECKLIST_LEVELS.PASS ? null : q.help
       }));
     });
 
@@ -687,6 +727,8 @@
     STATUS: STATUS,
     SEVERITY: SEVERITY,
     CHECKLIST_QUESTIONS: CHECKLIST_QUESTIONS,
+    CHECKLIST_LEVELS: CHECKLIST_LEVELS,
+    CHECKLIST_LEVEL_LABEL: CHECKLIST_LEVEL_LABEL,
     parseColor: parseColor,
     relativeLuminance: relativeLuminance,
     contrastRatio: contrastRatio,

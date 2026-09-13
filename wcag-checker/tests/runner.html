@@ -221,6 +221,40 @@
     return { score: res.score, ok: res.score === 100, counted: A.CRITERIA_ORDER.map(function (sc) { return res.byCriterion[sc].counted; }) };
   }
 
+  /* ---------- ตรวจสอบแบบประเมิน Checklist สามระดับ (บทที่ 3.8 และ 3.6.1) ----------
+     ใช้ภาพที่ตั้ง alt เป็นค่าว่าง ซึ่งกฎ R-ALT-02 ให้สถานะ "ต้องตรวจเพิ่ม" ไว้
+     แล้วตรวจว่าคำตอบแต่ละระดับเปลี่ยนสถานะและตัวหารของคะแนนอย่างไร        */
+  function verifyChecklistLevels() {
+    var html = '<!DOCTYPE html><html><body><img src="a.png" alt=""></body></html>';
+    var base = A.analyze(html);
+
+    function run(answer) {
+      var pairs = A.applyChecklist(base.pairs, answer ? { 'CL-1.1.1': answer } : {});
+      var byCriterion = A.summarise(pairs);
+      var c = byCriterion['SC 1.1.1'];
+      return { counted: c.counted, pass: c.pass, fail: c.fail, needsReview: c.needsReview,
+               score: A.computeScore(byCriterion).score };
+    }
+
+    var skip = run(null);
+    var pass = run(A.CHECKLIST_LEVELS.PASS);
+    var improve = run(A.CHECKLIST_LEVELS.IMPROVE);
+    var fail = run(A.CHECKLIST_LEVELS.FAIL);
+
+    var cases = [
+      { label: 'ไม่ตอบ — คงต้องตรวจเพิ่ม ไม่นับในตัวหาร',
+        got: skip, ok: skip.counted === 0 && skip.needsReview === 1 && skip.score === 100 },
+      { label: 'ตอบ "ผ่าน" — เปลี่ยนเป็นผ่าน และนับในตัวหาร',
+        got: pass, ok: pass.counted === 2 && pass.pass === 2 && pass.fail === 0 && pass.score === 100 },
+      { label: 'ตอบ "ควรปรับปรุง" — คงต้องตรวจเพิ่ม ไม่นับในตัวหาร คะแนนไม่เปลี่ยน',
+        got: improve, ok: improve.counted === 0 && improve.needsReview === 2 &&
+                          improve.score === skip.score },
+      { label: 'ตอบ "ไม่ผ่าน" — เปลี่ยนเป็นไม่ผ่าน และหักคะแนน',
+        got: fail, ok: fail.counted === 2 && fail.fail === 2 && fail.score < 100 }
+    ];
+    return { cases: cases, ok: cases.every(function (c) { return c.ok; }) };
+  }
+
   /* ---------- ตรวจสอบมาตรการความปลอดภัยของลิงก์ (บทที่ 3.3.2) ---------- */
   function verifyUrlSecurity() {
     var cases = [
@@ -258,12 +292,14 @@
     var scoringCheck = verifyScoringExample();
     var zeroCheck = verifyZeroDenominator();
     var security = verifyUrlSecurity();
+    var checklistCheck = verifyChecklistLevels();
 
     var allProblems = runs.reduce(function (n, r) { return n + r.problems.length; }, 0);
     var holdF1 = A.CRITERIA_ORDER.map(function (sc) { return holdTotals[sc].f1; });
     var holdMeetsTarget = holdF1.every(function (f) { return f !== null && f >= TARGET_F1; });
     var securityOk = security.every(function (c) { return c.ok; });
-    var overallOk = allProblems === 0 && holdMeetsTarget && scoringCheck.ok && zeroCheck.ok && securityOk;
+    var overallOk = allProblems === 0 && holdMeetsTarget && scoringCheck.ok && zeroCheck.ok &&
+      securityOk && checklistCheck.ok;
 
     var h = [];
     h.push('<div class="banner ' + (overallOk ? 'good' : 'bad') + '">' +
@@ -338,6 +374,12 @@
     h.push('<tr><td>ตัวหารเป็นศูนย์ (ไม่มีองค์ประกอบที่ตรวจได้เลย)<br><span class="sub">FailureRate ต้องเท่ากับ 0 จึงไม่หักคะแนน</span></td>' +
       '<td class="num">100.00</td><td class="num">' + fmt(zeroCheck.score, 2) + '</td>' +
       '<td><span class="tag ' + (zeroCheck.ok ? 'good' : 'bad') + '">' + (zeroCheck.ok ? 'ตรงกัน' : 'ไม่ตรงกัน') + '</span></td></tr>');
+    checklistCheck.cases.forEach(function (c) {
+      h.push('<tr><td>แบบประเมิน Checklist สามระดับ (บทที่ 3.8)<br><span class="sub">' + c.label + '</span></td>' +
+        '<td class="num">นับได้ ' + c.got.counted + '</td>' +
+        '<td class="num">' + fmt(c.got.score, 2) + '</td>' +
+        '<td><span class="tag ' + (c.ok ? 'good' : 'bad') + '">' + (c.ok ? 'ตรงกัน' : 'ไม่ตรงกัน') + '</span></td></tr>');
+    });
     h.push('</tbody></table>');
 
     h.push('<h2>5. การตรวจสอบมาตรการความปลอดภัยของลิงก์</h2>');
@@ -369,6 +411,7 @@
       holdout: holdTotals, development: devTotals,
       scoringCheck: { ok: scoringCheck.ok, expected: scoringCheck.expected, actual: scoringCheck.actual },
       zeroCheck: zeroCheck,
+      checklistCheck: checklistCheck,
       securityOk: securityOk,
       security: security,
       problems: runs.map(function (r) { return { suite: r.suite.id, problems: r.problems }; }),

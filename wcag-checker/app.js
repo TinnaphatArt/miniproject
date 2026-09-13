@@ -28,13 +28,23 @@
   function renderChecklist() {
     var html = A.CHECKLIST_QUESTIONS.map(function (q) {
       var name = 'cl-' + q.id;
+      function option(value, label, hint) {
+        return '<label><input type="radio" name="' + name + '" value="' + value +
+          '" data-q="' + esc(q.id) + '"' + (value === 'skip' ? ' checked' : '') + '>' +
+          '<span class="lvtext"><b>' + esc(label) + '</b>' +
+          '<span class="lvhint">' + esc(hint) + '</span></span></label>';
+      }
+
+      var levels = ['pass', 'improve', 'fail'].map(function (lv) {
+        return option(lv, A.CHECKLIST_LEVEL_LABEL[lv] +
+          (lv === 'improve' ? ' (ไม่คิดคะแนน)' : ''), q.levels[lv]);
+      }).join('');
+
       return '<fieldset class="q">' +
         '<legend>' + esc(q.sc) + ' — ' + esc(q.question) + '</legend>' +
         '<span class="hint">' + esc(q.help) + '</span>' +
-        '<div class="answers">' +
-        '<label><input type="radio" name="' + name + '" value="yes" data-q="' + esc(q.id) + '"> ใช่ / เหมาะสมแล้ว</label>' +
-        '<label><input type="radio" name="' + name + '" value="no" data-q="' + esc(q.id) + '"> ไม่ใช่ / ยังไม่เหมาะสม</label>' +
-        '<label><input type="radio" name="' + name + '" value="skip" data-q="' + esc(q.id) + '" checked> ยังไม่ได้ตรวจ (ไม่นำมาคิดคะแนน)</label>' +
+        '<div class="answers">' + levels +
+        option('skip', 'ยังไม่ได้ตรวจ', 'ไม่คิดคะแนน และคงสถานะต้องตรวจเพิ่มไว้') +
         '</div></fieldset>';
     }).join('');
     $('checklist-container').innerHTML = html;
