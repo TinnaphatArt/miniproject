@@ -15,10 +15,38 @@
   /* ------------------------------------------------------------------ *
    * ค่าคงที่ของหลักเกณฑ์และน้ำหนัก (บทที่ 3.7.2)
    * ------------------------------------------------------------------ */
+  /* ข้อมูลมาตรฐานของแต่ละหลักเกณฑ์ ใช้บอกผู้ใช้ว่าจุดที่ผิดละเมิดมาตรฐานข้อใดของ WCAG 2.1 */
   var CRITERIA = {
-    'SC 1.1.1': { id: 'SC 1.1.1', name: 'ข้อความแทนภาพ (Non-text Content)', weight: 3 },
-    'SC 1.3.1': { id: 'SC 1.3.1', name: 'โครงสร้างและความสัมพันธ์ (Info and Relationships)', weight: 2 },
-    'SC 1.4.3': { id: 'SC 1.4.3', name: 'ความคมชัดของสี (Contrast Minimum)', weight: 2 }
+    'SC 1.1.1': { id: 'SC 1.1.1', name: 'ข้อความแทนภาพ (Non-text Content)', weight: 3,
+      nameTh: 'ข้อความแทนภาพ', nameEn: 'Non-text Content', level: 'A',
+      guideline: '1.1 ทางเลือกที่เป็นข้อความ (Text Alternatives)', principle: '1 การรับรู้ได้ (Perceivable)',
+      url: 'https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html' },
+    'SC 1.3.1': { id: 'SC 1.3.1', name: 'โครงสร้างและความสัมพันธ์ (Info and Relationships)', weight: 2,
+      nameTh: 'โครงสร้างและความสัมพันธ์', nameEn: 'Info and Relationships', level: 'A',
+      guideline: '1.3 ปรับเปลี่ยนได้ (Adaptable)', principle: '1 การรับรู้ได้ (Perceivable)',
+      url: 'https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html' },
+    'SC 1.4.3': { id: 'SC 1.4.3', name: 'ความคมชัดของสี (Contrast Minimum)', weight: 2,
+      nameTh: 'ความคมชัดของสี', nameEn: 'Contrast (Minimum)', level: 'AA',
+      guideline: '1.4 แยกแยะได้ (Distinguishable)', principle: '1 การรับรู้ได้ (Perceivable)',
+      url: 'https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html' }
+  };
+
+  /* ส่วนของหน้าเว็บที่ระบบตรวจ ใช้สรุปว่าเว็บผิดที่ส่วนไหน (รูปภาพ หัวข้อ ช่องกรอกข้อมูล หรือสีข้อความ) */
+  var PAGE_PARTS = [
+    { key: 'img',   label: 'รูปภาพ',        sc: 'SC 1.1.1', rules: ['R-ALT-01', 'R-ALT-02'], what: 'แท็ก <img>' },
+    { key: 'head',  label: 'หัวข้อ',         sc: 'SC 1.3.1', rules: ['R-HEAD-01'],            what: 'แท็ก <h1> ถึง <h6>' },
+    { key: 'field', label: 'ช่องกรอกข้อมูล', sc: 'SC 1.3.1', rules: ['R-LABEL-01'],           what: 'แท็ก <input> <select> <textarea>' },
+    { key: 'color', label: 'สีข้อความ',      sc: 'SC 1.4.3', rules: ['R-CONTRAST-01'],        what: 'สีตัวอักษรกับสีพื้นหลังใน style' }
+  ];
+  var RULE_PART = {};
+  PAGE_PARTS.forEach(function (part) { part.rules.forEach(function (r) { RULE_PART[r] = part.key; }); });
+
+  /* หลักเกณฑ์อื่นที่จุดผิดบางลักษณะละเมิดร่วมด้วย ระบบไม่ได้ตรวจหลักเกณฑ์เหล่านี้โดยตรง
+     แต่ระบุไว้เพื่อให้ผู้ใช้เห็นผลกระทบครบ เช่น ภาพไม่มี alt ที่เป็นเนื้อหาเดียวของลิงก์ทำให้ลิงก์ไม่มีชื่อ */
+  var RELATED_CRITERIA = {
+    'SC 2.4.4': { id: 'SC 2.4.4', nameTh: 'จุดประสงค์ของลิงก์', nameEn: 'Link Purpose (In Context)', level: 'A' },
+    'SC 3.3.2': { id: 'SC 3.3.2', nameTh: 'ป้ายกำกับหรือคำแนะนำ', nameEn: 'Labels or Instructions', level: 'A' },
+    'SC 4.1.2': { id: 'SC 4.1.2', nameTh: 'ชื่อ บทบาท และค่า', nameEn: 'Name, Role, Value', level: 'A' }
   };
   var CRITERIA_ORDER = ['SC 1.1.1', 'SC 1.3.1', 'SC 1.4.3'];
 
@@ -286,8 +314,25 @@
       message: o.message,
       suggestion: o.suggestion || null,
       example: o.example || null,
-      detail: o.detail || null
+      detail: o.detail || null,
+      context: o.context || null
     };
+  }
+
+  /* บริบทของภาพที่อยู่ในลิงก์หรือปุ่ม: ลิงก์นั้นมีชื่อให้โปรแกรมอ่านหน้าจออ่านหรือไม่ */
+  function linkContext(el) {
+    if (!el || !el.closest) return null;
+    var a = el.closest('a,button');
+    if (!a) return { inLink: false };
+    var aria = (a.getAttribute('aria-label') || '').trim();
+    var by = (a.getAttribute('aria-labelledby') || '').trim();
+    var title = (a.getAttribute('title') || '').trim();
+    var clone = a.cloneNode(true);
+    var media = clone.querySelectorAll('img,svg');
+    for (var i = 0; i < media.length; i++) media[i].parentNode.removeChild(media[i]);
+    var text = (clone.textContent || '').replace(/\s+/g, ' ').trim();
+    var source = aria ? 'aria-label' : by ? 'aria-labelledby' : text ? 'ข้อความในลิงก์' : title ? 'title' : null;
+    return { inLink: true, linkTag: a.tagName.toLowerCase(), linkNamed: !!source, nameSource: source };
   }
 
   /** R-ALT-01 / R-ALT-02 — SC 1.1.1 ข้อความแทนภาพ */
@@ -316,6 +361,7 @@
           ruleId: 'R-ALT-01',
           status: STATUS.FAIL,
           severity: SEVERITY.CRITICAL,
+          context: linkContext(el),
           message: 'ไม่มีแอตทริบิวต์ alt ผู้ใช้โปรแกรมอ่านหน้าจอจะไม่ทราบเลยว่าภาพนี้สื่อถึงอะไร',
           suggestion: 'เพิ่มแอตทริบิวต์ alt ที่บรรยายความหมายของภาพ หากเป็นภาพตกแต่งที่ไม่สื่อความหมาย ให้ใส่ alt="" หรือ role="presentation"',
           example: '<img src="logo.png" alt="โลโก้บริษัท">'
@@ -324,6 +370,7 @@
         pairs.push(makePair(Object.assign({}, base, {
           ruleId: 'R-ALT-02',
           status: STATUS.NEEDS_REVIEW,
+          context: linkContext(el),
           severity: SEVERITY.ADVISORY,
           message: 'alt เป็นค่าว่าง ซึ่งถูกต้องเฉพาะกรณีที่เป็นภาพตกแต่งจริง ระบบแยกแยะแทนไม่ได้',
           suggestion: 'หากภาพนี้สื่อความหมาย ให้ใส่ข้อความบรรยายใน alt หากเป็นภาพตกแต่งจริง ค่าว่างถือว่าถูกต้องแล้ว',
@@ -442,6 +489,7 @@
         pairs.push(makePair(Object.assign({}, base, {
           status: STATUS.FAIL,
           severity: SEVERITY.CRITICAL,
+          context: { placeholder: hasPlaceholder },
           message: 'ไม่มีป้ายกำกับที่ผูกกับช่องกรอกนี้' + (hasPlaceholder ? ' (มีเพียง placeholder ซึ่งไม่นับเป็นป้ายกำกับที่ถูกต้อง เพราะหายไปเมื่อผู้ใช้เริ่มพิมพ์)' : ''),
           suggestion: 'เพิ่ม <label for="…"> ที่ตรงกับ id ของช่องกรอก หรือครอบช่องกรอกไว้ใน <label> หรือใช้ aria-label เมื่อไม่ต้องการแสดงป้ายกำกับบนหน้าจอ',
           example: '<label for="email">อีเมล</label><input id="email" type="text">'
@@ -608,6 +656,42 @@
   }
 
   /** PreliminaryScore = 100 x [ 1 - (Σ wi x FailureRate(i)) / Σ wi ] */
+  /** สรุปจำนวนคู่ตรวจแยกตามส่วนของหน้าเว็บ (รูปภาพ หัวข้อ ช่องกรอกข้อมูล สีข้อความ) */
+  function summariseParts(pairs) {
+    var out = {};
+    PAGE_PARTS.forEach(function (part) {
+      out[part.key] = { key: part.key, label: part.label, sc: part.sc, what: part.what,
+        pass: 0, fail: 0, needsReview: 0, notApplicable: 0, counted: 0, total: 0 };
+    });
+    pairs.forEach(function (p) {
+      var c = out[RULE_PART[p.ruleId]];
+      if (!c) return;
+      c.total++;
+      if (p.status === STATUS.PASS) { c.pass++; c.counted++; }
+      else if (p.status === STATUS.FAIL) { c.fail++; c.counted++; }
+      else if (p.status === STATUS.NEEDS_REVIEW) c.needsReview++;
+      else c.notApplicable++;
+    });
+    return out;
+  }
+
+  /** หลักเกณฑ์อื่นที่จุดผิดนี้ละเมิดร่วมด้วย ตัดสินจากบริบทที่กฎตรวจเก็บไว้ */
+  function relatedCriteria(pair) {
+    if (!pair || pair.status !== STATUS.FAIL || !pair.context) return [];
+    var c = pair.context;
+    if (pair.ruleId === 'R-ALT-01' && c.inLink && !c.linkNamed) {
+      return [{ sc: 'SC 2.4.4', reason: 'ภาพเป็นเนื้อหาเดียวของลิงก์ ลิงก์จึงไม่มีชื่อบอกว่าพาไปที่ใด' },
+              { sc: 'SC 4.1.2', reason: 'ลิงก์ไม่มีชื่อที่โปรแกรมอ่านหน้าจออ่านได้' }];
+    }
+    if (pair.ruleId === 'R-LABEL-01') {
+      return c.placeholder
+        ? [{ sc: 'SC 3.3.2', reason: 'มีเพียง placeholder ซึ่งหายไปเมื่อเริ่มพิมพ์' }]
+        : [{ sc: 'SC 3.3.2', reason: 'ไม่มีป้ายกำกับบอกว่าต้องกรอกอะไร' },
+           { sc: 'SC 4.1.2', reason: 'ช่องกรอกไม่มีชื่อที่โปรแกรมอ่านหน้าจออ่านได้' }];
+    }
+    return [];
+  }
+
   /**
    * คำนวณคะแนนผลการตรวจเบื้องต้นตามบทที่ 3.7.2
    *   PreliminaryScore = 100 × [ 1 − ( Σ wi × FailureRate(i) ) / Σ wi ]
@@ -752,6 +836,11 @@
   return {
     CRITERIA: CRITERIA,
     CRITERIA_ORDER: CRITERIA_ORDER,
+    PAGE_PARTS: PAGE_PARTS,
+    RULE_PART: RULE_PART,
+    RELATED_CRITERIA: RELATED_CRITERIA,
+    summariseParts: summariseParts,
+    relatedCriteria: relatedCriteria,
     STATUS: STATUS,
     SEVERITY: SEVERITY,
     CHECKLIST_QUESTIONS: CHECKLIST_QUESTIONS,

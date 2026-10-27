@@ -111,18 +111,146 @@
 
   var SEVERITY_LABEL = { critical: 'วิกฤต', should_fix: 'ควรแก้', advisory: 'แนะนำ' };
 
+  var PART_LABEL = {};
+  A.PAGE_PARTS.forEach(function (part) { PART_LABEL[part.key] = part.label; });
+
+  /* มาตรฐานที่จุดนี้ละเมิด: เลขหลักเกณฑ์ ชื่อ ระดับ หลักการ แนวทาง กฎตรวจ และหลักเกณฑ์ที่ละเมิดร่วมด้วย */
+  function standardBlock(p) {
+    var c = A.CRITERIA[p.sc];
+    if (!c) return '';
+    var isFail = p.status === S.FAIL;
+    var rel = A.relatedCriteria(p);
+    return '<div class="std' + (isFail ? '' : ' review') + '">' +
+      '<p class="std-main"><span class="std-label">' + (isFail ? 'ผิดมาตรฐาน' : 'ต้องยืนยันตามมาตรฐาน') + '</span> ' +
+      '<strong>WCAG 2.1 ' + esc(p.sc) + ' ' + esc(c.nameTh) + '</strong> (' + esc(c.nameEn) + ') ' +
+      '<span class="badge ok">ระดับ ' + esc(c.level) + '</span></p>' +
+      '<p class="std-path">หลักการที่ ' + esc(c.principle) + ' › แนวทาง ' + esc(c.guideline) + ' › กฎตรวจ ' + esc(p.ruleId) + '</p>' +
+      (rel.length ? '<p class="std-rel"><strong>ละเมิดร่วมด้วย:</strong> ' + rel.map(function (r) {
+        var rc = A.RELATED_CRITERIA[r.sc];
+        return esc(rc.id + ' ' + rc.nameTh + ' ระดับ ' + rc.level + ' เพราะ' + r.reason);
+      }).join(' · ') + ' <span class="muted">ระบบไม่ได้ตรวจหลักเกณฑ์นี้โดยตรง</span></p>' : '') +
+      '<p class="std-path"><a href="' + esc(c.url) + '" target="_blank" rel="noopener">อ่านคำอธิบาย ' + esc(p.sc) +
+      ' จาก W3C (ภาษาอังกฤษ)</a></p></div>';
+  }
+
   function renderIssue(p) {
     var sev = p.severity || 'should_fix';
+    var part = PART_LABEL[A.RULE_PART[p.ruleId]];
     return '<div class="issue ' + esc(sev) + '">' +
       '<h4><span class="rule-id">' + esc(p.ruleId) + '</span>' +
       '<span class="badge ' + (sev === 'critical' ? 'bad' : sev === 'should_fix' ? 'warn' : 'ok') + '">' +
-      esc(SEVERITY_LABEL[sev] || sev) + '</span> ' + esc(p.tag === 'checklist' ? 'คำตอบจากแบบประเมิน' : '<' + p.tag + '>') + '</h4>' +
+      esc(SEVERITY_LABEL[sev] || sev) + '</span> ' + (part ? '<span class="part-tag">' + esc(part) + '</span> ' : '') +
+      esc(p.tag === 'checklist' ? 'คำตอบจากแบบประเมิน' : '<' + p.tag + '>') + '</h4>' +
       '<p>' + esc(p.message) + '</p>' +
       '<code class="snippet">' + esc(p.snippet) + '</code>' +
       (p.path && p.tag !== 'checklist' ? '<p class="where">ตำแหน่ง: ' + esc(p.path) + '</p>' : '') +
+      standardBlock(p) +
       (p.suggestion ? '<div class="fix"><strong>คำแนะนำในการแก้ไข:</strong> ' + esc(p.suggestion) +
         (p.example ? '<code class="snippet">' + esc(p.example) + '</code>' : '') + '</div>' : '') +
       '</div>';
+  }
+
+  /* แดชบอร์ดสรุปว่าหน้าเว็บผิดที่ส่วนไหน (รูปภาพ หัวข้อ ช่องกรอกข้อมูล สีข้อความ)
+     และละเมิดมาตรฐานข้อใด ตามโจทย์เพิ่มเติมจากอาจารย์ที่ปรึกษา */
+  function renderPartsDashboard(result) {
+    var parts = A.summariseParts(result.pairs);
+    var list = A.PAGE_PARTS.map(function (part) { return parts[part.key]; });
+    var worst = list.slice().sort(function (a, b) { return b.fail - a.fail; })[0];
+    var out = ['<div class="dash" role="region" aria-labelledby="h-dash">',
+      '<h3 id="h-dash">ผิดที่ส่วนไหนของหน้าเว็บ</h3>'];
+
+    var lead;
+    if (result.issueCount) {
+      /* บอกส่วนที่ผิดมากที่สุด ถ้าเท่ากันหลายส่วนให้บอกครบ และถ้าทุกส่วนที่ผิดเท่ากันให้บอกว่ากระจายเท่ากัน */
+      var failing = list.filter(function (c) { return c.fail > 0; });
+      var top = failing.filter(function (c) { return c.fail === worst.fail; });
+      var thaiList = function (xs) { return xs.length < 2 ? xs.join('') : xs.slice(0, -1).join(' ') + ' และ' + xs[xs.length - 1]; };
+      var names = thaiList(top.map(function (c) { return '<strong>' + esc(c.label) + '</strong>'; }));
+      if (top.length === 1) {
+        var wc = A.CRITERIA[worst.sc];
+        lead = 'พบจุดที่ผิด ' + result.issueCount + ' จุด มากที่สุดที่' + names + ' ' + worst.fail + ' จุด ซึ่งละเมิด ' +
+          esc(worst.sc) + ' ' + esc(wc.nameTh) + ' ระดับ ' + esc(wc.level);
+      } else if (top.length === failing.length) {
+        lead = 'พบจุดที่ผิด ' + result.issueCount + ' จุด กระจายเท่ากันที่' + names + ' ส่วนละ ' + worst.fail + ' จุด';
+      } else {
+        lead = 'พบจุดที่ผิด ' + result.issueCount + ' จุด มากที่สุดที่' + names + ' ส่วนละ ' + worst.fail + ' จุด';
+      }
+    } else {
+      lead = 'ไม่พบจุดที่ผิดในส่วนที่ระบบตรวจได้' +
+        (result.needsReviewCount ? ' แต่มี ' + result.needsReviewCount + ' จุดที่ต้องให้ผู้ประเมินตรวจเพิ่ม' : '');
+    }
+    out.push('<p class="dash-lead">' + lead + '</p>');
+
+    out.push('<div class="part-grid">');
+    list.forEach(function (c) {
+      var crit = A.CRITERIA[c.sc];
+      var state, icon, text;
+      if (c.total === 0) { state = 'none'; icon = '–'; text = c.key === 'color' ? 'ตรวจไม่ได้' : 'ไม่มีในหน้านี้'; }
+      else if (c.fail > 0) { state = 'bad'; icon = '✕'; text = 'ต้องแก้'; }
+      else if (c.needsReview > 0) { state = 'warn'; icon = '!'; text = 'รอตรวจเพิ่ม'; }
+      else if (c.counted > 0) { state = 'good'; icon = '✓'; text = 'ผ่าน'; }
+      else { state = 'none'; icon = '–'; text = 'ไม่มีจุดให้ตรวจ'; }
+      var target = c.fail > 0 ? '#part-' + c.key : c.needsReview > 0 ? '#review-' + c.key : null;
+      var seg = function (n, cls) {
+        return n ? '<span class="' + cls + '" style="width:' + (n / c.total * 100).toFixed(2) + '%"></span>' : '';
+      };
+      var note = c.total === 0
+        ? (c.key === 'color' ? 'ไม่มีองค์ประกอบที่กำหนดทั้งสีตัวอักษรและสีพื้นหลังไว้ใน style ระบบจึงตรวจไม่ได้'
+                             : 'ไม่พบ' + esc(c.what) + 'ในโค้ดชุดนี้')
+        : 'ตรวจได้&nbsp;' + c.counted + '&nbsp;จุด · ผ่าน&nbsp;' + c.pass + (c.needsReview ? ' · รอตรวจ&nbsp;' + c.needsReview : '') +
+          (c.notApplicable ? ' · ไม่เกี่ยวข้อง&nbsp;' + c.notApplicable : '');
+      var tag = target ? 'a' : 'div';
+      out.push('<' + tag + ' class="part ' + state + '"' + (target ? ' href="' + target + '"' : '') + '>' +
+        '<span class="part-top"><span class="part-name">' + esc(c.label) + '</span>' +
+        '<span class="badge ' + state + '"><span aria-hidden="true">' + icon + '</span> ' + text + '</span></span>' +
+        '<span class="part-num">' + (c.total ? c.fail : '—') + '<small>จุดที่ผิด</small></span>' +
+        (c.total ? '<span class="bar" aria-hidden="true">' + seg(c.pass, 'b-pass') + seg(c.fail, 'b-fail') +
+          seg(c.needsReview, 'b-rev') + seg(c.notApplicable, 'b-na') + '</span>' : '') +
+        '<span class="part-meta">' + note + '</span>' +
+        '<span class="part-std">' + esc(c.sc).replace(' ', '&nbsp;') + ' ' + esc(crit.nameTh) + ' · ระดับ&nbsp;' + esc(crit.level) + '</span>' +
+        (target ? '<span class="part-go">ดูจุดที่' + (c.fail ? 'ผิด' : 'ต้องตรวจเพิ่ม') + ' ›</span>' : '') +
+        '</' + tag + '>');
+    });
+    out.push('</div>');
+
+    /* ตารางมาตรฐานที่ละเมิดในหน้านี้ */
+    var rows = [];
+    A.CRITERIA_ORDER.forEach(function (sc) {
+      var fails = result.issues.filter(function (p) { return p.sc === sc; });
+      if (!fails.length) return;
+      var where = {};
+      fails.forEach(function (p) { where[PART_LABEL[A.RULE_PART[p.ruleId]]] = (where[PART_LABEL[A.RULE_PART[p.ruleId]]] || 0) + 1; });
+      var c = A.CRITERIA[sc];
+      rows.push('<tr><th scope="row">' + esc(sc) + ' ' + esc(c.nameTh) + '<br><span class="muted">' + esc(c.nameEn) + '</span></th>' +
+        '<td>' + esc(c.level) + '</td><td>' + esc(c.guideline) + '</td>' +
+        '<td class="num">' + fails.length + '</td><td>' + Object.keys(where).map(function (k) {
+          return esc(k) + ' ' + where[k] + ' จุด'; }).join(', ') + '</td></tr>');
+    });
+    var related = {};
+    result.issues.forEach(function (p) {
+      A.relatedCriteria(p).forEach(function (r) {
+        var part = PART_LABEL[A.RULE_PART[p.ruleId]];
+        related[r.sc] = related[r.sc] || { n: 0, where: {} };
+        related[r.sc].n++; related[r.sc].where[part] = (related[r.sc].where[part] || 0) + 1;
+      });
+    });
+    Object.keys(related).sort().forEach(function (sc) {
+      var rc = A.RELATED_CRITERIA[sc], r = related[sc];
+      rows.push('<tr class="related-row"><th scope="row">' + esc(sc) + ' ' + esc(rc.nameTh) +
+        '<br><span class="muted">' + esc(rc.nameEn) + ' · ละเมิดร่วมด้วย</span></th>' +
+        '<td>' + esc(rc.level) + '</td><td class="muted">ระบบไม่ได้ตรวจหลักเกณฑ์นี้โดยตรง</td>' +
+        '<td class="num">' + r.n + '</td><td>' + Object.keys(r.where).map(function (k) {
+          return esc(k) + ' ' + r.where[k] + ' จุด'; }).join(', ') + '</td></tr>');
+    });
+    if (rows.length) {
+      out.push('<h4>มาตรฐานที่ละเมิดในหน้านี้</h4>');
+      out.push('<div class="table-scroll"><table class="std-table"><thead><tr>' +
+        '<th scope="col">หลักเกณฑ์ WCAG 2.1</th><th scope="col">ระดับ</th><th scope="col">แนวทาง</th>' +
+        '<th scope="col" class="num">จุดที่ผิด</th><th scope="col">พบที่ส่วน</th></tr></thead><tbody>' +
+        rows.join('') + '</tbody></table></div>');
+    }
+    out.push('</div>');
+    return out.join('');
   }
 
   function renderResults(result, highlighted) {
@@ -156,6 +284,8 @@
       ' · วิเคราะห์โครงสร้างโค้ด ' + result.analysisMs.toFixed(2) + ' มิลลิวินาที' +
       (state.fetchMs !== null ? ' · ดึงข้อมูลผ่านบริการตัวกลาง ' + state.fetchMs + ' มิลลิวินาที' : '') +
       '</p></div></div>');
+
+    h.push(renderPartsDashboard(result));
 
     h.push('<div class="note info" role="note"><p>' +
       'คะแนนนี้สะท้อนเฉพาะกฎย่อยสี่กฎที่ระบบตรวจได้ ไม่ใช่คะแนนความสอดคล้องกับมาตรฐาน WCAG 2.1 ทั้งฉบับ ' +
@@ -256,10 +386,12 @@
       h.push('<div class="note good" role="note"><p>ไม่พบข้อบกพร่องในกฎย่อยที่ระบบตรวจได้ ' +
         'อย่างไรก็ตามยังต้องตรวจสอบหลักเกณฑ์อื่นของ WCAG ที่อยู่นอกขอบเขตของเครื่องมือนี้ด้วย</p></div>');
     } else {
-      A.CRITERIA_ORDER.forEach(function (sc) {
-        var group = result.issues.filter(function (p) { return p.sc === sc; });
+      A.PAGE_PARTS.forEach(function (part) {
+        var group = result.issues.filter(function (p) { return A.RULE_PART[p.ruleId] === part.key; });
         if (!group.length) return;
-        h.push('<h4>' + esc(sc) + ' ' + esc(A.CRITERIA[sc].name) + ' — ' + group.length + ' จุด</h4>');
+        var c = A.CRITERIA[part.sc];
+        h.push('<h4 id="part-' + part.key + '" class="part-h">' + esc(part.label) + ' — ' + group.length + ' จุด ' +
+          '<span class="muted">ละเมิด ' + esc(part.sc) + ' ' + esc(c.nameTh) + ' ระดับ ' + esc(c.level) + '</span></h4>');
         group.forEach(function (p) { h.push(renderIssue(p)); });
       });
     }
@@ -269,7 +401,12 @@
       h.push('<h3>จุดที่ต้องตรวจเพิ่มด้วยตนเอง (' + result.needsReviewCount + ' จุด)</h3>');
       h.push('<p class="lead">ระบบตัดสินแทนไม่ได้ว่าผ่านหรือไม่ผ่าน จุดเหล่านี้จึงยังไม่ถูกนับในตัวหารของคะแนน ' +
         'ตอบแบบประเมิน Checklist ในขั้นที่ 2 เพื่อให้ระบบนำมาคิดคะแนน</p>');
-      result.needsReview.forEach(function (p) { h.push(renderIssue(p)); });
+      A.PAGE_PARTS.forEach(function (part) {
+        var group = result.needsReview.filter(function (p) { return A.RULE_PART[p.ruleId] === part.key; });
+        if (!group.length) return;
+        h.push('<h4 id="review-' + part.key + '" class="part-h">' + esc(part.label) + ' — ' + group.length + ' จุด</h4>');
+        group.forEach(function (p) { h.push(renderIssue(p)); });
+      });
     }
 
     /* ---- โค้ดที่ไฮไลต์จุดบกพร่อง ---- */
