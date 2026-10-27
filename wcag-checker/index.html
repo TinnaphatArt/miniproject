@@ -223,6 +223,7 @@
   .gauge .fill.ok   { stroke:var(--info); }
   .gauge .fill.warn { stroke:var(--warn); }
   .gauge .fill.bad  { stroke:var(--bad); }
+  .gauge .fill.none { stroke:var(--surface-3); }
   .gauge-label {
     position:absolute; inset:0; display:grid; place-content:center; text-align:center;
   }
@@ -240,6 +241,7 @@
   .badge.ok   { color:var(--info); background:var(--info-bg); border-color:var(--info-border); }
   .badge.warn { color:var(--warn); background:var(--warn-bg); border-color:var(--warn-border); }
   .badge.bad  { color:var(--bad);  background:var(--bad-bg);  border-color:var(--bad-border); }
+  .badge.none { color:var(--ink-2); background:var(--surface-3); border-color:var(--border-strong); }
 
   .stats { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
   .stat {
@@ -485,7 +487,7 @@
           วางลิงก์ที่ได้จากการ Deploy สคริปต์ในโฟลเดอร์ apps-script ระบบจำค่านี้ไว้ในเบราว์เซอร์ของคุณเท่านั้น
           กด &ldquo;ทดสอบการเชื่อมต่อ&rdquo; ก่อนบันทึกครั้งแรก เพื่อยืนยันว่าติดตั้งสคริปต์สำเร็จ
           ขั้นตอนติดตั้งโดยละเอียดพร้อมตารางแก้ปัญหาอยู่ในไฟล์
-          <a href="./docs/apps-script-setup.md"><code>wcag-checker/docs/apps-script-setup.md</code></a>
+          <a href="./docs/apps-script-setup.md"><code>docs/apps-script-setup.md</code></a>
           ของโครงงาน
         </span>
         <input type="url" id="endpoint-input" aria-describedby="endpoint-hint" placeholder="https://script.google.com/macros/s/…/exec">

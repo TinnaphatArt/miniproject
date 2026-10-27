@@ -37,14 +37,14 @@
 
       var levels = ['pass', 'improve', 'fail'].map(function (lv) {
         return option(lv, A.CHECKLIST_LEVEL_LABEL[lv] +
-          (lv === 'improve' ? ' (ไม่คิดคะแนน)' : ''), q.levels[lv]);
+          (lv === 'improve' ? ' (นับเป็นไม่ผ่าน)' : ''), q.levels[lv]);
       }).join('');
 
       return '<fieldset class="q">' +
         '<legend>' + esc(q.sc) + ' — ' + esc(q.question) + '</legend>' +
         '<span class="hint">' + esc(q.help) + '</span>' +
         '<div class="answers">' + levels +
-        option('skip', 'ยังไม่ได้ตรวจ', 'ไม่คิดคะแนน และคงสถานะต้องตรวจเพิ่มไว้') +
+        option('skip', 'ยังไม่ได้ตรวจ', 'ไม่รวมในคะแนน คงสถานะต้องตรวจเพิ่มไว้ และแสดงเป็นจำนวนค้างตรวจ') +
         '</div></fieldset>';
     }).join('');
     $('checklist-container').innerHTML = html;
@@ -131,7 +131,8 @@
 
     /* ---- การ์ดคะแนน: วงแหวนแสดงสัดส่วน อ่านค่าได้จากตัวเลขกลางวงเสมอ ---- */
     var C = 2 * Math.PI * 54;                       /* เส้นรอบวงของรัศมี 54 */
-    var arc = C * Math.max(0, Math.min(100, result.score)) / 100;
+    var hasScore = result.score !== null && result.score !== undefined;
+    var arc = hasScore ? C * Math.max(0, Math.min(100, result.score)) / 100 : 0;
     h.push('<div class="scorecard">' +
       '<div class="gauge">' +
       '<svg viewBox="0 0 128 128" aria-hidden="true" focusable="false">' +
@@ -139,7 +140,9 @@
       '<circle class="fill ' + interp.tone + '" cx="64" cy="64" r="54" fill="none" stroke-width="13" ' +
       'stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + (C - arc).toFixed(1) + '"></circle>' +
       '</svg>' +
-      '<span class="gauge-label"><b>' + result.score.toFixed(2) + '</b><span>จาก 100 คะแนน</span></span>' +
+      (hasScore
+        ? '<span class="gauge-label"><b>' + result.score.toFixed(2) + '</b><span>จาก 100 คะแนน</span></span>'
+        : '<span class="gauge-label"><b>—</b><span>ไม่มีคะแนน</span></span>') +
       '</div>' +
       '<div class="scoremeta">' +
       '<p class="title">คะแนนผลการตรวจเบื้องต้นตามรายการที่กำหนด</p>' +
@@ -174,7 +177,7 @@
       h.push('<div class="cov' + (c.counted === 0 ? ' empty' : '') + '">' +
         '<div class="cov-head"><strong>' + esc(sc) + ' <span class="sc-name">' + esc(c.name) + '</span></strong>' +
         '<span class="cov-nums">ตรวจได้ ' + c.counted + ' จาก ' + c.related + ' จุด' +
-        (c.counted ? ' · อัตราไม่ผ่าน ' + c.failureRate.toFixed(3) : '') +
+        (c.counted ? ' · อัตราไม่ผ่าน ' + c.failureRate.toFixed(3) : ' · ตัดออกจากการคำนวณคะแนน') +
         ' · น้ำหนัก ' + c.weight + '</span></div>' +
         (c.related
           ? '<div class="bar">' + seg(c.pass, 'b-pass', 'ผ่าน') + seg(c.fail, 'b-fail', 'ไม่ผ่าน') +
@@ -218,9 +221,13 @@
 
     var zeroed = A.CRITERIA_ORDER.filter(function (sc) { return result.byCriterion[sc].counted === 0; });
     if (zeroed.length) {
-      h.push('<div class="note warn" role="note"><p>หลักเกณฑ์ ' + esc(zeroed.join(', ')) +
-        ' ไม่มีจุดที่ตรวจได้เลยในโค้ดชุดนี้ ระบบกำหนดอัตราไม่ผ่านเป็นศูนย์จึงไม่หักคะแนนในหลักเกณฑ์นั้น ' +
-        'ไม่ได้หมายความว่าเว็บไซต์ผ่านเกณฑ์ดังกล่าว</p></div>');
+      /* บทที่ 3.7.2: ตัดน้ำหนักของหลักเกณฑ์ที่ไม่มีข้อมูลออก ไม่ให้คะแนนเต็มแทน */
+      h.push('<div class="note warn" role="note"><p>' + (zeroed.length === A.CRITERIA_ORDER.length
+        ? 'ข้อมูลไม่เพียงพอสำหรับคำนวณคะแนน ทั้งสามหลักเกณฑ์ไม่มีจุดที่ตรวจได้เลยในโค้ดชุดนี้ ' +
+          'จึงไม่แสดงคะแนนเป็นตัวเลข'
+        : 'หลักเกณฑ์ ' + esc(zeroed.join(', ')) + ' ไม่มีจุดที่ตรวจได้เลยในโค้ดชุดนี้ ' +
+          'ระบบจึงตัดน้ำหนักของหลักเกณฑ์นั้นออกจากการคำนวณ คะแนนนี้มาจากหลักเกณฑ์ที่ตรวจได้จริงเท่านั้น ' +
+          'และไม่ได้หมายความว่าเว็บไซต์ผ่านหลักเกณฑ์ที่ถูกตัดออก') + '</p></div>');
     }
 
     /* ---- ที่มาของคะแนน ---- */
@@ -232,13 +239,16 @@
       var c = result.byCriterion[t.sc];
       h.push('<tr><th scope="row">' + esc(t.sc) + '</th>' +
         '<td class="num">' + c.counted + ' / ' + c.fail + '</td>' +
-        '<td class="num">' + t.failureRate.toFixed(3) + '</td>' +
-        '<td class="num">' + t.weight + ' × ' + t.failureRate.toFixed(3) + ' = ' + t.product.toFixed(3) + '</td></tr>');
+        (t.excluded
+          ? '<td class="num">—</td><td class="num">ไม่มีจุดที่ตรวจได้ ตัดน้ำหนัก ' + t.weight + ' ออก</td></tr>'
+          : '<td class="num">' + t.failureRate.toFixed(3) + '</td>' +
+            '<td class="num">' + t.weight + ' × ' + t.failureRate.toFixed(3) + ' = ' + t.product.toFixed(3) + '</td></tr>'));
     });
     h.push('</tbody><tfoot><tr><th scope="row" colspan="3">ผลรวมถ่วงน้ำหนัก ÷ ผลรวมน้ำหนัก</th>' +
-      '<td class="num">' + result.scoring.weightedSum.toFixed(3) + ' ÷ ' + result.scoring.weightTotal + '</td></tr>' +
+      '<td class="num">' + (hasScore ? result.scoring.weightedSum.toFixed(3) + ' ÷ ' + result.scoring.weightTotal : '—') + '</td></tr>' +
       '<tr><th scope="row" colspan="3">คะแนนผลการตรวจเบื้องต้น</th><td class="num"><strong>' +
-      result.score.toFixed(2) + '</strong></td></tr></tfoot></table></div></details>');
+      (hasScore ? result.score.toFixed(2) : 'ข้อมูลไม่เพียงพอสำหรับคำนวณคะแนน') +
+      '</strong></td></tr></tfoot></table></div></details>');
 
     /* ---- รายการจุดบกพร่อง ---- */
     h.push('<h3>จุดที่ต้องแก้ไข (' + result.issueCount + ' จุด)</h3>');
@@ -417,7 +427,7 @@
       criteria[sc] = {
         counted: c.counted, pass: c.pass, fail: c.fail,
         needsReview: c.needsReview, notApplicable: c.notApplicable,
-        failureRate: Math.round(c.failureRate * 1000) / 1000
+        failureRate: c.failureRate === null ? null : Math.round(c.failureRate * 1000) / 1000
       };
     });
     /* ไม่ส่งโค้ด HTML ต้นฉบับไปบันทึก เพื่อลดความเสี่ยงด้านความเป็นส่วนตัว (บทที่ 3.3.3) */
@@ -513,6 +523,10 @@
     if (!endpoint) return;
     var payload = buildPayload();
     if (!payload) { setStatus(status, 'ยังไม่มีผลการประเมินให้บันทึก', 'bad'); return; }
+    if (payload.score === null) {
+      setStatus(status, 'ผลนี้ไม่มีคะแนนให้บันทึก เพราะทั้งสามหลักเกณฑ์ไม่มีจุดที่ตรวจได้ ลองตรวจหน้าเว็บที่มีรูปภาพ หัวข้อ หรือช่องกรอกข้อมูล', 'bad');
+      return;
+    }
 
     var btn = $('btn-save');
     btn.disabled = true;

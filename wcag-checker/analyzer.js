@@ -46,12 +46,14 @@
     {
       id: 'CL-1.1.1',
       sc: 'SC 1.1.1',
-      question: 'ข้อความ alt ของภาพในหน้านี้ สื่อความหมายหรือหน้าที่ของภาพได้ตรงกับบริบทที่ปรากฏหรือไม่ (พิจารณาเฉพาะภาพที่ระบบตรวจพบว่ามีการประกาศแอตทริบิวต์ alt ไว้แล้วเท่านั้น)',
-      help: 'ระบบตรวจได้เพียงว่า "มี" แอตทริบิวต์ alt หรือไม่ แต่ตรวจไม่ได้ว่าข้อความนั้นบรรยายภาพได้ตรงหรือไม่',
+      question: 'ภาพที่ประกาศ alt เป็นค่าว่าง (alt="") ในหน้านี้ เป็นภาพตกแต่งที่ไม่ได้เพิ่มข้อมูลหรือหน้าที่ให้เนื้อหาใช่หรือไม่',
+      help: 'ระบบตรวจได้เพียงว่า alt เป็นค่าว่างหรือไม่ แต่ตัดสินแทนไม่ได้ว่าภาพนั้นเป็นภาพตกแต่งจริง ' +
+        'ตามหลักการ W3C Decorative Images การใช้ alt ว่างถูกต้องเฉพาะกับภาพที่ไม่เพิ่มข้อมูลหรือหน้าที่ให้เนื้อหาเท่านั้น ' +
+        'คำถามนี้จึงไม่ตัดสินคุณภาพของข้อความ alt ที่ไม่ว่าง ซึ่งเป็นคนละกรณีกัน',
       levels: {
-        pass: 'ข้อความ alt สื่อความหมายหรือหน้าที่ของภาพได้ตรงกับบริบท เช่น alt="โลโก้บริษัท"',
-        improve: 'มีข้อความ alt แต่คลุมเครือหรือไม่เจาะจง เช่น alt="รูปภาพ" หรือ alt="image1"',
-        fail: 'ข้อความ alt ไม่ตรงกับภาพหรือทำให้เข้าใจผิด เช่น ปุ่ม "ยกเลิกคำสั่งซื้อ" ที่กำหนด alt="ยืนยัน"'
+        pass: 'เป็นภาพตกแต่งที่ไม่สื่อข้อมูล เช่น เส้นคั่นหรือลวดลายพื้นหลัง การใช้ alt ว่างจึงเหมาะสมแล้ว',
+        improve: 'ภาพสื่อข้อมูลอยู่บ้างหรือยังตัดสินได้ไม่ชัด แต่ใช้ alt ว่าง',
+        fail: 'ภาพสื่อข้อมูลหรือมีหน้าที่ เช่น ภาพแผนภูมิหรือปุ่มที่เป็นภาพ แต่ใช้ alt ว่าง'
       }
     },
     {
@@ -71,9 +73,9 @@
       question: 'ข้อความที่วางทับบนภาพพื้นหลังหรือสีไล่ระดับ ซึ่งระบบไม่สามารถคำนวณอัตราส่วนความคมชัดให้โดยอัตโนมัติ ยังคงอ่านได้ชัดเจนในทุกตำแหน่งที่ข้อความปรากฏหรือไม่',
       help: 'ระบบอ่านค่าสีได้เฉพาะที่เขียนไว้ในแอตทริบิวต์ style เท่านั้น ไม่เห็นภาพพื้นหลังหรือ gradient',
       levels: {
-        pass: 'อ่านได้ชัดเจนในทุกตำแหน่งที่ข้อความซ้อนทับพื้นหลัง',
-        improve: 'อ่านได้ยากเฉพาะบางตำแหน่ง เช่น บริเวณสีอ่อนของภาพไล่ระดับ',
-        fail: 'ข้อความกลืนกับพื้นหลังจนอ่านไม่ออกในบางตำแหน่ง'
+        pass: 'วัดอัตราส่วนจริงแล้วผ่านเกณฑ์ในทุกตำแหน่ง คือไม่ต่ำกว่า 4.5:1 สำหรับข้อความทั่วไป หรือ 3:1 สำหรับข้อความขนาดใหญ่',
+        improve: 'วัดแล้วต่ำกว่าเกณฑ์เฉพาะบางตำแหน่ง เช่น บริเวณสีอ่อนของภาพไล่ระดับ',
+        fail: 'วัดแล้วต่ำกว่าเกณฑ์ หรือยังไม่ได้วัดแล้วตัดสินจากความรู้สึกว่าอ่านชัด'
       }
     }
   ];
@@ -399,6 +401,17 @@
         path: pathOf(el), snippet: snippetOf(el)
       };
 
+      /* ข้อยกเว้น: แอตทริบิวต์ hidden ทำให้ช่องกรอกไม่ถูกแสดง รับโฟกัสไม่ได้ และไม่อยู่ใน
+         Accessibility Tree เช่นเดียวกับ type="hidden" จึงไม่มีผู้ใช้คนใดต้องการป้ายกำกับของช่องนี้
+         พบจากการทดสอบกับเว็บไซต์จริง (pkg.go.dev) ซึ่งใช้ <input name="m" hidden> ในแบบฟอร์มค้นหา */
+      if (el.hasAttribute('hidden')) {
+        pairs.push(makePair(Object.assign({}, base, {
+          status: STATUS.NOT_APPLICABLE,
+          message: 'ช่องกรอกมีแอตทริบิวต์ hidden จึงไม่แสดงผลและไม่อยู่ใน Accessibility Tree ไม่ตรวจสอบป้ายกำกับ'
+        })));
+        continue;
+      }
+
       if (tag === 'input' && SKIPPED_INPUT_TYPES.indexOf(type) >= 0) {
         pairs.push(makePair(Object.assign({}, base, {
           status: STATUS.NOT_APPLICABLE,
@@ -517,6 +530,19 @@
    *  - 'fail'    -> ไม่ผ่าน: เพิ่มคู่สถานะไม่ผ่านหนึ่งคู่ และเปลี่ยนคู่ "ต้องตรวจเพิ่ม" เป็นไม่ผ่าน
    *  - ไม่ตอบ    -> ไม่เพิ่มคู่ใด และคู่ "ต้องตรวจเพิ่ม" ถูกตัดออกจากทั้งตัวเศษและตัวหาร
    */
+  /**
+   * นำคำตอบจากแบบประเมิน Checklist มาปิดสถานะ "ต้องตรวจเพิ่ม" ของคู่ตรวจที่มีอยู่แล้ว
+   *
+   * หลักการตามบทที่ 3.3 ของเอกสารข้อแก้ไขครั้งที่ 3
+   *   ใช้คู่ตรวจเดิมที่ระบบสร้างไว้เท่านั้น ไม่สร้างคู่ตรวจใหม่จากคำตอบ
+   *   เพราะคำตอบเป็นการ "ยืนยันบริบท" ของคู่ที่มีอยู่ ไม่ใช่หน่วยนับใหม่
+   *
+   * การนับคะแนนตามบทที่ 3.8 และข้อ 4.1 ของเอกสารข้อแก้ไขครั้งที่ 3
+   *   ผ่าน          -> ผ่าน      นับในตัวหาร ไม่เพิ่มจำนวนไม่ผ่าน
+   *   ควรปรับปรุง   -> ไม่ผ่าน   นับทั้งตัวเศษและตัวหาร แต่บันทึกระดับคำตอบแยกไว้
+   *   ไม่ผ่าน       -> ไม่ผ่าน   นับทั้งตัวเศษและตัวหาร
+   *   ยังไม่ได้ตอบ  -> คงสถานะต้องตรวจเพิ่ม ไม่รวมในคะแนน และแสดงเป็นจำนวนค้างตรวจ
+   */
   function applyChecklist(pairs, answers) {
     answers = answers || {};
     var resolved = pairs.map(function (p) { return Object.assign({}, p); });
@@ -527,11 +553,9 @@
           answer !== CHECKLIST_LEVELS.IMPROVE &&
           answer !== CHECKLIST_LEVELS.FAIL) return;
 
+      var isPass = answer === CHECKLIST_LEVELS.PASS;
       var isImprove = answer === CHECKLIST_LEVELS.IMPROVE;
-      var isFail = answer === CHECKLIST_LEVELS.FAIL;
-      var newStatus = isImprove ? STATUS.NEEDS_REVIEW
-        : isFail ? STATUS.FAIL
-        : STATUS.PASS;
+      var newStatus = isPass ? STATUS.PASS : STATUS.FAIL;
       var verdict = CHECKLIST_LEVEL_LABEL[answer];
 
       resolved.forEach(function (p) {
@@ -539,24 +563,12 @@
         p.status = newStatus;
         p.resolvedByChecklist = q.id;
         p.checklistLevel = answer;
-        p.message = p.message + ' — ผู้ประเมินตอบแบบประเมิน Checklist ว่า "' + verdict + '"' +
-          (isImprove ? ' จึงคงสถานะต้องตรวจเพิ่มไว้ ไม่นำมาคิดคะแนน' : '');
-        if (isFail && !p.severity) p.severity = SEVERITY.SHOULD_FIX;
+        p.message = p.message + ' — ผู้ประเมินตอบแบบประเมิน Checklist ว่า "' + verdict + '" ' +
+          q.levels[answer] +
+          (isImprove ? ' จึงนับเป็นไม่ผ่านตามเกณฑ์ในบทที่ 3.8 โดยบันทึกระดับคำตอบไว้แยกต่างหาก' : '');
+        if (!isPass && !p.severity) p.severity = SEVERITY.SHOULD_FIX;
+        if (!isPass && !p.suggestion) p.suggestion = q.help;
       });
-
-      resolved.push(makePair({
-        ruleId: q.id,
-        sc: q.sc,
-        status: newStatus,
-        severity: isFail ? SEVERITY.SHOULD_FIX : null,
-        tag: 'checklist',
-        checklistLevel: answer,
-        path: '(แบบประเมิน Checklist)',
-        snippet: q.question,
-        message: 'ผู้ประเมินตอบว่า "' + verdict + '" — ' + q.levels[answer] +
-          (isImprove ? ' จึงไม่นับในตัวหารของคะแนน ตามบทที่ 3.6.1' : ''),
-        suggestion: answer === CHECKLIST_LEVELS.PASS ? null : q.help
-      }));
     });
 
     return resolved;
@@ -571,7 +583,7 @@
         name: CRITERIA[sc].name,
         weight: CRITERIA[sc].weight,
         pass: 0, fail: 0, needsReview: 0, notApplicable: 0,
-        counted: 0, related: 0, failureRate: 0
+        counted: 0, related: 0, failureRate: null
       };
     });
 
@@ -587,25 +599,38 @@
 
     CRITERIA_ORDER.forEach(function (sc) {
       var c = byCriterion[sc];
-      /* ตัวหารเป็นศูนย์ -> FailureRate = 0 ตามที่กำหนดในบทที่ 3.7.2 */
-      c.failureRate = c.counted === 0 ? 0 : c.fail / c.counted;
+      /* ตัวหารเป็นศูนย์ -> ไม่มี FailureRate (null) ตามบทที่ 3.7.2
+         ห้ามกำหนดเป็นศูนย์ เพราะเท่ากับให้คะแนนเต็มในหลักเกณฑ์ที่ไม่มีหลักฐานว่าผ่านจริง */
+      c.failureRate = c.counted === 0 ? null : c.fail / c.counted;
     });
 
     return byCriterion;
   }
 
   /** PreliminaryScore = 100 x [ 1 - (Σ wi x FailureRate(i)) / Σ wi ] */
+  /**
+   * คำนวณคะแนนผลการตรวจเบื้องต้นตามบทที่ 3.7.2
+   *   PreliminaryScore = 100 × [ 1 − ( Σ wi × FailureRate(i) ) / Σ wi ]
+   * หลักเกณฑ์ที่ไม่มีคู่ที่นับได้ถูกตัดน้ำหนักออกจากทั้งตัวเศษและตัวส่วน
+   * และถ้าไม่มีหลักเกณฑ์ใดนับได้เลย จะไม่คำนวณคะแนน (score = null, insufficient = true)
+   */
   function computeScore(byCriterion) {
     var weightedSum = 0, weightTotal = 0;
     var terms = CRITERIA_ORDER.map(function (sc) {
       var c = byCriterion[sc];
+      var noData = c.counted === 0 || c.failureRate === null || c.failureRate === undefined;
+      if (noData) {
+        return { sc: sc, weight: c.weight, failureRate: null, product: null, excluded: true };
+      }
       weightedSum += c.weight * c.failureRate;
       weightTotal += c.weight;
-      return { sc: sc, weight: c.weight, failureRate: c.failureRate, product: c.weight * c.failureRate };
+      return { sc: sc, weight: c.weight, failureRate: c.failureRate, product: c.weight * c.failureRate, excluded: false };
     });
-    var score = weightTotal === 0 ? 100 : 100 * (1 - weightedSum / weightTotal);
+    var insufficient = weightTotal === 0;
+    var score = insufficient ? null : 100 * (1 - weightedSum / weightTotal);
     return {
-      score: Math.round(score * 100) / 100,
+      score: insufficient ? null : Math.round(score * 100) / 100,
+      insufficient: insufficient,
       weightedSum: Math.round(weightedSum * 1000) / 1000,
       weightTotal: weightTotal,
       terms: terms
@@ -614,6 +639,9 @@
 
   /** เกณฑ์การแปลผลคะแนน (บทที่ 3.7.3) — ช่วงต่อเนื่องกันโดยไม่มีช่องว่างหรือทับซ้อน */
   function interpretScore(score) {
+    if (score === null || score === undefined || isNaN(score)) {
+      return { band: 'ข้อมูลไม่เพียงพอ', text: 'ข้อมูลไม่เพียงพอสำหรับคำนวณคะแนน', tone: 'none' };
+    }
     if (score >= 90) return { band: 'ดีมาก', text: 'พบข้อบกพร่องน้อยมากในกฎย่อยที่ตรวจได้', tone: 'good' };
     if (score >= 75) return { band: 'ดี', text: 'พบข้อบกพร่องบางส่วน ควรปรับปรุงเพิ่มเติม', tone: 'ok' };
     if (score >= 60) return { band: 'พอใช้', text: 'พบข้อบกพร่องพอสมควร ควรปรับปรุงก่อนเผยแพร่', tone: 'warn' };

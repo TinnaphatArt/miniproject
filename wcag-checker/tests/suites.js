@@ -134,6 +134,7 @@
     '<p style="color:#ffffff;background-color:#767676;" data-gt="R-CONTRAST-01:pass">แถบสีเทา</p>',
     '<div style="background-color:#eeeeee;" data-gt="R-CONTRAST-01:na">กล่องพื้นหลังอย่างเดียว</div>',
     '<input type="hidden" name="page" value="1" data-gt="R-LABEL-01:na">',
+    '<input name="m" value="" hidden data-gt="R-LABEL-01:na">',
     '<img src="sep.png" aria-hidden="true" data-gt="R-ALT-01:na">'
   ].join('\n'));
 
@@ -311,7 +312,9 @@
     { id: 'E', group: 'development', title: 'ผสมข้อบกพร่องทุกประเภทในชุดเดียว', purpose: 'ตรวจว่าฟังก์ชันต่าง ๆ ไม่รบกวนกันเมื่อทำงานพร้อมกัน', html: E },
     { id: 'F', group: 'holdout', title: 'ค่าสีหลากหลายรูปแบบ', purpose: 'ยืนยันความสามารถอ่านค่าสีที่พบในเว็บไซต์จริง', html: F },
     { id: 'G', group: 'holdout', title: 'โครงสร้างเอกสารซ้อนกันหลายชั้น', purpose: 'ยืนยันการไล่สำรวจโหนดที่ซ้อนลึกได้ถูกต้อง', html: G },
-    { id: 'H', group: 'holdout', title: 'หน้าเว็บขนาดใหญ่ (ประมาณ 300 องค์ประกอบ)', purpose: 'วัดประสิทธิภาพด้านเวลาประมวลผล', html: H },
+    /* accuracy: false — ชุด H วัดเวลาประมวลผลอย่างเดียว ไม่นำมาคิด Precision Recall และ F1
+       ตรงตามที่บทที่ 3.7.1 ระบุว่าตัวเลข 300 องค์ประกอบไม่ใช่จำนวนคู่ตรวจ */
+    { id: 'H', group: 'holdout', accuracy: false, title: 'หน้าเว็บขนาดใหญ่ (ประมาณ 300 องค์ประกอบ)', purpose: 'วัดประสิทธิภาพด้านเวลาประมวลผล', html: H },
     { id: 'I', group: 'holdout', title: 'โครงสร้างโค้ดไม่สมบูรณ์ (แท็กปิดไม่ครบ)', purpose: 'ยืนยันว่าระบบไม่หยุดทำงานเมื่อพบโค้ดผิดรูป', html: I }
   ];
 

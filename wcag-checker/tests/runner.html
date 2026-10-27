@@ -122,6 +122,9 @@
     A.CRITERIA_ORDER.forEach(function (sc) {
       perCriterion[sc] = { sc: sc, tp: 0, fp: 0, fn: 0, tn: 0, strictMatch: 0, strictTotal: 0 };
     });
+    /* ตัวนับรายกฎตามข้อ 5.3 ของเอกสารข้อแก้ไขครั้งที่ 3
+       ต้องรวมยอดรายกฎก่อน แล้วจึงรวมกฎที่อยู่ในหลักเกณฑ์เดียวกัน ไม่ใช้ค่าเฉลี่ย F1 รายชุด */
+    var perRule = {};
     var problems = [];
     var seenElements = new Set();
 
@@ -138,6 +141,13 @@
       }
 
       var c = perCriterion[pair.sc];
+      if (!perRule[pair.ruleId]) {
+        perRule[pair.ruleId] = { ruleId: pair.ruleId, sc: pair.sc, tp: 0, fp: 0, fn: 0, tn: 0,
+                                 strictMatch: 0, strictTotal: 0 };
+      }
+      var rc = perRule[pair.ruleId];
+      rc.strictTotal++;
+      if (expected === pair.status) rc.strictMatch++;
       c.strictTotal++;
       if (expected === pair.status) c.strictMatch++;
       else problems.push({
@@ -148,10 +158,10 @@
       /* นับ TP/FP/FN เฉพาะคู่ที่ทั้งค่าอ้างอิงและผลระบบเป็นผ่านหรือไม่ผ่าน (บทที่ 3.6.2) */
       var countable = (expected === S.PASS || expected === S.FAIL) && (pair.status === S.PASS || pair.status === S.FAIL);
       if (!countable) return;
-      if (expected === S.FAIL && pair.status === S.FAIL) c.tp++;
-      else if (expected === S.PASS && pair.status === S.FAIL) c.fp++;
-      else if (expected === S.FAIL && pair.status === S.PASS) c.fn++;
-      else c.tn++;
+      if (expected === S.FAIL && pair.status === S.FAIL) { c.tp++; rc.tp++; }
+      else if (expected === S.PASS && pair.status === S.FAIL) { c.fp++; rc.fp++; }
+      else if (expected === S.FAIL && pair.status === S.PASS) { c.fn++; rc.fn++; }
+      else { c.tn++; rc.tn++; }
     });
 
     /* องค์ประกอบที่มีค่าอ้างอิงแต่ระบบไม่สร้างคู่ตรวจให้เลย */
@@ -173,6 +183,7 @@
       suite: suite,
       result: result,
       perCriterion: perCriterion,
+      perRule: perRule,
       problems: problems,
       elementCount: result.elementCount,
       pairCount: result.pairs.length,
@@ -185,8 +196,12 @@
   function prf(c) {
     var precision = (c.tp + c.fp) === 0 ? null : c.tp / (c.tp + c.fp);
     var recall = (c.tp + c.fn) === 0 ? null : c.tp / (c.tp + c.fn);
-    var f1 = (precision === null || recall === null || (precision + recall) === 0)
-      ? null : 2 * (precision * recall) / (precision + recall);
+    /* คำนวณ F1 จาก TP FP FN โดยตรงตามบทที่ 3.7.1 ไม่คำนวณผ่าน Precision และ Recall
+       เพราะกรณีที่ระบบตรวจผิดทั้งหมด (เช่น TP=0 FP=2 FN=3) ต้องรายงานว่า F1 = 0
+       ซึ่งเป็นผลตรวจที่ไม่สำเร็จ ไม่ใช่ "ไม่มีข้อมูล"
+       F1 ไม่กำหนด (N/A) เฉพาะเมื่อ TP FP และ FN เป็นศูนย์ทั้งหมด คือไม่มีคู่ที่ใช้ประเมิน */
+    var f1Denominator = 2 * c.tp + c.fp + c.fn;
+    var f1 = f1Denominator === 0 ? null : (2 * c.tp) / f1Denominator;
     return { precision: precision, recall: recall, f1: f1 };
   }
 
@@ -204,6 +219,28 @@
     return totals;
   }
 
+  /** รวมยอดรายกฎข้ามชุดทดสอบ ตามข้อ 5.3 ของเอกสารข้อแก้ไขครั้งที่ 3 */
+  function aggregateByRule(runs) {
+    var totals = {};
+    runs.forEach(function (run) {
+      Object.keys(run.perRule).forEach(function (id) {
+        var s = run.perRule[id];
+        if (!totals[id]) {
+          totals[id] = { ruleId: id, sc: s.sc, tp: 0, fp: 0, fn: 0, tn: 0, strictMatch: 0, strictTotal: 0 };
+        }
+        var t = totals[id];
+        t.tp += s.tp; t.fp += s.fp; t.fn += s.fn; t.tn += s.tn;
+        t.strictMatch += s.strictMatch; t.strictTotal += s.strictTotal;
+      });
+    });
+    Object.keys(totals).forEach(function (id) { Object.assign(totals[id], prf(totals[id])); });
+    /* เรียงตามหลักเกณฑ์ก่อน แล้วจึงตามรหัสกฎ เพื่อให้ตารางอ่านคู่กับตารางรายหลักเกณฑ์ได้ */
+    return Object.keys(totals).sort(function (a, b) {
+      var d = A.CRITERIA_ORDER.indexOf(totals[a].sc) - A.CRITERIA_ORDER.indexOf(totals[b].sc);
+      return d !== 0 ? d : (a < b ? -1 : 1);
+    }).map(function (id) { return totals[id]; });
+  }
+
   /* ---------- ตรวจสอบสูตรคะแนนกับตัวอย่างการคำนวณในบทที่ 3.7.2 ---------- */
   function verifyScoringExample() {
     var byCriterion = {
@@ -216,16 +253,43 @@
   }
 
   /* ---------- ตรวจสอบตัวหารเป็นศูนย์ (บทที่ 3.7.2) ---------- */
+  /* ทุกหลักเกณฑ์ไม่มีคู่ที่นับได้ ต้องไม่แสดงคะแนนเป็นตัวเลข แต่แจ้งว่าข้อมูลไม่เพียงพอ */
   function verifyZeroDenominator() {
     var res = A.analyze('<!DOCTYPE html><html><body><p>ไม่มีองค์ประกอบที่ตรวจได้เลย</p></body></html>');
-    return { score: res.score, ok: res.score === 100, counted: A.CRITERIA_ORDER.map(function (sc) { return res.byCriterion[sc].counted; }) };
+    return { score: res.score, band: res.interpretation.band,
+      ok: res.score === null && res.scoring.insufficient === true && res.interpretation.band === 'ข้อมูลไม่เพียงพอ',
+      counted: A.CRITERIA_ORDER.map(function (sc) { return res.byCriterion[sc].counted; }) };
+  }
+
+  /* หลักเกณฑ์ที่ไม่มีคู่ที่นับได้ต้องถูกตัดน้ำหนักออกจากทั้งตัวเศษและตัวส่วน (บทที่ 3.7.2)
+     SC 1.1.1 นับได้ 4 ไม่ผ่าน 2 / SC 1.3.1 นับได้ 5 ไม่ผ่าน 2 / SC 1.4.3 ไม่มีข้อมูล
+     100 × [1 − (3 × 2/4 + 2 × 2/5) ÷ (3 + 2)] = 54.00
+     ถ้ากำหนด FailureRate ของ SC 1.4.3 เป็นศูนย์แบบเดิม จะได้ 67.14 ซึ่งสูงเกินจริง */
+  function verifyWeightExclusion() {
+    var byCriterion = {
+      'SC 1.1.1': { weight: 3, counted: 4, fail: 2, failureRate: 2 / 4 },
+      'SC 1.3.1': { weight: 2, counted: 5, fail: 2, failureRate: 2 / 5 },
+      'SC 1.4.3': { weight: 2, counted: 0, fail: 0, failureRate: null }
+    };
+    var out = A.computeScore(byCriterion);
+    return { expected: 54.00, actual: out.score, ok: out.score === 54 && out.weightTotal === 5, detail: out };
   }
 
   /* ---------- ตรวจสอบแบบประเมิน Checklist สามระดับ (บทที่ 3.8 และ 3.6.1) ----------
      ใช้ภาพที่ตั้ง alt เป็นค่าว่าง ซึ่งกฎ R-ALT-02 ให้สถานะ "ต้องตรวจเพิ่ม" ไว้
      แล้วตรวจว่าคำตอบแต่ละระดับเปลี่ยนสถานะและตัวหารของคะแนนอย่างไร        */
   function verifyChecklistLevels() {
-    var html = '<!DOCTYPE html><html><body><img src="a.png" alt=""></body></html>';
+    /* สร้างโค้ดที่ให้จำนวนคู่ตรงกับตัวอย่างคำนวณในบทที่ 3.7.2 ทุกตัว
+       SC 1.1.1 ภาพมี alt 2 ภาพ ไม่มี alt 2 ภาพ และภาพ alt ว่าง 1 ภาพ (ต้องตรวจเพิ่ม)
+       SC 1.3.1 ช่องกรอกมีป้ายกำกับ 3 ช่อง ไม่มี 2 ช่อง
+       SC 1.4.3 คู่สีผ่าน 2 คู่ ไม่ผ่าน 1 คู่ */
+    var html = '<!DOCTYPE html><html><body>' +
+      '<img src="a.png" alt="โลโก้"><img src="b.png" alt="แผนที่"><img src="c.png"><img src="d.png">' +
+      '<img src="e.png" alt="">' +
+      '<input aria-label="ชื่อ"><input aria-label="อีเมล"><input aria-label="โทรศัพท์"><input><input>' +
+      '<p style="color:#000000;background-color:#ffffff">ก</p><p style="color:#ffffff;background-color:#2451b8">ข</p>' +
+      '<p style="color:#cccccc;background-color:#ffffff">ค</p>' +
+      '</body></html>';
     var base = A.analyze(html);
 
     function run(answer) {
@@ -236,22 +300,34 @@
                score: A.computeScore(byCriterion).score };
     }
 
+    /* ยืนยันว่าคำตอบไม่ทำให้จำนวนคู่ตรวจเพิ่มขึ้น ตามข้อ 3.3 ที่ห้ามสร้างคู่ใหม่ */
+    var pairCountBefore = base.pairs.length;
+    var pairCountAfter = A.applyChecklist(base.pairs, { 'CL-1.1.1': A.CHECKLIST_LEVELS.FAIL }).length;
+
     var skip = run(null);
     var pass = run(A.CHECKLIST_LEVELS.PASS);
     var improve = run(A.CHECKLIST_LEVELS.IMPROVE);
     var fail = run(A.CHECKLIST_LEVELS.FAIL);
 
+    /* ผลที่คาดหวังตามบทที่ 3.7.2 และ 3.8
+       ไม่ตอบ   = 57.62 (ตัวอย่างก่อนยืนยัน)
+       ผ่าน     = 100 × [1 − (3 × 2/5 + 2 × 2/5 + 2 × 1/3) ÷ 7] = 61.90
+       ไม่ผ่าน  = 53.33 (ตัวอย่างหลังยืนยัน) และควรปรับปรุงต้องเท่ากับไม่ผ่าน */
     var cases = [
-      { label: 'ไม่ตอบ — คงต้องตรวจเพิ่ม ไม่นับในตัวหาร',
-        got: skip, ok: skip.counted === 0 && skip.needsReview === 1 && skip.score === 100 },
-      { label: 'ตอบ "ผ่าน" — เปลี่ยนเป็นผ่าน และนับในตัวหาร',
-        got: pass, ok: pass.counted === 2 && pass.pass === 2 && pass.fail === 0 && pass.score === 100 },
-      { label: 'ตอบ "ควรปรับปรุง" — คงต้องตรวจเพิ่ม ไม่นับในตัวหาร คะแนนไม่เปลี่ยน',
-        got: improve, ok: improve.counted === 0 && improve.needsReview === 2 &&
-                          improve.score === skip.score },
-      { label: 'ตอบ "ไม่ผ่าน" — เปลี่ยนเป็นไม่ผ่าน และหักคะแนน',
-        got: fail, ok: fail.counted === 2 && fail.fail === 2 && fail.score < 100 }
+      { label: 'ไม่ตอบ — คงต้องตรวจเพิ่ม ไม่รวมในคะแนน ได้ 57.62 ตรงกับตัวอย่างก่อนยืนยันในบทที่ 3.7.2',
+        expect: '57.62', got: skip, ok: skip.counted === 4 && skip.needsReview === 1 && skip.score === 57.62 },
+      { label: 'ตอบ "ผ่าน" (ภาพตกแต่งจริง) — เปลี่ยนเป็นผ่าน นับในตัวหาร ไม่เพิ่มจำนวนไม่ผ่าน',
+        expect: '61.90', got: pass, ok: pass.counted === 5 && pass.fail === 2 && pass.score === 61.9 },
+      { label: 'ตอบ "ควรปรับปรุง" — นับเป็นไม่ผ่าน เท่ากับคำตอบ "ไม่ผ่าน" โดยบันทึกระดับแยกไว้',
+        expect: '53.33', got: improve, ok: improve.counted === 5 && improve.fail === 3 && improve.score === fail.score },
+      { label: 'ตอบ "ไม่ผ่าน" (ภาพสื่อข้อมูลแต่ใช้ alt ว่าง) — ได้ 53.33 ตรงกับตัวอย่างหลังยืนยันในบทที่ 3.7.2',
+        expect: '53.33', got: fail, ok: fail.counted === 5 && fail.fail === 3 && fail.score === 53.33 }
     ];
+    cases.push({
+      label: 'คำตอบไม่สร้างคู่ตรวจใหม่ — ใช้คู่เดิมที่ระบบสร้างไว้เท่านั้น',
+      expect: String(pairCountBefore) + ' คู่', got: { counted: pairCountAfter, score: null, pairs: pairCountAfter },
+      ok: pairCountAfter === pairCountBefore
+    });
     return { cases: cases, ok: cases.every(function (c) { return c.ok; }) };
   }
 
@@ -286,11 +362,18 @@
   function render() {
     var runs = T.SUITES.map(runSuite);
     var dev = runs.filter(function (r) { return r.suite.group === 'development'; });
-    var hold = runs.filter(function (r) { return r.suite.group === 'holdout'; });
+    /* ชุด H ใช้วัดเวลาประมวลผลเท่านั้น ไม่นำมาคิดค่าความแม่นยำ ตามที่บทที่ 3.7.1 กำหนดไว้
+       (300 องค์ประกอบของชุด H เป็นโครงสร้างซ้ำ ๆ ถ้านับรวมจะกลบสัดส่วนของชุด F G และ I จนผลดูดีเกินจริง)
+       ชุด H ยังคงปรากฏในตารางผลรายชุดและในการวัดเวลาตามเดิม */
+    var hold = runs.filter(function (r) {
+      return r.suite.group === 'holdout' && r.suite.accuracy !== false;
+    });
     var devTotals = aggregate(dev), holdTotals = aggregate(hold);
+    var holdByRule = aggregateByRule(hold), devByRule = aggregateByRule(dev);
 
     var scoringCheck = verifyScoringExample();
     var zeroCheck = verifyZeroDenominator();
+    var weightCheck = verifyWeightExclusion();
     var security = verifyUrlSecurity();
     var checklistCheck = verifyChecklistLevels();
 
@@ -298,7 +381,7 @@
     var holdF1 = A.CRITERIA_ORDER.map(function (sc) { return holdTotals[sc].f1; });
     var holdMeetsTarget = holdF1.every(function (f) { return f !== null && f >= TARGET_F1; });
     var securityOk = security.every(function (c) { return c.ok; });
-    var overallOk = allProblems === 0 && holdMeetsTarget && scoringCheck.ok && zeroCheck.ok &&
+    var overallOk = allProblems === 0 && holdMeetsTarget && scoringCheck.ok && zeroCheck.ok && weightCheck.ok &&
       securityOk && checklistCheck.ok;
 
     var h = [];
@@ -327,9 +410,37 @@
     h.push(prfTable('ชุดประเมินผลสุดท้าย (Held-out Evaluation Set: F, G, H, I)', holdTotals,
       'นับเฉพาะคู่องค์ประกอบ–กฎตรวจที่ทั้งค่าอ้างอิงและผลของระบบมีสถานะผ่านหรือไม่ผ่านเท่านั้น'));
 
+    function ruleTable(title, rows, note) {
+      var body = rows.map(function (c) {
+        /* แยก "ไม่มีคู่ที่ใช้ประเมิน" ออกจาก "ยังไม่ถึงเป้าหมาย" ตามข้อ 5.2
+           ที่ห้ามตีความ N/A ว่าผ่านเกณฑ์ และไม่ควรรายงานว่าไม่ผ่านทั้งที่ยังไม่ได้ประเมิน */
+        var verdict = c.f1 === null
+          ? { cls: 'warn', text: 'ไม่มีคู่ที่ใช้ประเมิน' }
+          : c.f1 >= TARGET_F1
+            ? { cls: 'good', text: 'ผ่านเป้าหมาย' }
+            : { cls: 'bad', text: 'ยังไม่ถึงเป้าหมาย' };
+        return '<tr><th scope="row"><code>' + c.ruleId + '</code></th><td>' + c.sc + '</td>' +
+          '<td class="num">' + c.tp + '</td><td class="num">' + c.fp + '</td><td class="num">' + c.fn + '</td><td class="num">' + c.tn + '</td>' +
+          '<td class="num">' + fmt(c.precision) + '</td><td class="num">' + fmt(c.recall) + '</td>' +
+          '<td class="num">' + fmt(c.f1) + '</td>' +
+          '<td><span class="tag ' + verdict.cls + '">' + verdict.text + '</span></td></tr>';
+      }).join('');
+      return '<table><caption>' + title + '</caption>' +
+        '<thead><tr><th scope="col">รหัสกฎ</th><th scope="col">หลักเกณฑ์</th>' +
+        '<th scope="col" class="num">TP</th><th scope="col" class="num">FP</th>' +
+        '<th scope="col" class="num">FN</th><th scope="col" class="num">TN</th><th scope="col" class="num">Precision</th>' +
+        '<th scope="col" class="num">Recall</th><th scope="col" class="num">F1-score</th><th scope="col">การแปลผล</th></tr></thead>' +
+        '<tbody>' + body + '</tbody></table>' + (note ? '<p class="sub">' + note + '</p>' : '');
+    }
+
+    h.push(ruleTable('ผลรายกฎบนชุดประเมินผลสุดท้าย (F–I)', holdByRule,
+      'รวมจำนวน TP FP FN ของแต่ละกฎข้ามชุด F–I ก่อนคำนวณ แล้วจึงรวมกฎที่อยู่ในหลักเกณฑ์เดียวกัน ' +
+      'ตามบทที่ 3.7.1 ไม่ได้ใช้ค่าเฉลี่ย F1 ของแต่ละชุด หลักเกณฑ์ SC 1.3.1 ประกอบด้วยกฎ R-HEAD-01 และ R-LABEL-01'));
+
     h.push('<h2>2. ความแม่นยำบนชุดใช้พัฒนากฎ (A–E)</h2>');
     h.push('<p>รายงานไว้เพื่อความโปร่งใส ไม่ใช้ตัดสินผลการวิจัย เพราะเป็นชุดเดียวกับที่ใช้ปรับแก้กฎระหว่างพัฒนา</p>');
     h.push(prfTable('ชุดใช้พัฒนากฎ (Development Set: A, B, C, D, E)', devTotals));
+    h.push(ruleTable('ผลรายกฎบนชุดใช้พัฒนากฎ (A–E)', devByRule));
 
     h.push('<h2>3. ผลรายชุดทดสอบ</h2>');
     h.push('<table><caption>สรุปรายชุด</caption><thead><tr>' +
@@ -371,13 +482,16 @@
     h.push('<tr><td>ตัวอย่างการคำนวณทีละขั้นในบทที่ 3.7.2<br><span class="sub">SC 1.1.1 นับได้ 4 ไม่ผ่าน 2 / SC 1.3.1 นับได้ 5 ไม่ผ่าน 2 / SC 1.4.3 นับได้ 3 ไม่ผ่าน 1</span></td>' +
       '<td class="num">57.62</td><td class="num">' + fmt(scoringCheck.actual, 2) + '</td>' +
       '<td><span class="tag ' + (scoringCheck.ok ? 'good' : 'bad') + '">' + (scoringCheck.ok ? 'ตรงกัน' : 'ไม่ตรงกัน') + '</span></td></tr>');
-    h.push('<tr><td>ตัวหารเป็นศูนย์ (ไม่มีองค์ประกอบที่ตรวจได้เลย)<br><span class="sub">FailureRate ต้องเท่ากับ 0 จึงไม่หักคะแนน</span></td>' +
-      '<td class="num">100.00</td><td class="num">' + fmt(zeroCheck.score, 2) + '</td>' +
+    h.push('<tr><td>หลักเกณฑ์หนึ่งไม่มีคู่ที่นับได้ (บทที่ 3.7.2)<br><span class="sub">SC 1.4.3 ไม่มีข้อมูล ต้องตัดน้ำหนักออกจากทั้งตัวเศษและตัวส่วน</span></td>' +
+      '<td class="num">54.00</td><td class="num">' + fmt(weightCheck.actual, 2) + '</td>' +
+      '<td><span class="tag ' + (weightCheck.ok ? 'good' : 'bad') + '">' + (weightCheck.ok ? 'ตรงกัน' : 'ไม่ตรงกัน') + '</span></td></tr>');
+    h.push('<tr><td>ทุกหลักเกณฑ์ไม่มีคู่ที่นับได้ (บทที่ 3.7.2)<br><span class="sub">ต้องไม่แสดงคะแนนเป็นตัวเลข แต่แจ้งว่าข้อมูลไม่เพียงพอสำหรับคำนวณคะแนน</span></td>' +
+      '<td class="num">ไม่แสดงคะแนน</td><td class="num">' + (zeroCheck.score === null ? esc(zeroCheck.band) : fmt(zeroCheck.score, 2)) + '</td>' +
       '<td><span class="tag ' + (zeroCheck.ok ? 'good' : 'bad') + '">' + (zeroCheck.ok ? 'ตรงกัน' : 'ไม่ตรงกัน') + '</span></td></tr>');
     checklistCheck.cases.forEach(function (c) {
       h.push('<tr><td>แบบประเมิน Checklist สามระดับ (บทที่ 3.8)<br><span class="sub">' + c.label + '</span></td>' +
-        '<td class="num">นับได้ ' + c.got.counted + '</td>' +
-        '<td class="num">' + fmt(c.got.score, 2) + '</td>' +
+        '<td class="num">' + c.expect + '</td>' +
+        '<td class="num">' + (c.got.pairs !== undefined ? c.got.pairs + ' คู่' : fmt(c.got.score, 2)) + '</td>' +
         '<td><span class="tag ' + (c.ok ? 'good' : 'bad') + '">' + (c.ok ? 'ตรงกัน' : 'ไม่ตรงกัน') + '</span></td></tr>');
     });
     h.push('</tbody></table>');
@@ -409,8 +523,10 @@
     window.__RESULTS__ = {
       overallOk: overallOk,
       holdout: holdTotals, development: devTotals,
+      holdoutByRule: holdByRule, developmentByRule: devByRule,
       scoringCheck: { ok: scoringCheck.ok, expected: scoringCheck.expected, actual: scoringCheck.actual },
       zeroCheck: zeroCheck,
+      weightCheck: { ok: weightCheck.ok, expected: weightCheck.expected, actual: weightCheck.actual },
       checklistCheck: checklistCheck,
       securityOk: securityOk,
       security: security,
