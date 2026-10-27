@@ -365,6 +365,17 @@
     pre.source { max-height:none; }
     a[href^="http"]::after { content:" (" attr(href) ")"; font-size:.85em; }
   }
+
+  /* ---------- แท็บเลือกรูปแบบการตรวจ ---------- */
+  .tabs { display:flex; flex-wrap:wrap; gap:4px; margin-top:28px; border-bottom:1px solid var(--border); }
+  .tabs button[role="tab"] {
+    background:transparent; color:var(--ink-2); border:0; border-bottom:3px solid transparent; border-radius:0;
+    box-shadow:none; transform:none; padding:10px 16px 9px; margin-bottom:-1px; font-size:1rem; font-weight:700;
+  }
+  .tabs button[role="tab"]:hover { color:var(--ink); background:var(--surface-2); box-shadow:none; transform:none; }
+  .tabs button[role="tab"][aria-selected="true"] { color:var(--brand); border-bottom-color:var(--brand); }
+  #panel-compare { padding-top:28px; }
+  @media print { .tabs { display:none; } }
 </style>
 </head>
 <body>
@@ -395,6 +406,13 @@
 
 <div class="wrap">
 <main id="main">
+
+  <div class="tabs no-print" role="tablist" aria-label="เลือกรูปแบบการตรวจ">
+    <button type="button" role="tab" id="tab-single" aria-selected="true" aria-controls="panel-single">ตรวจทีละเว็บ</button>
+    <button type="button" role="tab" id="tab-compare" aria-selected="false" aria-controls="panel-compare" tabindex="-1">เทียบหลายเว็บไซต์ (แดชบอร์ด)</button>
+  </div>
+
+  <div id="panel-single" role="tabpanel" aria-labelledby="tab-single">
 
   <div class="note warn" role="note">
     <p><strong>ข้อจำกัดที่ต้องทราบก่อนใช้งาน</strong></p>
@@ -505,6 +523,13 @@
     </div>
   </section>
 
+  </div>
+
+  <!-- ============ แดชบอร์ดเทียบหลายเว็บไซต์ (สร้างโดย compare.js) ============ -->
+  <div id="panel-compare" role="tabpanel" aria-labelledby="tab-compare" hidden>
+    <div id="compare-root"></div>
+  </div>
+
 </main>
 
 <footer class="site">
@@ -515,12 +540,52 @@
   <p>
     มาตรฐานอ้างอิง:
     <a href="https://www.w3.org/TR/WCAG21/" target="_blank" rel="noopener">WCAG 2.1 (W3C, 2018)</a> ·
-    <a href="./tests/runner.html">ผลการวัดความแม่นยำจากชุดทดสอบที่ผู้วิจัยพัฒนา</a>
+    <a href="./tests/runner.html">ผลการวัดความแม่นยำจากชุดทดสอบที่ผู้วิจัยพัฒนา</a> ·
+    <a href="./compare.html">แดชบอร์ดเทียบหลายเว็บไซต์แบบเต็มหน้า</a>
   </p>
 </footer>
 </div>
 
 <script src="./analyzer.js"></script>
 <script src="./app.js"></script>
+<script src="./compare-data.js"></script>
+<script src="./compare.js"></script>
+<script>
+/* สลับแท็บ "ตรวจทีละเว็บ" กับ "เทียบหลายเว็บไซต์" ตามรูปแบบ ARIA Tabs
+   ลิงก์ที่ลงท้ายด้วย #compare จะเปิดแท็บแดชบอร์ดทันที */
+(function () {
+  var tabs = [document.getElementById('tab-single'), document.getElementById('tab-compare')];
+  var mounted = false;
+  function select(tab, focus) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    });
+    if (tab.id === 'tab-compare' && !mounted && window.WcagCompare) {
+      window.WcagCompare.mount(document.getElementById('compare-root'), { level: 2 });
+      mounted = true;
+    }
+    if (focus) tab.focus();
+    var hash = tab.id === 'tab-compare' ? '#compare' : '';
+    if (location.hash !== hash && window.history && history.replaceState) {
+      history.replaceState(null, '', location.pathname + location.search + hash);
+    }
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { select(t); });
+    t.addEventListener('keydown', function (e) {
+      var j = e.key === 'ArrowRight' ? (i + 1) % tabs.length
+        : e.key === 'ArrowLeft' ? (i - 1 + tabs.length) % tabs.length
+        : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : null;
+      if (j !== null) { e.preventDefault(); select(tabs[j], true); }
+    });
+  });
+  function fromHash() { select(location.hash === '#compare' ? tabs[1] : tabs[0]); }
+  window.addEventListener('hashchange', fromHash);
+  fromHash();
+})();
+</script>
 </body>
 </html>
