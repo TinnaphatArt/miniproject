@@ -26,10 +26,10 @@
    * แบบประเมิน Checklist
    * ================================================================ */
   function renderChecklist() {
-    var html = A.CHECKLIST_QUESTIONS.map(function (q) {
+    var html = A.CHECKLIST_QUESTIONS.map(function (q, qi) {
       var name = 'cl-' + q.id;
       function option(value, label, hint) {
-        return '<label><input type="radio" name="' + name + '" value="' + value +
+        return '<label class="lv-' + value + '"><input type="radio" name="' + name + '" value="' + value +
           '" data-q="' + esc(q.id) + '"' + (value === 'skip' ? ' checked' : '') + '>' +
           '<span class="lvtext"><b>' + esc(label) + '</b>' +
           '<span class="lvhint">' + esc(hint) + '</span></span></label>';
@@ -41,8 +41,9 @@
       }).join('');
 
       return '<fieldset class="q">' +
-        '<legend>' + esc(q.sc) + ' — ' + esc(q.question) + '</legend>' +
-        '<span class="hint">' + esc(q.help) + '</span>' +
+        '<legend><span class="q-meta"><span>ข้อ ' + (qi + 1) + ' จาก ' + A.CHECKLIST_QUESTIONS.length + '</span>' +
+        '<span class="rule-id">' + esc(q.sc) + '</span></span>' + esc(q.question) + '</legend>' +
+        '<p class="hint">' + esc(q.help) + '</p>' +
         '<div class="answers">' + levels +
         option('skip', 'ยังไม่ได้ตรวจ', 'ไม่รวมในคะแนน คงสถานะต้องตรวจเพิ่มไว้ และแสดงเป็นจำนวนค้างตรวจ') +
         '</div></fieldset>';
@@ -120,33 +121,36 @@
     if (!c) return '';
     var isFail = p.status === S.FAIL;
     var rel = A.relatedCriteria(p);
-    return '<div class="std' + (isFail ? '' : ' review') + '">' +
-      '<p class="std-main"><span class="std-label">' + (isFail ? 'ผิดมาตรฐาน' : 'ต้องยืนยันตามมาตรฐาน') + '</span> ' +
-      '<strong>WCAG 2.1 ' + esc(p.sc) + ' ' + esc(c.nameTh) + '</strong> (' + esc(c.nameEn) + ') ' +
-      '<span class="badge ok">ระดับ ' + esc(c.level) + '</span></p>' +
-      '<p class="std-path">หลักการที่ ' + esc(c.principle) + ' › แนวทาง ' + esc(c.guideline) + ' › กฎตรวจ ' + esc(p.ruleId) + '</p>' +
-      (rel.length ? '<p class="std-rel"><strong>ละเมิดร่วมด้วย:</strong> ' + rel.map(function (r) {
+    return '<dl class="std' + (isFail ? '' : ' review') + '">' +
+      '<dt class="std-label">' + (isFail ? 'ผิดมาตรฐาน' : 'ต้องยืนยันตามมาตรฐาน') + '</dt>' +
+      '<dd><strong>WCAG 2.1 ' + esc(p.sc) + ' ' + esc(c.nameTh) + '</strong> (' + esc(c.nameEn) + ') ' +
+      '<span class="badge none">ระดับ ' + esc(c.level) + '</span></dd>' +
+      '<dt>อยู่ภายใต้</dt><dd>หลักการที่ ' + esc(c.principle) + ' › แนวทาง ' + esc(c.guideline) + ' › กฎตรวจ ' + esc(p.ruleId) + '</dd>' +
+      (rel.length ? '<dt>ละเมิดร่วมด้วย</dt><dd>' + rel.map(function (r) {
         var rc = A.RELATED_CRITERIA[r.sc];
         return esc(rc.id + ' ' + rc.nameTh + ' ระดับ ' + rc.level + ' เพราะ' + r.reason);
-      }).join(' · ') + ' <span class="muted">ระบบไม่ได้ตรวจหลักเกณฑ์นี้โดยตรง</span></p>' : '') +
-      '<p class="std-path"><a href="' + esc(c.url) + '" target="_blank" rel="noopener">อ่านคำอธิบาย ' + esc(p.sc) +
-      ' จาก W3C (ภาษาอังกฤษ)</a></p></div>';
+      }).join(' · ') + ' <span class="muted">ระบบไม่ได้ตรวจหลักเกณฑ์นี้โดยตรง</span></dd>' : '') +
+      '<dt>อ้างอิง</dt><dd><a href="' + esc(c.url) + '" target="_blank" rel="noopener">อ่านคำอธิบาย ' + esc(p.sc) +
+      ' จาก W3C (ภาษาอังกฤษ)</a></dd></dl>';
   }
 
   function renderIssue(p) {
     var sev = p.severity || 'should_fix';
     var part = PART_LABEL[A.RULE_PART[p.ruleId]];
+    var isChecklist = p.tag === 'checklist';
     return '<div class="issue ' + esc(sev) + '">' +
-      '<h4><span class="rule-id">' + esc(p.ruleId) + '</span>' +
-      '<span class="badge ' + (sev === 'critical' ? 'bad' : sev === 'should_fix' ? 'warn' : 'ok') + '">' +
-      esc(SEVERITY_LABEL[sev] || sev) + '</span> ' + (part ? '<span class="part-tag">' + esc(part) + '</span> ' : '') +
-      esc(p.tag === 'checklist' ? 'คำตอบจากแบบประเมิน' : '<' + p.tag + '>') + '</h4>' +
-      '<p>' + esc(p.message) + '</p>' +
+      '<p class="issue-meta"><span class="sev ' + esc(sev) + '">' + esc(SEVERITY_LABEL[sev] || sev) + '</span>' +
+      '<span class="rule-id">' + esc(p.ruleId) + '</span>' +
+      '<span>' + (part ? esc(part) + ' · ' : '') + esc(isChecklist ? 'คำตอบจากแบบประเมิน' : '<' + p.tag + '>') + '</span></p>' +
+      '<h5 class="issue-msg">' + esc(p.message) + '</h5>' +
+      '<div class="codes' + (p.suggestion ? '' : ' single') + '">' +
+      '<div class="code-col found"><p class="code-cap">' + (isChecklist ? 'ที่มา' : 'โค้ดที่พบ') + '</p>' +
       '<code class="snippet">' + esc(p.snippet) + '</code>' +
-      (p.path && p.tag !== 'checklist' ? '<p class="where">ตำแหน่ง: ' + esc(p.path) + '</p>' : '') +
+      (p.path && !isChecklist ? '<p class="where">ตำแหน่ง: ' + esc(p.path) + '</p>' : '') + '</div>' +
+      (p.suggestion ? '<div class="code-col fix"><p class="code-cap">แนวทางแก้ไข</p><p>' + esc(p.suggestion) + '</p>' +
+        (p.example ? '<p class="code-cap sub">ตัวอย่างโค้ดที่ถูกต้อง</p><code class="snippet">' + esc(p.example) + '</code>' : '') + '</div>' : '') +
+      '</div>' +
       standardBlock(p) +
-      (p.suggestion ? '<div class="fix"><strong>คำแนะนำในการแก้ไข:</strong> ' + esc(p.suggestion) +
-        (p.example ? '<code class="snippet">' + esc(p.example) + '</code>' : '') + '</div>' : '') +
       '</div>';
   }
 
@@ -244,7 +248,7 @@
     });
     if (rows.length) {
       out.push('<h4>มาตรฐานที่ละเมิดในหน้านี้</h4>');
-      out.push('<div class="table-scroll"><table class="std-table"><thead><tr>' +
+      out.push('<div class="table-scroll" tabindex="0" role="region" aria-label="ตารางมาตรฐานที่ละเมิดในหน้านี้"><table class="std-table"><thead><tr>' +
         '<th scope="col">หลักเกณฑ์ WCAG 2.1</th><th scope="col">ระดับ</th><th scope="col">แนวทาง</th>' +
         '<th scope="col" class="num">จุดที่ผิด</th><th scope="col">พบที่ส่วน</th></tr></thead><tbody>' +
         rows.join('') + '</tbody></table></div>');
@@ -257,33 +261,34 @@
     var h = [];
     var interp = result.interpretation;
 
-    /* ---- การ์ดคะแนน: วงแหวนแสดงสัดส่วน อ่านค่าได้จากตัวเลขกลางวงเสมอ ---- */
-    var C = 2 * Math.PI * 54;                       /* เส้นรอบวงของรัศมี 54 */
+    /* ---- คะแนน: ตัวเลขเป็นข้อมูลหลัก แถบด้านข้างแสดงว่าคะแนนตกช่วงใดตามเกณฑ์ในบทที่ 3.7.3 ---- */
     var hasScore = result.score !== null && result.score !== undefined;
-    var arc = hasScore ? C * Math.max(0, Math.min(100, result.score)) / 100 : 0;
-    h.push('<div class="scorecard">' +
-      '<div class="gauge">' +
-      '<svg viewBox="0 0 128 128" aria-hidden="true" focusable="false">' +
-      '<circle class="track" cx="64" cy="64" r="54" fill="none" stroke-width="13"></circle>' +
-      '<circle class="fill ' + interp.tone + '" cx="64" cy="64" r="54" fill="none" stroke-width="13" ' +
-      'stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + (C - arc).toFixed(1) + '"></circle>' +
-      '</svg>' +
-      (hasScore
-        ? '<span class="gauge-label"><b>' + result.score.toFixed(2) + '</b><span>จาก 100 คะแนน</span></span>'
-        : '<span class="gauge-label"><b>—</b><span>ไม่มีคะแนน</span></span>') +
+    var scale = SCORE_BANDS.map(function (b) {
+      return '<span class="seg ' + b.tone + (b.tone === interp.tone ? ' on' : '') + '" style="width:' + (b.to - b.from) + '%"></span>';
+    }).join('') + (hasScore ? '<span class="marker" style="left:' + Math.max(0, Math.min(100, result.score)).toFixed(2) + '%"></span>' : '');
+    h.push('<div class="score" id="r-score">' +
+      '<div class="score-main">' +
+      '<p class="score-label">คะแนนผลการตรวจเบื้องต้นตามรายการที่กำหนด</p>' +
+      '<p class="score-num">' + (hasScore ? '<b>' + result.score.toFixed(2) + '</b><span>จาก 100</span>' : '<b>—</b><span>ไม่มีคะแนน</span>') + '</p>' +
+      '<p class="score-band"><span class="tag ' + interp.tone + '">' + esc(interp.band) + '</span> ' + esc(interp.text) + '</p>' +
       '</div>' +
-      '<div class="scoremeta">' +
-      '<p class="title">คะแนนผลการตรวจเบื้องต้นตามรายการที่กำหนด</p>' +
-      '<p><span class="badge ' + interp.tone + '">' + esc(interp.band) + '</span> ' + esc(interp.text) + '</p>' +
-      '<div class="stats">' +
-      '<div class="stat"><b>' + result.issueCount + '</b><span>จุดที่ต้องแก้</span></div>' +
-      '<div class="stat"><b>' + result.needsReviewCount + '</b><span>ต้องตรวจเพิ่ม</span></div>' +
-      '<div class="stat"><b>' + result.elementCount + '</b><span>องค์ประกอบทั้งหมด</span></div>' +
-      '</div>' +
-      '<p class="muted" style="margin-top:12px">แหล่งข้อมูล: ' + esc(state.sourceLabel || 'วางโค้ดเอง') +
+      '<div class="scale-wrap" aria-hidden="true">' +
+      '<p class="scale-cap">ช่วงคะแนน' + (hasScore ? '' : ' (ยังไม่มีคะแนนให้วาง)') + '</p>' +
+      '<div class="scale">' + scale + '</div>' +
+      '<div class="scale-ticks"><span style="left:0">0</span>' + SCORE_BANDS.slice(1).map(function (b) {
+        return '<span style="left:' + b.from + '%">' + b.from + '</span>'; }).join('') + '<span style="left:100%">100</span></div>' +
+      '<div class="scale-names">' + SCORE_BANDS.map(function (b) {
+        return '<span' + (b.tone === interp.tone ? ' class="on"' : '') + ' style="width:' + (b.to - b.from) + '%">' + esc(b.name) + '</span>'; }).join('') +
+      '</div></div>' +
+      '<dl class="figures">' +
+      '<div><dt>จุดที่ต้องแก้</dt><dd' + (result.issueCount ? ' class="bad"' : '') + '>' + result.issueCount + '</dd></div>' +
+      '<div><dt>ต้องตรวจเพิ่ม</dt><dd>' + result.needsReviewCount + '</dd></div>' +
+      '<div><dt>องค์ประกอบทั้งหมด</dt><dd>' + result.elementCount + '</dd></div>' +
+      '</dl>' +
+      '<p class="score-src">แหล่งข้อมูล: ' + esc(state.sourceLabel || 'วางโค้ดเอง') +
       ' · วิเคราะห์โครงสร้างโค้ด ' + result.analysisMs.toFixed(2) + ' มิลลิวินาที' +
       (state.fetchMs !== null ? ' · ดึงข้อมูลผ่านบริการตัวกลาง ' + state.fetchMs + ' มิลลิวินาที' : '') +
-      '</p></div></div>');
+      '</p></div>');
 
     h.push(renderPartsDashboard(result));
 
@@ -293,7 +298,7 @@
       'ไม่ได้แปลว่าเว็บไซต์ไม่มีปัญหาในหลักเกณฑ์นั้น</p></div>');
 
     /* ---- ตารางความครอบคลุมรายหลักเกณฑ์ ---- */
-    h.push('<h3>ความครอบคลุมและอัตราไม่ผ่านรายหลักเกณฑ์</h3>');
+    h.push('<h3 id="h-coverage">ความครอบคลุมและอัตราไม่ผ่านรายหลักเกณฑ์</h3>');
 
     /* แถบสัดส่วนช่วยให้เห็นทันทีว่าคะแนนมาจากการตรวจได้กี่จุด ไม่ใช่ดูแต่ตัวเลขคะแนน */
     h.push('<div class="coverage">');
@@ -316,7 +321,7 @@
             (c.pass ? '<span><i style="background:var(--good)"></i>ผ่าน ' + c.pass + '</span>' : '') +
             (c.fail ? '<span><i style="background:var(--bad)"></i>ไม่ผ่าน ' + c.fail + '</span>' : '') +
             (c.needsReview ? '<span><i style="background:var(--warn)"></i>ต้องตรวจเพิ่ม ' + c.needsReview + '</span>' : '') +
-            (c.notApplicable ? '<span><i style="background:var(--border-strong)"></i>ไม่เกี่ยวข้อง ' + c.notApplicable + '</span>' : '') +
+            (c.notApplicable ? '<span><i style="background:var(--control);opacity:.45"></i>ไม่เกี่ยวข้อง ' + c.notApplicable + '</span>' : '') +
             '</div>'
           : '<p class="muted" style="margin:0">ไม่พบองค์ประกอบที่เกี่ยวข้องกับหลักเกณฑ์นี้ในโค้ดชุดนี้</p>') +
         '</div>');
@@ -324,7 +329,7 @@
     h.push('</div>');
 
     h.push('<details><summary>ตารางตัวเลขรายหลักเกณฑ์</summary>');
-    h.push('<div class="table-scroll"><table>' +
+    h.push('<div class="table-scroll" tabindex="0" role="region" aria-label="ตารางตัวเลขรายหลักเกณฑ์"><table>' +
       '<caption>รายงานจำนวนคู่องค์ประกอบ–กฎตรวจควบคู่กับคะแนน ตามข้อกำหนดในบทที่ 3.7.2</caption>' +
       '<thead><tr>' +
       '<th scope="col">หลักเกณฑ์</th>' +
@@ -362,7 +367,7 @@
 
     /* ---- ที่มาของคะแนน ---- */
     h.push('<details><summary>ที่มาของคะแนนทีละขั้น</summary>');
-    h.push('<div class="table-scroll"><table><caption>PreliminaryScore = 100 × [ 1 − ( Σ w<sub>i</sub> × FailureRate(i) ) / Σ w<sub>i</sub> ]</caption>' +
+    h.push('<div class="table-scroll" tabindex="0" role="region" aria-label="ตารางที่มาของคะแนน"><table><caption>PreliminaryScore = 100 × [ 1 − ( Σ w<sub>i</sub> × FailureRate(i) ) / Σ w<sub>i</sub> ]</caption>' +
       '<thead><tr><th scope="col">หลักเกณฑ์</th><th scope="col" class="num">ตรวจได้ / ไม่ผ่าน</th>' +
       '<th scope="col" class="num">FailureRate</th><th scope="col" class="num">น้ำหนัก × FailureRate</th></tr></thead><tbody>');
     result.scoring.terms.forEach(function (t) {
@@ -381,7 +386,7 @@
       '</strong></td></tr></tfoot></table></div></details>');
 
     /* ---- รายการจุดบกพร่อง ---- */
-    h.push('<h3>จุดที่ต้องแก้ไข (' + result.issueCount + ' จุด)</h3>');
+    h.push('<h3 id="h-issues">จุดที่ต้องแก้ไข (' + result.issueCount + ' จุด)</h3>');
     if (!result.issueCount) {
       h.push('<div class="note good" role="note"><p>ไม่พบข้อบกพร่องในกฎย่อยที่ระบบตรวจได้ ' +
         'อย่างไรก็ตามยังต้องตรวจสอบหลักเกณฑ์อื่นของ WCAG ที่อยู่นอกขอบเขตของเครื่องมือนี้ด้วย</p></div>');
@@ -398,7 +403,7 @@
 
     /* ---- รายการที่ต้องตรวจเพิ่ม ---- */
     if (result.needsReviewCount) {
-      h.push('<h3>จุดที่ต้องตรวจเพิ่มด้วยตนเอง (' + result.needsReviewCount + ' จุด)</h3>');
+      h.push('<h3 id="h-review">จุดที่ต้องตรวจเพิ่มด้วยตนเอง (' + result.needsReviewCount + ' จุด)</h3>');
       h.push('<p class="lead">ระบบตัดสินแทนไม่ได้ว่าผ่านหรือไม่ผ่าน จุดเหล่านี้จึงยังไม่ถูกนับในตัวหารของคะแนน ' +
         'ตอบแบบประเมิน Checklist ในขั้นที่ 2 เพื่อให้ระบบนำมาคิดคะแนน</p>');
       A.PAGE_PARTS.forEach(function (part) {
@@ -410,6 +415,7 @@
     }
 
     /* ---- โค้ดที่ไฮไลต์จุดบกพร่อง ---- */
+    h.push('<div class="results-tail">');
     if (highlighted) {
       h.push('<details><summary>โค้ดที่ไฮไลต์จุดบกพร่อง</summary>' +
         '<p class="muted">โค้ดด้านล่างเป็นผลจากการแปลงเป็นโครงสร้าง DOM แล้วแปลงกลับเป็นข้อความ ' +
@@ -419,7 +425,7 @@
 
     /* ---- ผลการตรวจทั้งหมด ---- */
     h.push('<details><summary>ผลการตรวจทุกคู่องค์ประกอบ–กฎตรวจ (' + result.pairs.length + ' คู่)</summary>' +
-      '<div class="table-scroll"><table><thead><tr>' +
+      '<div class="table-scroll" tabindex="0" role="region" aria-label="ตารางผลการตรวจทุกคู่"><table><thead><tr>' +
       '<th scope="col">กฎ</th><th scope="col">หลักเกณฑ์</th><th scope="col">องค์ประกอบ</th>' +
       '<th scope="col">สถานะ</th><th scope="col">รายละเอียด</th></tr></thead><tbody>');
     result.pairs.forEach(function (p) {
@@ -430,9 +436,49 @@
         '<td><span class="badge ' + tone + '">' + esc(STATUS_LABEL[p.status]) + '</span></td>' +
         '<td>' + esc(p.message) + '</td></tr>');
     });
-    h.push('</tbody></table></div></details>');
+    h.push('</tbody></table></div></details></div>');
 
     $('results-body').innerHTML = h.join('\n');
+    renderResultsNav(result);
+  }
+
+  /* ช่วงคะแนนตามบทที่ 3.7.3 ใช้วาดแถบใต้คะแนน (ค่าตัดช่วงต้องตรงกับ interpretScore ใน analyzer.js) */
+  var SCORE_BANDS = [
+    { from: 0, to: 60, tone: 'bad', name: 'ต้องปรับปรุง' },
+    { from: 60, to: 75, tone: 'warn', name: 'พอใช้' },
+    { from: 75, to: 90, tone: 'ok', name: 'ดี' },
+    { from: 90, to: 100, tone: 'good', name: 'ดีมาก' }
+  ];
+
+  /* เมนูขั้นตอนด้านซ้าย: เมื่อมีผลแล้วให้ขั้นที่ 3 ลิงก์ไปยังหัวข้อย่อยของผลพร้อมจำนวน */
+  function renderResultsNav(result) {
+    var li = $('nav-results');
+    if (!li) return;
+    var sub = [['#r-score', 'คะแนน', result.score === null ? '—' : result.score.toFixed(2), ''],
+      ['#h-dash', 'ผิดที่ส่วนไหน', '', ''],
+      ['#h-coverage', 'ความครอบคลุม', '', ''],
+      ['#h-issues', 'จุดที่ต้องแก้', String(result.issueCount), result.issueCount ? 'bad' : '']];
+    if (result.needsReviewCount) sub.push(['#h-review', 'ต้องตรวจเพิ่ม', String(result.needsReviewCount), '']);
+    li.innerHTML = '<a href="#results-section"><span class="n">3</span><span class="t">ผลการประเมิน</span></a>' +
+      '<ol class="sub">' + sub.map(function (s) {
+        return '<li><a href="' + s[0] + '"><span class="t">' + esc(s[1]) + '</span>' +
+          (s[2] ? '<span class="cnt ' + s[3] + '">' + esc(s[2]) + '</span>' : '') + '</a></li>';
+      }).join('') + '</ol>';
+    updateRailCurrent();
+  }
+
+  /* ไฮไลต์ขั้นที่ผู้ใช้กำลังดูอยู่ในเมนูด้านซ้าย */
+  var RAIL_SECTIONS = ['input-section', 'checklist-section', 'results-section', 'history-section'];
+  function updateRailCurrent() {
+    var current = null;
+    RAIL_SECTIONS.forEach(function (id) {
+      var el = $(id);
+      if (el && !el.classList.contains('hidden') && el.getBoundingClientRect().top < window.innerHeight * 0.35) current = id;
+    });
+    document.querySelectorAll('.steps > li > a').forEach(function (a) {
+      if (a.getAttribute('href') === '#' + current) a.setAttribute('aria-current', 'location');
+      else a.removeAttribute('aria-current');
+    });
   }
 
   /* ================================================================ *
@@ -728,6 +774,14 @@
    * ================================================================ */
   function init() {
     renderChecklist();
+
+    var railTick = false;
+    window.addEventListener('scroll', function () {
+      if (railTick) return;
+      railTick = true;
+      window.requestAnimationFrame(function () { railTick = false; updateRailCurrent(); });
+    }, { passive: true });
+    updateRailCurrent();
 
     document.querySelectorAll('input[name="mode"]').forEach(function (radio) {
       radio.addEventListener('change', function () {
