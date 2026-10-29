@@ -1,0 +1,30 @@
+<title>เทียบผลตรวจ WCAG ห้าเว็บ</title>
+<meta name="description" content="แดชบอร์ดเปรียบเทียบผลตรวจการเข้าถึงเว็บไซต์ตาม WCAG 2.1 หลายเว็บพร้อมกัน">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap">
+<style>
+  /* สไตล์ระดับหน้าเท่านั้น ส่วนแดชบอร์ดใช้ compare.css ภายใน Shadow DOM */
+  :root { --bg:#fbfbfd; --ink:#14151a; --brand:#2451b8; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { color-scheme:dark; --bg:#0f1117; --ink:#eceef5; --brand:#8ab0ff; }
+  }
+  :root[data-theme="dark"] { color-scheme:dark; --bg:#0f1117; --ink:#eceef5; --brand:#8ab0ff; }
+  body {
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Sarabun","Noto Sans Thai","IBM Plex Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:1180px; margin:0 auto; padding-inline:clamp(16px, 4vw, 40px); padding-block:24px 72px; }
+  .back { display:inline-block; margin-bottom:18px; color:var(--brand); font-weight:600; }
+</style>
+
+<div class="wrap">
+  <a class="back" href="index.html">← กลับไปหน้าเครื่องมือหลัก</a>
+  <div id="compare-root"></div>
+</div>
+
+<script src="analyzer.js"></script>
+<script src="compare-data.js"></script>
+<script src="compare.js"></script>
+<script>WcagCompare.mount(document.getElementById('compare-root'), { level: 1 });</script>
