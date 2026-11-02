@@ -1277,6 +1277,24 @@
     .view > section.who-faq { margin-top:64px; }
   }
 
+  /* ---------- ทรานซิชันตอนเปลี่ยนหน้า ----------
+   * เบราว์เซอร์ที่รองรับ View Transitions: ภาพทั้งจอจางข้ามกัน แถบเมนู (topbar) และแถบขั้นตอน (stepper) อยู่นิ่ง
+   * วงขั้นปัจจุบัน (step-cur) เลื่อนจากขั้นเดิมไปขั้นใหม่ ส่วนเนื้อหาหน้าใหม่เลื่อนเข้าด้วยคลาส .view-enter
+   * เบราว์เซอร์ที่ไม่รองรับเห็นเฉพาะ .view-enter ทั้งหมดปิดเมื่อผู้ใช้ตั้งลดการเคลื่อนไหว */
+  @media (prefers-reduced-motion: no-preference) {
+    .sidebar { view-transition-name:topbar; }
+    .pg-band { view-transition-name:stepper; }
+    .pg-steps .cur .ps-n { view-transition-name:step-cur; }
+    /* ใช้การจางข้ามแบบเดิมของเบราว์เซอร์ (ความทึบสองภาพรวมกันเท่ากับ 1) ส่วนที่เหมือนกันจึงไม่ซีดระหว่างทาง */
+    ::view-transition-old(root), ::view-transition-new(root) { animation-duration:.28s; }
+    ::view-transition-group(step-cur) { animation-duration:.42s; animation-timing-function:cubic-bezier(.3, .7, .2, 1); }
+    ::view-transition-group(topbar), ::view-transition-group(stepper) { animation-duration:.2s; }
+    .view-enter { animation:view-in-fwd .36s cubic-bezier(.2, .7, .2, 1) backwards; }
+    :root[data-nav-dir="back"] .view-enter { animation-name:view-in-back; }
+  }
+  @keyframes view-in-fwd { from { opacity:0; transform:translateX(28px); } }
+  @keyframes view-in-back { from { opacity:0; transform:translateX(-28px); } }
+
   /* ---------- การพิมพ์รายงาน ---------- */
   @media print {
     .caps { display:none !important; }

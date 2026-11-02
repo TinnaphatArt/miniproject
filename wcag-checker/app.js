@@ -627,19 +627,61 @@
     });
   }
 
+  /* ลำดับหน้า ใช้บอกทิศทางของทรานซิชัน (ไปข้างหน้าเลื่อนเข้าจากขวา ย้อนกลับเลื่อนเข้าจากซ้าย) */
+  var VIEW_ORDER = ['home', 'standards', 'check', 'checklist', 'results', 'report'];
+  var motionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  function reducedMotion() { return !!(motionQuery && motionQuery.matches); }
+
+  /* เปลี่ยนหน้า: ใช้ View Transitions API เมื่อเบราว์เซอร์รองรับ (ภาพหน้าเก่าจางออก หน้าใหม่เลื่อนเข้า
+   * แถบเมนูกับแถบขั้นตอนอยู่นิ่ง วงขั้นปัจจุบันเลื่อนไปยังขั้นใหม่) เบราว์เซอร์ที่ไม่รองรับใช้แอนิเมชัน CSS แทน
+   * ผู้ที่ตั้งลดการเคลื่อนไหวไว้จะเปลี่ยนหน้าทันทีโดยไม่มีทรานซิชัน */
   function showView(name, target, moveFocus) {
-    var changed = name !== currentView;
+    var prev = currentView, changed = name !== prev;
     currentView = name;
+    var apply = function () { applyView(name, target, moveFocus, changed); };
+    if (!prev || !changed || reducedMotion()) { apply(); return; }
+
+    var root = document.documentElement;
+    root.setAttribute('data-nav-dir', VIEW_ORDER.indexOf(name) < VIEW_ORDER.indexOf(prev) ? 'back' : 'fwd');
+    var view = document.querySelector('[data-view="' + name + '"]');
+    var enter = function () {
+      if (!view) return;
+      view.classList.remove('view-enter');
+      void view.offsetWidth;            /* เริ่มแอนิเมชันใหม่แม้คลาสเดิมยังค้างอยู่ */
+      view.classList.add('view-enter');
+    };
+    if (typeof document.startViewTransition === 'function') {
+      try {
+        document.startViewTransition(function () { apply(); enter(); });
+        return;
+      } catch (e) { /* ใช้ทางสำรองด้านล่าง */ }
+    }
+    apply();
+    enter();
+  }
+
+  function applyView(name, target, moveFocus, changed) {
     document.body.setAttribute('data-page', name);
     document.querySelectorAll('[data-view]').forEach(function (v) { v.hidden = v.getAttribute('data-view') !== name; });
     var empty = $('results-empty');
     if (empty) empty.hidden = !$('results-section').classList.contains('hidden');
     updateRailCurrent();
     document.title = (name === 'home' ? '' : VIEW_TITLES[name] + ' · ') + BASE_TITLE;
-    var deep = target && !target.hasAttribute('data-view') && !target.classList.contains('hidden');
-    if (deep) target.scrollIntoView({ block: 'start' });
-    else window.scrollTo(0, 0);
-    if (moveFocus && (changed || deep)) {
+    /* #results-section คือเนื้อหาหลักของหน้าผล จึงเปิดที่ด้านบนเหมือนหน้าอื่น (เห็นแถบขั้นตอน) ไม่ใช่ลิงก์ย่อย */
+    var deep = target && !target.hasAttribute('data-view') && !target.classList.contains('hidden') &&
+      target.id !== 'results-section';
+    /* การเปลี่ยนหน้าเริ่มที่ด้านบนเสมอ ส่วนลิงก์ภายในหน้าเดียวกันเลื่อนแบบนุ่มนวล
+     * หน้า CSS ตั้ง scroll-behavior:smooth ไว้ การเปลี่ยนหน้าจึงต้องสั่ง 'instant' ตรง ๆ
+     * ไม่เช่นนั้นหน้าใหม่จะไหลขึ้นระหว่างทรานซิชัน */
+    var how = (changed || !deep || reducedMotion()) ? 'instant' : 'smooth';
+    try {
+      if (deep) target.scrollIntoView({ block: 'start', behavior: how });
+      else window.scrollTo({ top: 0, left: 0, behavior: how });
+    } catch (e) {
+      if (deep) target.scrollIntoView(true); else window.scrollTo(0, 0);
+    }
+    var resultsMain = target && target.id === 'results-section';
+    if (moveFocus && (changed || deep || resultsMain)) {
       /* ย้ายโฟกัสไปหัวข้อของหน้าใหม่ โปรแกรมอ่านหน้าจอจึงรู้ว่าเปลี่ยนหน้าแล้ว */
       var view = document.querySelector('[data-view="' + name + '"]:not([hidden])');
       var h = deep ? target : view && view.querySelector('h1, h2:not(.sr-only)');
