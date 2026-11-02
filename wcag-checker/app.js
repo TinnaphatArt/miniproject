@@ -353,12 +353,8 @@
       '<div class="scale-names">' + SCORE_BANDS.map(function (b) {
         return '<span' + (b.tone === interp.tone ? ' class="on"' : '') + ' style="width:' + (b.to - b.from) + '%">' + esc(b.name) + '</span>'; }).join('') +
       '</div></div>' +
-      '<dl class="figures">' +
-      '<div><dt>จุดที่ต้องแก้</dt><dd' + (result.issueCount ? ' class="bad"' : '') + '>' + result.issueCount + '</dd></div>' +
-      '<div><dt>ต้องตรวจเพิ่ม</dt><dd>' + result.needsReviewCount + '</dd></div>' +
-      '<div><dt>องค์ประกอบทั้งหมด</dt><dd>' + result.elementCount + '</dd></div>' +
-      '</dl>' +
-      renderSeverityStrip(result) +
+      renderKpis(result) +
+      renderSeverityStrip(result) + renderCriteriaBars(result) +
       '<p class="score-src">แหล่งข้อมูล: ' + esc(state.sourceLabel || 'วางโค้ดเอง') +
       ' · วิเคราะห์โครงสร้างโค้ด ' + result.analysisMs.toFixed(2) + ' มิลลิวินาที' +
       (state.fetchMs !== null ? ' · ดึงข้อมูลผ่านบริการตัวกลาง ' + state.fetchMs + ' มิลลิวินาที' : '') +
@@ -523,6 +519,36 @@
     { from: 75, to: 90, tone: 'ok', name: 'ดี' },
     { from: 90, to: 100, tone: 'good', name: 'ดีมาก' }
   ];
+
+  /* การ์ดสรุป ผิด / ต้องตรวจเพิ่ม / ผ่าน / องค์ประกอบ (ตัวเลขเป็นข้อความ ไอคอนเป็นภาพตกแต่ง) */
+  var KPI_ICON = {
+    bad: '<path d="M7 7l10 10M17 7 7 17"/>',
+    warn: '<path d="M12 7v6M12 16.5v.5"/>',
+    good: '<path d="M6.5 12.5l3.5 3.5 7.5-8"/>',
+    none: '<path d="M5 8h14M5 12h14M5 16h9"/>'
+  };
+  function renderKpis(result) {
+    var passCount = (result.pairs || []).filter(function (p) { return p.status === 'pass'; }).length;
+    var items = [['bad', 'ผิด ต้องแก้', result.issueCount], ['warn', 'ต้องตรวจเพิ่ม', result.needsReviewCount],
+      ['good', 'ผ่าน', passCount], ['none', 'องค์ประกอบทั้งหมด', result.elementCount]];
+    return '<dl class="figures kpis">' + items.map(function (it) {
+      return '<div class="kpi kpi-' + it[0] + '"><span class="kpi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">' +
+        KPI_ICON[it[0]] + '</svg></span><dt>' + it[1] + '</dt><dd>' + it[2] + '</dd></div>';
+    }).join('') + '</dl>';
+  }
+
+  /* อัตราผ่านแยกตามหลักเกณฑ์ (ผ่าน ÷ จุดที่นับได้) แถบเป็นภาพตกแต่ง ตัวเลขเป็นข้อความ */
+  function renderCriteriaBars(result) {
+    var rows = Object.keys(result.byCriterion || {}).map(function (sc) {
+      var c = result.byCriterion[sc], crit = A.CRITERIA[sc] || {};
+      var pct = c.counted ? (c.pass / c.counted * 100) : null;
+      return '<li><span class="cb-name"><b>' + esc(sc) + '</b> ' + esc(crit.nameTh || '') +
+        ' <span class="cb-lv">ระดับ ' + esc(crit.level || '') + '</span></span>' +
+        '<span class="cb-bar" aria-hidden="true"><i style="width:' + (pct === null ? 0 : pct.toFixed(1)) + '%"></i></span>' +
+        '<span class="cb-val">' + (pct === null ? 'ไม่มีจุดให้ตรวจ' : 'ผ่าน ' + pct.toFixed(1) + '% (' + c.pass + ' จาก ' + c.counted + ')') + '</span></li>';
+    }).join('');
+    return '<div class="crit-bars"><p class="sev-cap">อัตราผ่านแยกตามหลักเกณฑ์ WCAG 2.1</p><ul>' + rows + '</ul></div>';
+  }
 
   /* แถบจำนวนจุดที่ต้องแก้แยกตามความรุนแรง ตัวเลขอยู่ในคำอธิบายใต้แถบ (แถบเป็นภาพตกแต่ง) */
   function renderSeverityStrip(result) {
@@ -921,12 +947,33 @@
 
     document.querySelectorAll('input[name="mode"]').forEach(function (radio) {
       radio.addEventListener('change', function () {
-        var isUrl = radio.value === 'url' && radio.checked;
-        $('panel-snippet').classList.toggle('hidden', isUrl);
-        $('panel-url').classList.toggle('hidden', !isUrl);
+        if (!radio.checked) return;
+        var v = radio.value;
+        $('panel-snippet').classList.toggle('hidden', v !== 'snippet');
+        $('panel-url').classList.toggle('hidden', v !== 'url');
+        $('panel-file').classList.toggle('hidden', v !== 'file');
+        $('btn-analyze').closest('.actions').classList.toggle('hidden', v === 'file');
         setStatus($('input-status'), '');
       });
     });
+
+    /* อ่านไฟล์ HTML ในเบราว์เซอร์ แล้วตรวจด้วยขั้นตอนเดิม (ใช้ทั้งหน้าแรกและหน้าตรวจโค้ด) */
+    function readHtmlFile(input, statusEl) {
+      var f = input.files && input.files[0];
+      if (!f) return;
+      if (!/\.html?$/i.test(f.name)) { setStatus(statusEl, 'รองรับเฉพาะไฟล์ .html และ .htm', 'bad'); input.value = ''; return; }
+      if (f.size > 2 * 1024 * 1024) { setStatus(statusEl, 'ไฟล์ใหญ่เกิน 2 MB', 'bad'); input.value = ''; return; }
+      var reader = new FileReader();
+      reader.onload = function () {
+        $('html-input').value = String(reader.result || '');
+        setStatus(statusEl, 'อ่านไฟล์ ' + f.name + ' แล้ว', 'good');
+        input.value = '';
+        runAnalysis($('html-input').value, 'ไฟล์ ' + f.name, 'snippet');
+      };
+      reader.onerror = function () { setStatus(statusEl, 'อ่านไฟล์ไม่สำเร็จ', 'bad'); };
+      reader.readAsText(f);
+    }
+    $('file-input').addEventListener('change', function () { readHtmlFile($('file-input'), $('input-status')); });
 
     $('btn-analyze').addEventListener('click', onAnalyzeClick);
 
@@ -945,21 +992,7 @@
       onAnalyzeClick();
     });
     var quickFile = $('quick-file');
-    if (quickFile) quickFile.addEventListener('change', function () {
-      var f = quickFile.files && quickFile.files[0];
-      if (!f) return;
-      if (!/\.html?$/i.test(f.name)) { setStatus($('quick-status'), 'รองรับเฉพาะไฟล์ .html และ .htm', 'bad'); quickFile.value = ''; return; }
-      if (f.size > 2 * 1024 * 1024) { setStatus($('quick-status'), 'ไฟล์ใหญ่เกิน 2 MB', 'bad'); quickFile.value = ''; return; }
-      var reader = new FileReader();
-      reader.onload = function () {
-        useMode('snippet'); $('html-input').value = String(reader.result || '');
-        setStatus($('quick-status'), 'อ่านไฟล์ ' + f.name + ' แล้ว', 'good');
-        quickFile.value = '';
-        runAnalysis($('html-input').value, 'ไฟล์ ' + f.name, 'snippet');
-      };
-      reader.onerror = function () { setStatus($('quick-status'), 'อ่านไฟล์ไม่สำเร็จ', 'bad'); };
-      reader.readAsText(f);
-    });
+    if (quickFile) quickFile.addEventListener('change', function () { readHtmlFile(quickFile, $('quick-status')); });
     var demoBtn = $('btn-demo-report');
     if (demoBtn) demoBtn.addEventListener('click', function () {
       useMode('snippet'); $('html-input').value = SAMPLE_BAD;
@@ -968,6 +1001,7 @@
     $('btn-save').addEventListener('click', onSaveClick);
     $('btn-test').addEventListener('click', onTestClick);
     $('btn-print').addEventListener('click', function () { window.print(); });
+    var exp = $('btn-export'); if (exp) exp.addEventListener('click', function () { window.print(); });
     $('btn-clear').addEventListener('click', function () {
       $('html-input').value = '';
       $('html-input').focus();
