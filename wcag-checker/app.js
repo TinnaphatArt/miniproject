@@ -260,12 +260,12 @@
     out.push('<div class="part-grid">');
     list.forEach(function (c) {
       var crit = A.CRITERIA[c.sc];
-      var state, icon, text;
-      if (c.total === 0) { state = 'none'; icon = '–'; text = c.key === 'color' ? 'ตรวจไม่ได้' : 'ไม่มีในหน้านี้'; }
-      else if (c.fail > 0) { state = 'bad'; icon = '✕'; text = 'ต้องแก้'; }
-      else if (c.needsReview > 0) { state = 'warn'; icon = '!'; text = 'รอตรวจเพิ่ม'; }
-      else if (c.counted > 0) { state = 'good'; icon = '✓'; text = 'ผ่าน'; }
-      else { state = 'none'; icon = '–'; text = 'ไม่มีจุดให้ตรวจ'; }
+      var state, text;
+      if (c.total === 0) { state = 'none'; text = c.key === 'color' ? 'ตรวจไม่ได้' : 'ไม่มีในหน้านี้'; }
+      else if (c.fail > 0) { state = 'bad'; text = 'ต้องแก้'; }
+      else if (c.needsReview > 0) { state = 'warn'; text = 'รอตรวจเพิ่ม'; }
+      else if (c.counted > 0) { state = 'good'; text = 'ผ่าน'; }
+      else { state = 'none'; text = 'ไม่มีจุดให้ตรวจ'; }
       var target = c.fail > 0 ? '#part-' + c.key : c.needsReview > 0 ? '#review-' + c.key : null;
       var seg = function (n, cls) {
         return n ? '<span class="' + cls + '" style="width:' + (n / c.total * 100).toFixed(2) + '%"></span>' : '';
@@ -278,7 +278,7 @@
       var tag = target ? 'a' : 'div';
       out.push('<' + tag + ' class="part ' + state + '"' + (target ? ' href="' + target + '"' : '') + '>' +
         '<span class="part-top"><span class="part-name">' + partIcon(c.key) + esc(c.label) + '</span>' +
-        '<span class="badge ' + state + '"><span aria-hidden="true">' + icon + '</span> ' + text + '</span></span>' +
+        '<span class="badge ' + state + '">' + text + '</span></span>' +
         '<span class="part-num">' + (c.total ? c.fail : '—') + '<small>จุดที่ผิด</small></span>' +
         (c.total ? '<span class="bar" aria-hidden="true">' + seg(c.pass, 'b-pass') + seg(c.fail, 'b-fail') +
           seg(c.needsReview, 'b-rev') + seg(c.notApplicable, 'b-na') + '</span>' : '') +
