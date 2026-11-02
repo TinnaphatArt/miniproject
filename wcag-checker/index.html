@@ -570,8 +570,157 @@
   .std-card h2 .en { display:block; font-size:.88rem; font-weight:400; color:var(--ink-2); }
   h4.issue-msg { margin:0 0 14px; font-size:1.02rem; line-height:1.6; font-weight:600; }
 
+
+  /* ============================================================
+     ธีมสดใส (3 พ.ย. 2569 ผู้พัฒนาเลือกเองจากตัวเลือก): ไล่สีน้ำเงิน-ม่วง-ชมพู การ์ดมุมโค้งมน ไอคอนสี
+     ต่างจากกฎของสกิล design-taste-frontend โดยตั้งใจ แต่ข้อความทุกคู่ยังผ่าน 4.5:1 (ขาวบนทุกจุดของไล่สีได้ 6.3:1 ขึ้นไป)
+     ============================================================ */
+  :root {
+    --ground:#f5f6fc;  --rule:#e5e7f2;  --rule-2:#eef0f7;  --paper-2:#f7f8fd;  --paper-3:#eceefa;
+    --ink:#1b1d2a;  --ink-2:#545a6e;  --muted:#545a6e;  --link:#4338ca;  --hue:#6d28d9;
+    --btn:#4338ca;  --btn-hover:#3730a3;  --btn2:#eef0ff;  --btn2-hover:#e0e4ff;
+    --grad:linear-gradient(120deg, #2b48d6 0%, #6d28d9 55%, #a21caf 100%);
+    --p1:#eef2ff; --p2:#fdf2f8; --p3:#ecfdf5; --p4:#fff7ed; --deep:#1e1b4b;
+    --radius:20px;  --shadow:0 12px 32px -16px rgba(67,56,202,.35);  --tile-dark:#1e1b4b;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --ground:#0f1020; --page:#171a2e; --rule:#2a2e4a; --rule-2:#22263f; --paper-2:#1c2036; --paper-3:#272b47;
+    --ink:#eef0fb; --ink-2:#b3b8d0; --muted:#b3b8d0; --link:#a5b4fc; --hue:#c4b5fd;
+    --btn:#a5b4fc; --btn-ink:#14152a; --btn-hover:#c7d2fe; --btn2:#272b47; --btn2-hover:#323758;
+    --p1:#1f2447; --p2:#2a1d33; --p3:#14302a; --p4:#33261a; --deep:#0b0a24; --tile-dark:#0b0a24; } }
+  :root[data-theme="dark"] {
+    --ground:#0f1020; --page:#171a2e; --rule:#2a2e4a; --rule-2:#22263f; --paper-2:#1c2036; --paper-3:#272b47;
+    --ink:#eef0fb; --ink-2:#b3b8d0; --muted:#b3b8d0; --link:#a5b4fc; --hue:#c4b5fd;
+    --btn:#a5b4fc; --btn-ink:#14152a; --btn-hover:#c7d2fe; --btn2:#272b47; --btn2-hover:#323758;
+    --p1:#1f2447; --p2:#2a1d33; --p3:#14302a; --p4:#33261a; --deep:#0b0a24; --tile-dark:#0b0a24; }
+
+  /* แถบเมนูด้านบนแทนแถบข้าง */
+  .app { display:block; }
+  .sidebar { position:sticky; top:0; z-index:20; height:auto; overflow:visible; flex-direction:row; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 20px; padding:10px clamp(16px, 4vw, 48px); background:var(--page); border-right:0; border-bottom:1px solid var(--rule); }
+  .brand svg { width:36px; height:36px; }
+  .brand svg rect { fill:url(#brand-grad); }
+  .sidebar .rail { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+  .rail .rail-title, .steps .sub, #nav-results .cnt { display:none; }
+  .rail .steps { display:flex; gap:2px; margin:0 !important; }
+  .steps a { border-radius:999px; padding:6px 14px; min-height:38px; align-items:center; font-size:.93rem; white-space:nowrap; }
+  .steps a:hover { background:var(--paper-3); }
+  .steps a[aria-current="page"] { background:var(--p1); color:var(--link); font-weight:700; }
+  .steps a[aria-current="page"] .n { color:var(--link); }
+  .canvas { max-width:1240px; margin:0 auto; padding:28px clamp(16px, 4vw, 48px) 0; }
+  .canvas > * { max-width:none; }
+
+  /* ส่วนหัวไล่สี */
+  .board { gap:16px; }
+  .board > .t { border-radius:24px; box-shadow:var(--shadow); }
+  .t-name { grid-column:1 / -1; background:var(--grad) !important; color:#fff; display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(0, 1fr); align-items:center; gap:24px; min-height:420px; padding:48px clamp(24px, 4vw, 56px); position:relative; overflow:hidden; }
+  .hero-text { display:flex; flex-direction:column; gap:20px; }
+  .t-name h1 { font-size:clamp(2rem, 1.2rem + 2.4vw, 3.2rem); line-height:1.2; }
+  .t-lead { color:rgba(255,255,255,.92); font-size:1.12rem; }
+  .btn-mint { background:#fff; color:#3730a3; border-radius:999px; padding:12px 28px; box-shadow:0 10px 24px -10px rgba(0,0,0,.45); }
+  .btn-mint:hover { background:#eef2ff; }
+  .t-link { color:#fff; }
+  .hero-art { position:relative; height:320px; }
+  .ha-card { position:absolute; background:#fff; color:#1b1d2a; border-radius:20px; box-shadow:0 20px 40px -18px rgba(15,10,60,.55); }
+  .ha-score { left:6%; top:12%; width:58%; padding:18px 20px; display:flex; flex-direction:column; gap:6px; }
+  .ha-score b { font-size:2.4rem; line-height:1; letter-spacing:-.02em; color:#3730a3; }
+  .ha-k { font-size:.85rem; color:#545a6e; }
+  .ha-bar { height:10px; border-radius:5px; background:#eceefa; overflow:hidden; }
+  .ha-bar i { display:block; height:100%; width:57.62%; background:var(--grad); border-radius:5px; }
+  .ha-pass { right:4%; bottom:6%; padding:10px 16px; font-weight:600; font-size:.92rem; display:flex; align-items:center; gap:8px; }
+  .ha-dot { width:10px; height:10px; border-radius:50%; background:#16a34a; }
+  .ha-bubble { position:absolute; width:76px; height:76px; border-radius:22px; background:#fff; display:grid; place-items:center; box-shadow:0 16px 30px -14px rgba(15,10,60,.55); }
+  .ha-bubble svg { width:44px; height:44px; }
+  .ha-1 { right:6%; top:0; } .ha-2 { right:30%; top:52%; } .ha-3 { left:2%; bottom:0; } .ha-4 { right:0; top:40%; }
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
+    .ha-bubble { animation:float 5s ease-in-out infinite; }
+    .ha-2 { animation-delay:-1.2s; } .ha-3 { animation-delay:-2.4s; } .ha-4 { animation-delay:-3.6s; }
+  }
+
+  /* การ์ด 4 ส่วน */
+  .board-h { grid-column:1 / -1; margin:20px 0 0; font-size:1.4rem; }
+  .t-feature { grid-column:span 3; background:var(--page); display:flex; flex-direction:column; gap:8px; transition:transform .2s; }
+  .t-feature:hover { transform:translateY(-4px); }
+  .t-feature h3 { margin:6px 0 0; font-size:1.15rem; }
+  .t-feature p { margin:0; font-size:.95rem; color:var(--ink-2); }
+  .f-ico { width:56px; height:56px; padding:10px; border-radius:18px; }
+  .f-img .f-ico { background:var(--p4); } .f-head .f-ico { background:var(--p1); } .f-field .f-ico { background:var(--p2); } .f-color .f-ico { background:var(--p3); }
+  .f-sc { margin-top:auto; align-self:flex-start; font-size:.8rem; font-weight:700; color:var(--link); background:var(--p1); padding:2px 10px; border-radius:999px; }
+
+  /* การ์ดสถิติ */
+  .t-score { grid-column:1 / span 6; }
+  .t-fig { grid-column:7 / span 3; background:var(--p3) !important; color:var(--ink) !important; }
+  .t-contrast { grid-column:10 / span 3; background:var(--p2) !important; }
+  .t-anatomy { grid-column:1 / span 6; }
+  .t-sites { grid-column:7 / span 6; background:var(--deep) !important; }
+  .fx-fill { background:var(--grad); }
+  .board-2 .t-sec { background:var(--deep) !important; }
+  .board-2 .limits { background:var(--p4) !important; }
+
+  /* หน้าแอป: การ์ดโค้ง ปุ่มไล่สี */
+  main > section, .view > section { border:0; border-radius:24px; box-shadow:var(--shadow); padding:28px clamp(18px, 3vw, 36px) 32px; }
+  .standards.view, .view > .board-2 { box-shadow:none; }
+  .std-card { border-radius:24px; box-shadow:var(--shadow); }
+  .std-ill { background:var(--p1); border-radius:16px; }
+  button { border-radius:999px; padding-inline:20px; }
+  button.primary, .btn-link { background:var(--grad); color:#fff; border-radius:999px; box-shadow:0 10px 24px -12px rgba(109,40,217,.7); }
+  button.primary:hover, .btn-link:hover { filter:brightness(1.08); background:var(--grad); }
+  .btn-ghost { border-radius:999px; background:var(--btn2); color:var(--link); }
+  button.secondary { background:var(--btn2); color:var(--link); }
+  .modes { border:0; background:var(--paper-3); border-radius:999px; padding:4px; display:inline-flex; }
+  .mode-opt label { border:0; border-radius:999px; margin:0; padding:8px 18px; }
+  .mode-opt input:checked + label { background:var(--page); color:var(--link); box-shadow:0 4px 12px -6px rgba(67,56,202,.5); }
+  textarea, input[type="text"], input[type="url"] { border-radius:16px; background:var(--paper-2); }
+  .answers label { border-radius:16px; }
+  .answers label:has(input:checked) { border-color:var(--link); box-shadow:inset 0 0 0 1px var(--link); background:var(--p1); }
+  .answers input { accent-color:var(--link); }
+  .part { border:0; border-radius:20px; background:var(--paper-2); }
+  .part-ico { width:30px; height:30px; stroke:none; }
+  .issue { border:0; border-radius:20px; background:var(--paper-2); }
+  .figures { border:0; gap:12px; }
+  .figures > div { background:var(--paper-2); border-radius:16px; border:0 !important; }
+  .scale .marker { background:var(--hue); }
+  .next-step .btn-ghost, .next-step .btn-link { min-height:44px; padding:10px 22px; }
+
+  @media (max-width:1100px) {
+    .t-name { grid-template-columns:minmax(0, 1fr); }
+    .hero-art { height:260px; }
+    .t-feature { grid-column:span 6; }
+    .t-score, .t-anatomy, .t-sites { grid-column:1 / -1; }
+    .t-fig, .t-contrast { grid-column:span 6; }
+  }
+  @media (max-width:960px) {
+    .sidebar { position:static; }
+    .sidebar .rail { width:100%; flex-wrap:nowrap; overflow-x:auto; }
+  }
+  @media (max-width:640px) {
+    .t-name { padding:28px 20px; min-height:0; }
+    .hero-art { height:220px; }
+    .ha-bubble { width:60px; height:60px; } .ha-bubble svg { width:34px; height:34px; }
+    .t-feature, .t-fig, .t-contrast { grid-column:1 / -1; }
+  }
+
+
+  .t-sites { grid-column:1 / -1 !important; }
+  .t-sites .site-list { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:12px; margin:4px 0 14px; }
+  .t-sites .site-list li { flex-direction:column; gap:2px; padding:14px 16px; border-radius:16px; background:rgba(255,255,255,.08); }
+  .t-sites .site-list b { font-size:1.6rem; line-height:1.2; }
+  @media (max-width:760px) { .t-sites .site-list { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+
+
+  /* เผื่อความสูงแถบเมนูด้านบนที่ติดหน้าจอ เวลาเลื่อนไปยังหัวข้อ */
+  main [id], main > section, .view > section { scroll-margin-top:84px; }
+  @media (max-width:960px) { main [id], main > section, .view > section { scroll-margin-top:16px; } }
+
+
+  @media (max-width:960px) {
+    .rail .steps a { height:40px; min-height:0; padding:0 14px; line-height:40px; }
+    .rail .steps li { flex:none; }
+  }
+
   /* ---------- การพิมพ์รายงาน ---------- */
   @media print {
+    .hero-art, .board-h, .t-feature { display:none !important; }
     [data-view][hidden] { display:block !important; }
     [data-view="standards"], [data-view="check"], [data-view="checklist"], [data-view="report"] { display:none !important; }
     .no-print, .sidebar, .skip-link, footer.site, .hero-fig, .intro-cta, .t-score, .t-fig, .t-contrast, .t-anatomy, .t-sites, .t-sec, .t-cta { display:none !important; }
@@ -600,7 +749,7 @@
 <div class="app">
 <aside class="sidebar" aria-label="เมนูเครื่องมือ">
   <div class="brand">
-    <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="7" fill="#1d5fbf"/><path d="M9 16.5l4.5 4.5L23 11" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="brand-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2b48d6"/><stop offset=".55" stop-color="#6d28d9"/><stop offset="1" stop-color="#a21caf"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="#4338ca"/><path d="M9 16.5l4.5 4.5L23 11" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="brand-name">ตรวจการเข้าถึงเว็บไซต์<small>WCAG 2.1 · ระดับ A และ AA</small></span>
   </div>
   <nav class="rail no-print" aria-label="เมนูหลัก">
@@ -626,6 +775,7 @@
 <div class="view" data-view="home" id="home">
 <header class="board" aria-labelledby="h-top">
   <div class="t t-dark t-name">
+    <div class="hero-text">
     <h1 id="h-top">ตรวจการเข้าถึงเว็บไซต์ตาม <span class="nw">WCAG 2.1</span></h1>
     <p class="t-lead">
       เครื่องมือประเมินและแนะนำการปรับปรุงเว็บไซต์เพื่อผู้พิการ แบบกึ่งอัตโนมัติ
@@ -635,7 +785,24 @@
       <a class="btn-mint" href="#input-section">เริ่มตรวจโค้ด</a>
       <a class="t-link" href="#standards-section">มาตรฐานที่ตรวจหมายถึงอะไร</a>
     </p>
+    </div>
+
+    <div class="hero-art" aria-hidden="true">
+      <div class="ha-card ha-score"><span class="ha-k">คะแนนตัวอย่าง</span><b>57.62</b><span class="ha-bar"><i></i></span></div>
+      <div class="ha-bubble ha-1"><svg class="" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none"><path fill="#d3883e" d="m2 2l14 3l14-3v28l-14-3l-14 3z"/><path fill="#f3ad61" d="M30 2H2l14 14z"/><path fill="#b97028" d="M30 30H2l14-14z"/><path fill="#aeddff" d="M5 5h22v4.164L18 22L5 19v-3l1.5-3L5 10z"/><path fill="#fff" d="M24.667 10.114A3 3 0 0 1 27 9v6a3 3 0 0 1-2.009-.772a3 3 0 1 1-2.73-3.217a2 2 0 0 1 2.406-.897M5 16v-6c.981 0 1.853.471 2.4 1.2A1 1 0 0 1 9 12a2 2 0 1 1 0 4z"/><path fill="#14a085" d="M8 17.5L5 19v8h22V12c-1.5 0-2.5.5-4 2l-4.5 4.5c-1 1-1.5 1.5-2.5 1l-4-2c-1.6-.8-3.167-.5-4 0"/><path fill="#96c34a" d="M27 26.812V27H5v-.189c2.564-2.579 6.538-4.311 11-4.311s8.436 1.732 11 4.311"/><path fill="#ff822d" d="M19.056 10.185a.75.75 0 0 0 0-1.37a.75.75 0 0 0-.685-1.186a.75.75 0 0 0-1.186-.685a.75.75 0 0 0-1.37 0a.75.75 0 0 0-1.186.685a.75.75 0 0 0-.685 1.186a.75.75 0 0 0 0 1.37a.75.75 0 0 0 .685 1.186a.75.75 0 0 0 1.186.685a.75.75 0 0 0 1.37 0a.75.75 0 0 0 1.186-.685a.75.75 0 0 0 .685-1.186"/><path fill="#f9c23c" d="M18.705 9.5a2.205 2.205 0 1 1-4.41 0a2.205 2.205 0 0 1 4.41 0"/></g></svg></div>
+      <div class="ha-bubble ha-2"><svg class="" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none"><path fill="#b4acbc" d="M4.5 1A2.5 2.5 0 0 0 2 3.5v23A2.5 2.5 0 0 0 4.5 29H7v.5A1.5 1.5 0 0 0 8.5 31h17a1.5 1.5 0 0 0 1.5-1.5v-23A1.5 1.5 0 0 0 25.5 5h-4.586l-3.268-3.268A2.5 2.5 0 0 0 15.88 1z"/><path fill="#f3eef8" d="M3 3.5A1.5 1.5 0 0 1 4.5 2h11.379a1.5 1.5 0 0 1 1.06.44l5.622 5.62A1.5 1.5 0 0 1 23 9.122V26.5a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 3 26.5z"/><path fill="#998ea4" d="M6.5 11a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1zM6 17.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1z"/><path fill="#cdc4d6" d="M16 2.005a1.5 1.5 0 0 1 .94.434l5.62 5.622a1.5 1.5 0 0 1 .435.939H17.5A1.5 1.5 0 0 1 16 7.5z"/><path fill="#f70a8d" d="M22.36 13.118a.5.5 0 0 1 .323-.118H25.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2.817a.5.5 0 0 1-.322-.118l-1.187-1a.5.5 0 0 1 0-.764z"/><path fill="#f9c23c" d="M25.36 20.118a.5.5 0 0 1 .323-.118H28.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2.817a.5.5 0 0 1-.322-.118l-1.187-1a.5.5 0 0 1 0-.764z"/></g></svg></div>
+      <div class="ha-bubble ha-3"><svg class="" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none"><path fill="#b4acbc" d="M20.343 2.293A1 1 0 0 0 19.636 2H7a2 2 0 0 0-2 2v24a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V9.364a1 1 0 0 0-.293-.707z"/><path fill="#f3eef8" d="M19.682 3H7a1 1 0 0 0-1 1v24a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V9.453z"/><path fill="#998ea4" d="M9.5 12h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1m0 3a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1zM9 18.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1z"/><path fill="#cdc4d6" d="M26 9.453h-4.61a1.707 1.707 0 0 1-1.708-1.707V3z"/><path fill="#ff822d" d="m26.766 20.172l-1.08-3.231l-2.796-2.006l-10.607 7.849l1.148 3.156l2.727 2.082z"/><path fill="#ffce7c" d="m11.106 26.655l.171.893l.836.468l4.039-.006l-3.86-5.216z"/><path fill="#402a32" d="m10.687 28.018l.418-1.363l1.007 1.36z"/><path fill="#f92f60" d="M26.52 12.249a2 2 0 0 1 2.798.418l1.496 2.022a2 2 0 0 1-.418 2.797l-2.058 1.524l-2.805-2.069l-1.071-3.17z"/><path fill="#d3d3d3" d="m24.462 13.772l3.876 5.238l-1.572 1.162l-3.875-5.237z"/></g></svg></div>
+      <div class="ha-bubble ha-4"><svg class="" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none"><path fill="#fbb8ab" d="M21.993 5.854c-6.707-3.42-14.656-2.1-18.279 3.883S2.398 23.68 8.87 27.517c3.18 1.886 8.312 3.811 10.398 1.244c2.044-2.516-.972-4.11-.268-5.502c1.133-2.24 6.2.699 9.515-2.922c3.734-4.082.009-11.151-6.522-14.483M24 19c-1.745 0-3-1.273-3-3s1.255-3 3-3s3 1.273 3 3s-1.255 3-3 3"/><path fill="#8d65c5" d="M14.25 11a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/><path fill="#f70a8d" d="M8.25 15a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/><path fill="#00d26a" d="M8.25 22a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/><path fill="#3f5fff" d="M13.75 26.5a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/></g></svg></div>
+      <div class="ha-card ha-pass"><span class="ha-dot"></span>ตรวจ 3 หลักเกณฑ์ WCAG 2.1</div>
+    </div>
   </div>
+
+
+  <h2 class="board-h">เครื่องมือตรวจ 4 ส่วนของหน้าเว็บ</h2>
+  <div class="t t-feature f-img"><svg class="f-ico" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none"><path fill="#d3883e" d="m2 2l14 3l14-3v28l-14-3l-14 3z"/><path fill="#f3ad61" d="M30 2H2l14 14z"/><path fill="#b97028" d="M30 30H2l14-14z"/><path fill="#aeddff" d="M5 5h22v4.164L18 22L5 19v-3l1.5-3L5 10z"/><path fill="#fff" d="M24.667 10.114A3 3 0 0 1 27 9v6a3 3 0 0 1-2.009-.772a3 3 0 1 1-2.73-3.217a2 2 0 0 1 2.406-.897M5 16v-6c.981 0 1.853.471 2.4 1.2A1 1 0 0 1 9 12a2 2 0 1 1 0 4z"/><path fill="#14a085" d="M8 17.5L5 19v8h22V12c-1.5 0-2.5.5-4 2l-4.5 4.5c-1 1-1.5 1.5-2.5 1l-4-2c-1.6-.8-3.167-.5-4 0"/><path fill="#96c34a" d="M27 26.812V27H5v-.189c2.564-2.579 6.538-4.311 11-4.311s8.436 1.732 11 4.311"/><path fill="#ff822d" d="M19.056 10.185a.75.75 0 0 0 0-1.37a.75.75 0 0 0-.685-1.186a.75.75 0 0 0-1.186-.685a.75.75 0 0 0-1.37 0a.75.75 0 0 0-1.186.685a.75.75 0 0 0-.685 1.186a.75.75 0 0 0 0 1.37a.75.75 0 0 0 .685 1.186a.75.75 0 0 0 1.186.685a.75.75 0 0 0 1.37 0a.75.75 0 0 0 1.186-.685a.75.75 0 0 0 .685-1.186"/><path fill="#f9c23c" d="M18.705 9.5a2.205 2.205 0 1 1-4.41 0a2.205 2.205 0 0 1 4.41 0"/></g></svg><h3>รูปภาพ</h3><p>ภาพต้องมีข้อความทดแทน (alt) ให้โปรแกรมอ่านหน้าจออ่านแทนได้</p><span class="f-sc">SC 1.1.1</span></div>
+  <div class="t t-feature f-head"><svg class="f-ico" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none"><path fill="#b4acbc" d="M4.5 1A2.5 2.5 0 0 0 2 3.5v23A2.5 2.5 0 0 0 4.5 29H7v.5A1.5 1.5 0 0 0 8.5 31h17a1.5 1.5 0 0 0 1.5-1.5v-23A1.5 1.5 0 0 0 25.5 5h-4.586l-3.268-3.268A2.5 2.5 0 0 0 15.88 1z"/><path fill="#f3eef8" d="M3 3.5A1.5 1.5 0 0 1 4.5 2h11.379a1.5 1.5 0 0 1 1.06.44l5.622 5.62A1.5 1.5 0 0 1 23 9.122V26.5a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 3 26.5z"/><path fill="#998ea4" d="M6.5 11a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1zM6 17.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1z"/><path fill="#cdc4d6" d="M16 2.005a1.5 1.5 0 0 1 .94.434l5.62 5.622a1.5 1.5 0 0 1 .435.939H17.5A1.5 1.5 0 0 1 16 7.5z"/><path fill="#f70a8d" d="M22.36 13.118a.5.5 0 0 1 .323-.118H25.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2.817a.5.5 0 0 1-.322-.118l-1.187-1a.5.5 0 0 1 0-.764z"/><path fill="#f9c23c" d="M25.36 20.118a.5.5 0 0 1 .323-.118H28.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2.817a.5.5 0 0 1-.322-.118l-1.187-1a.5.5 0 0 1 0-.764z"/></g></svg><h3>หัวข้อ</h3><p>ลำดับหัวข้อ h1–h6 ต้องไม่กระโดดข้าม เพื่อให้นำทางตามโครงสร้างได้</p><span class="f-sc">SC 1.3.1</span></div>
+  <div class="t t-feature f-field"><svg class="f-ico" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none"><path fill="#b4acbc" d="M20.343 2.293A1 1 0 0 0 19.636 2H7a2 2 0 0 0-2 2v24a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V9.364a1 1 0 0 0-.293-.707z"/><path fill="#f3eef8" d="M19.682 3H7a1 1 0 0 0-1 1v24a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V9.453z"/><path fill="#998ea4" d="M9.5 12h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1m0 3a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1zM9 18.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1z"/><path fill="#cdc4d6" d="M26 9.453h-4.61a1.707 1.707 0 0 1-1.708-1.707V3z"/><path fill="#ff822d" d="m26.766 20.172l-1.08-3.231l-2.796-2.006l-10.607 7.849l1.148 3.156l2.727 2.082z"/><path fill="#ffce7c" d="m11.106 26.655l.171.893l.836.468l4.039-.006l-3.86-5.216z"/><path fill="#402a32" d="m10.687 28.018l.418-1.363l1.007 1.36z"/><path fill="#f92f60" d="M26.52 12.249a2 2 0 0 1 2.798.418l1.496 2.022a2 2 0 0 1-.418 2.797l-2.058 1.524l-2.805-2.069l-1.071-3.17z"/><path fill="#d3d3d3" d="m24.462 13.772l3.876 5.238l-1.572 1.162l-3.875-5.237z"/></g></svg><h3>ช่องกรอกข้อมูล</h3><p>ทุกช่องต้องมีป้ายกำกับที่ผูกกับช่อง placeholder ไม่นับ</p><span class="f-sc">SC 1.3.1</span></div>
+  <div class="t t-feature f-color"><svg class="f-ico" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none"><path fill="#fbb8ab" d="M21.993 5.854c-6.707-3.42-14.656-2.1-18.279 3.883S2.398 23.68 8.87 27.517c3.18 1.886 8.312 3.811 10.398 1.244c2.044-2.516-.972-4.11-.268-5.502c1.133-2.24 6.2.699 9.515-2.922c3.734-4.082.009-11.151-6.522-14.483M24 19c-1.745 0-3-1.273-3-3s1.255-3 3-3s3 1.273 3 3s-1.255 3-3 3"/><path fill="#8d65c5" d="M14.25 11a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/><path fill="#f70a8d" d="M8.25 15a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/><path fill="#00d26a" d="M8.25 22a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/><path fill="#3f5fff" d="M13.75 26.5a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/></g></svg><h3>สีข้อความ</h3><p>ข้อความกับพื้นหลังต้องคมชัดอย่างน้อย 4.5 : 1</p><span class="f-sc">SC 1.4.3</span></div>
 
   <figure class="t t-surface t-score" data-ui>
     <figcaption class="t-cap">ตัวอย่างผลตรวจ (บทที่ 3.7.2)</figcaption>
@@ -673,45 +840,6 @@
     </div>
   </div>
 
-  <figure class="t t-surface t-anatomy">
-    <svg class="hero-svg" viewBox="0 0 520 370" aria-hidden="true" focusable="false">
-        <rect x="10" y="10" width="500" height="340" rx="10" class="il-page"/>
-        <path d="M20 10h480a10 10 0 0 1 10 10v26H10V20a10 10 0 0 1 10-10z" class="il-paper2"/>
-        <path d="M10 46h500" class="il-line2"/>
-        <circle cx="32" cy="28" r="5" class="il-rule"/><circle cx="48" cy="28" r="5" class="il-rule"/><circle cx="64" cy="28" r="5" class="il-rule"/>
-        <rect x="84" y="19" width="250" height="18" rx="9" class="il-page il-stroke2"/>
-        <rect x="34" y="62" width="34" height="24" rx="3" class="il-ink"/>
-        <text x="51" y="79" text-anchor="middle" class="il-txt-inv" font-size="13" font-weight="700">H1</text>
-        <rect x="78" y="68" width="190" height="12" rx="2" class="il-ink"/>
-        <rect x="34" y="94" width="34" height="24" rx="3" class="il-ink2"/>
-        <text x="51" y="111" text-anchor="middle" class="il-txt-inv" font-size="13" font-weight="700">H3</text>
-        <rect x="78" y="100" width="130" height="12" rx="2" class="il-ink2"/>
-        <rect x="34" y="130" width="172" height="112" rx="4" class="il-paper3"/>
-        <path d="M44 232 92 172 122 204 146 182 196 232z" class="il-ink2" opacity=".4"/>
-        <circle cx="172" cy="154" r="12" class="il-mark"/>
-        <rect x="224" y="134" width="252" height="10" rx="2" class="il-ink2"/>
-        <rect x="224" y="152" width="232" height="10" rx="2" class="il-ink2"/>
-        <rect x="224" y="170" width="200" height="10" rx="2" class="il-faint"/>
-        <rect x="224" y="212" width="190" height="30" rx="4" class="il-page il-stroke2"/>
-        <rect x="236" y="223" width="84" height="8" rx="2" class="il-faint"/>
-        <rect x="422" y="212" width="54" height="30" rx="4" class="il-ink"/>
-        <rect x="34" y="262" width="442" height="10" rx="2" class="il-paper3"/>
-        <rect x="34" y="280" width="410" height="10" rx="2" class="il-paper3"/>
-        <rect x="34" y="298" width="300" height="10" rx="2" class="il-paper3"/>
-        <rect x="10" y="10" width="500" height="340" rx="10" class="il-none il-stroke"/>
-        <circle cx="420" cy="294" r="34" class="il-lens"/>
-        <circle cx="420" cy="294" r="34" class="il-none il-stroke-thick"/>
-        <path d="M445 318l38 36" class="il-handle"/>
-        <g class="il-marker"><circle cx="40" cy="136" r="14"/><text x="40" y="141" text-anchor="middle">1</text></g>
-        <g class="il-marker"><circle cx="226" cy="106" r="14"/><text x="226" y="111" text-anchor="middle">2</text></g>
-        <g class="il-marker"><circle cx="418" cy="210" r="14"/><text x="418" y="215" text-anchor="middle">3</text></g>
-        <g class="il-marker"><circle cx="442" cy="175" r="14"/><text x="442" y="180" text-anchor="middle">4</text></g>
-      </svg>
-    <figcaption>
-      <span class="hc"><b>1</b>รูปภาพ</span><span class="hc"><b>2</b>หัวข้อ</span><span class="hc"><b>3</b>ช่องกรอกข้อมูล</span><span class="hc"><b>4</b>สีข้อความ</span>
-      <span class="hc-note">ส่วนของหน้าเว็บที่ระบบตรวจ เลขตรงกับการ์ด 4 ส่วนในผลการประเมิน</span>
-    </figcaption>
-  </figure>
 
   <div class="t t-dark t-sites">
     <h2 class="t-h">ทดลองกับเว็บไซต์จริง 5 แห่ง</h2>
