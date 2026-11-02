@@ -115,6 +115,78 @@
   var PART_LABEL = {};
   A.PAGE_PARTS.forEach(function (part) { PART_LABEL[part.key] = part.label; });
 
+  /* ไอคอนประจำส่วนของหน้าเว็บ ใช้ในแดชบอร์ด (ตกแต่ง ข้อความข้าง ๆ บอกความหมายครบแล้ว) */
+  var PART_ICON = {
+    img: '<path d="M3.5 5.5h17v13h-17z"/><path d="M3.5 16.5l5.5-5.5 4 4 3-3 4.5 4.5"/><circle cx="16" cy="9" r="1.6"/>',
+    head: '<path d="M4 5v14M12 5v14M4 12h8"/><path d="M15.5 8h5M15.5 12h5M15.5 16h3.5"/>',
+    field: '<path d="M3.5 5.5h7"/><path d="M3.5 9.5h17v9h-17z"/><path d="M7.5 12v4"/>',
+    color: '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/>'
+  };
+  function partIcon(key) {
+    return '<svg class="part-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + PART_ICON[key] + '</svg>';
+  }
+
+  /* ภาพประกอบความหมายของแต่ละหลักเกณฑ์ สีมาจากตัวแปรของธีม ยกเว้นตัวอย่างความคมชัดที่ต้องใช้สีจริง */
+  var STD_ILLUSTRATION = {
+    'SC 1.1.1':
+      '<rect x="16" y="18" width="128" height="96" rx="6" class="il-paper3 il-stroke2"/>' +
+      '<path d="M24 106 64 58 88 84 104 70 136 106z" class="il-ink2" opacity=".45"/>' +
+      '<circle cx="116" cy="40" r="9" class="il-mark"/>' +
+      '<rect x="16" y="122" width="128" height="26" rx="13" class="il-ink"/>' +
+      '<text x="80" y="140" text-anchor="middle" class="il-txt-inv" font-size="13">alt="ภูเขายามเช้า"</text>' +
+      '<path d="M146 135C176 135 168 66 196 62" class="il-dash"/>' +
+      '<rect x="196" y="30" width="112" height="56" rx="12" class="il-page il-stroke"/>' +
+      '<path d="M214 86 206 102 232 86z" class="il-page"/><path d="M214 86 206 102 232 86" class="il-stroke"/>' +
+      '<text x="252" y="64" text-anchor="middle" class="il-txt" font-size="15">ภูเขายามเช้า</text>' +
+      '<path d="M188 120h8l10-8v26l-10-8h-8z" class="il-ink"/><path d="M212 117c4 4 4 12 0 16M218 112c7 7 7 19 0 26" class="il-line"/>',
+    'SC 1.3.1':
+      '<rect x="16" y="18" width="32" height="22" rx="3" class="il-ink"/><text x="32" y="33" text-anchor="middle" class="il-txt-inv" font-size="12" font-weight="700">H1</text>' +
+      '<rect x="56" y="24" width="88" height="10" rx="2" class="il-ink"/>' +
+      '<rect x="40" y="56" width="32" height="22" rx="3" class="il-ink2"/><text x="56" y="71" text-anchor="middle" class="il-txt-inv" font-size="12" font-weight="700">H2</text>' +
+      '<rect x="80" y="62" width="64" height="10" rx="2" class="il-ink2"/>' +
+      '<rect x="64" y="94" width="32" height="22" rx="3" class="il-ink2"/><text x="80" y="109" text-anchor="middle" class="il-txt-inv" font-size="12" font-weight="700">H3</text>' +
+      '<rect x="104" y="100" width="40" height="10" rx="2" class="il-ink2"/>' +
+      '<path d="M24 40v27h16M48 78v27h16" class="il-line2"/>' +
+      '<text x="184" y="58" class="il-txt" font-size="15" font-weight="700">อีเมล</text>' +
+      '<rect x="184" y="68" width="122" height="32" rx="4" class="il-page il-stroke"/>' +
+      '<path d="M194 76v16" class="il-line"/>' +
+      '<path d="M176 52v32h8" class="il-dash"/>' +
+      '<rect x="184" y="112" width="122" height="24" rx="12" class="il-paper3"/>' +
+      '<text x="245" y="128" text-anchor="middle" class="il-txt-mono" font-size="11">label for = id</text>',
+    'SC 1.4.3':
+      '<rect x="16" y="20" width="136" height="120" rx="8" fill="#ffffff" class="il-stroke2"/>' +
+      '<text x="84" y="70" text-anchor="middle" fill="#161616" font-size="24" font-weight="700" class="il-font">อ่านง่าย</text>' +
+      '<rect x="32" y="92" width="104" height="28" rx="14" fill="#e8f3eb"/>' +
+      '<text x="84" y="111" text-anchor="middle" fill="#1d6b3c" font-size="14" font-weight="700" class="il-font">18.10 : 1</text>' +
+      '<rect x="168" y="20" width="136" height="120" rx="8" fill="#ffffff" class="il-stroke2"/>' +
+      '<text x="236" y="70" text-anchor="middle" fill="#cccccc" font-size="24" font-weight="700" class="il-font">อ่านยาก</text>' +
+      '<rect x="184" y="92" width="104" height="28" rx="14" fill="#fcebe9"/>' +
+      '<text x="236" y="111" text-anchor="middle" fill="#b42318" font-size="14" font-weight="700" class="il-font">1.61 : 1</text>' +
+      '<circle cx="140" cy="32" r="10" fill="#1d6b3c"/><path d="M135 32l3.5 3.5 6.5-7" stroke="#ffffff" stroke-width="2.4" fill="none"/>' +
+      '<circle cx="292" cy="32" r="10" fill="#b42318"/><path d="M288 28l8 8M296 28l-8 8" stroke="#ffffff" stroke-width="2.4"/>'
+  };
+
+  /* ส่วน "มาตรฐานที่เครื่องมือนี้ตรวจ": ความหมายของแต่ละหลักเกณฑ์ ข้อมูลทั้งหมดมาจาก CRITERIA ใน analyzer.js */
+  function renderStandards() {
+    var box = $('standards-cards');
+    if (!box) return;
+    box.innerHTML = A.CRITERIA_ORDER.map(function (sc) {
+      var c = A.CRITERIA[sc];
+      return '<article class="std-card" id="' + stdAnchor(sc) + '" aria-labelledby="' + stdAnchor(sc) + '-h">' +
+        '<div class="std-ill"><svg viewBox="0 0 320 160" aria-hidden="true" focusable="false">' + STD_ILLUSTRATION[sc] + '</svg></div>' +
+        '<p class="std-tagline"><span class="rule-id">' + esc(sc) + '</span> ระดับ ' + esc(c.level) + ' · แนวทาง ' + esc(c.guideline) + '</p>' +
+        '<h3 id="' + stdAnchor(sc) + '-h">' + esc(c.nameTh) + ' <span class="en">' + esc(c.nameEn) + '</span></h3>' +
+        '<dl class="std-def"><dt>หมายถึง</dt><dd>' + esc(c.meaningTh) + '</dd>' +
+        '<dt>ผู้ได้รับผลกระทบ</dt><dd>' + esc(c.whoTh) + '</dd>' +
+        '<dt>เครื่องมือนี้ตรวจ</dt><dd><ul>' + c.checksTh.map(function (k) {
+          return '<li><span class="rule-id">' + esc(k.rule) + '</span> ' + esc(k.text) + '</li>';
+        }).join('') + '</ul></dd></dl>' +
+        '<p class="std-more"><a href="' + esc(c.url) + '" target="_blank" rel="noopener">อ่านคำอธิบายฉบับเต็มของ W3C (ภาษาอังกฤษ)</a></p>' +
+        '</article>';
+    }).join('');
+  }
+  function stdAnchor(sc) { return 'sc-' + sc.replace('SC ', '').replace(/\./g, '-'); }
+
   /* มาตรฐานที่จุดนี้ละเมิด: เลขหลักเกณฑ์ ชื่อ ระดับ หลักการ แนวทาง กฎตรวจ และหลักเกณฑ์ที่ละเมิดร่วมด้วย */
   function standardBlock(p) {
     var c = A.CRITERIA[p.sc];
@@ -130,8 +202,8 @@
         var rc = A.RELATED_CRITERIA[r.sc];
         return esc(rc.id + ' ' + rc.nameTh + ' ระดับ ' + rc.level + ' เพราะ' + r.reason);
       }).join(' · ') + ' <span class="muted">ระบบไม่ได้ตรวจหลักเกณฑ์นี้โดยตรง</span></dd>' : '') +
-      '<dt>อ้างอิง</dt><dd><a href="' + esc(c.url) + '" target="_blank" rel="noopener">อ่านคำอธิบาย ' + esc(p.sc) +
-      ' จาก W3C (ภาษาอังกฤษ)</a></dd></dl>';
+      '<dt>อ้างอิง</dt><dd><a href="#' + stdAnchor(p.sc) + '">ความหมายของ ' + esc(p.sc) + ' ภาษาไทย</a> · ' +
+      '<a href="' + esc(c.url) + '" target="_blank" rel="noopener">คำอธิบายจาก W3C (ภาษาอังกฤษ)</a></dd></dl>';
   }
 
   function renderIssue(p) {
@@ -205,7 +277,7 @@
           (c.notApplicable ? ' · ไม่เกี่ยวข้อง&nbsp;' + c.notApplicable : '');
       var tag = target ? 'a' : 'div';
       out.push('<' + tag + ' class="part ' + state + '"' + (target ? ' href="' + target + '"' : '') + '>' +
-        '<span class="part-top"><span class="part-name">' + esc(c.label) + '</span>' +
+        '<span class="part-top"><span class="part-name">' + partIcon(c.key) + esc(c.label) + '</span>' +
         '<span class="badge ' + state + '"><span aria-hidden="true">' + icon + '</span> ' + text + '</span></span>' +
         '<span class="part-num">' + (c.total ? c.fail : '—') + '<small>จุดที่ผิด</small></span>' +
         (c.total ? '<span class="bar" aria-hidden="true">' + seg(c.pass, 'b-pass') + seg(c.fail, 'b-fail') +
@@ -773,6 +845,7 @@
    * เริ่มต้นระบบ
    * ================================================================ */
   function init() {
+    renderStandards();
     renderChecklist();
 
     var railTick = false;

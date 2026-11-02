@@ -20,15 +20,29 @@
     'SC 1.1.1': { id: 'SC 1.1.1', name: 'ข้อความแทนภาพ (Non-text Content)', weight: 3,
       nameTh: 'ข้อความแทนภาพ', nameEn: 'Non-text Content', level: 'A',
       guideline: '1.1 ทางเลือกที่เป็นข้อความ (Text Alternatives)', principle: '1 การรับรู้ได้ (Perceivable)',
-      url: 'https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html' },
+      url: 'https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html',
+      meaningTh: 'เนื้อหาที่ไม่ใช่ข้อความ เช่น รูปภาพ ไอคอน หรือปุ่มที่เป็นภาพ ต้องมีข้อความทดแทนที่สื่อความหมายเดียวกัน ' +
+        'โปรแกรมอ่านหน้าจอจะอ่านข้อความนี้ให้ผู้ใช้ฟังแทนภาพ ส่วนภาพตกแต่งให้ใส่ alt ว่างเพื่อให้โปรแกรมข้ามไป',
+      whoTh: 'ผู้พิการทางการเห็นที่ใช้โปรแกรมอ่านหน้าจอ และผู้ที่โหลดภาพไม่ขึ้น',
+      checksTh: [{ rule: 'R-ALT-01', text: 'ภาพที่ไม่มีแอตทริบิวต์ alt เลย ตัดสินว่าไม่ผ่าน' },
+        { rule: 'R-ALT-02', text: 'ภาพที่ alt ว่าง ส่งให้ผู้ประเมินยืนยันว่าเป็นภาพตกแต่งหรือไม่' }] },
     'SC 1.3.1': { id: 'SC 1.3.1', name: 'โครงสร้างและความสัมพันธ์ (Info and Relationships)', weight: 2,
       nameTh: 'โครงสร้างและความสัมพันธ์', nameEn: 'Info and Relationships', level: 'A',
       guideline: '1.3 ปรับเปลี่ยนได้ (Adaptable)', principle: '1 การรับรู้ได้ (Perceivable)',
-      url: 'https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html' },
+      url: 'https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html',
+      meaningTh: 'โครงสร้างที่ตาเห็น เช่น หัวข้อใหญ่กับหัวข้อย่อย หรือป้ายที่อยู่ข้างช่องกรอก ต้องเขียนไว้ในโค้ดด้วย ' +
+        'ไม่ใช่แค่จัดให้ดูเหมือน โปรแกรมอ่านหน้าจอจึงกระโดดไปตามหัวข้อได้ และบอกได้ว่าช่องนี้ให้กรอกอะไร',
+      whoTh: 'ผู้ใช้โปรแกรมอ่านหน้าจอ และผู้ที่ใช้คีย์บอร์ดหรือปรับการแสดงผลเอง',
+      checksTh: [{ rule: 'R-HEAD-01', text: 'ระดับหัวข้อกระโดดข้ามมากกว่าหนึ่งระดับ เช่น h1 ไป h3' },
+        { rule: 'R-LABEL-01', text: 'ช่องกรอกไม่มี label, aria-label หรือ aria-labelledby (placeholder ไม่นับ)' }] },
     'SC 1.4.3': { id: 'SC 1.4.3', name: 'ความคมชัดของสี (Contrast Minimum)', weight: 2,
       nameTh: 'ความคมชัดของสี', nameEn: 'Contrast (Minimum)', level: 'AA',
       guideline: '1.4 แยกแยะได้ (Distinguishable)', principle: '1 การรับรู้ได้ (Perceivable)',
-      url: 'https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html' }
+      url: 'https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html',
+      meaningTh: 'ข้อความต้องเข้มพอเมื่อเทียบกับพื้นหลัง อัตราส่วนความคมชัดอย่างน้อย 4.5 ต่อ 1 สำหรับข้อความทั่วไป ' +
+        'และ 3 ต่อ 1 สำหรับตัวอักษรขนาดใหญ่ (18 พอยต์ หรือ 14 พอยต์ตัวหนา)',
+      whoTh: 'ผู้มีสายตาเลือนราง ผู้สูงอายุ ผู้ที่บกพร่องในการเห็นสี และผู้ที่ใช้มือถือกลางแดด',
+      checksTh: [{ rule: 'R-CONTRAST-01', text: 'สีตัวอักษรกับสีพื้นหลังใน style มีอัตราส่วนต่ำกว่า 4.5 ต่อ 1' }] }
   };
 
   /* ส่วนของหน้าเว็บที่ระบบตรวจ ใช้สรุปว่าเว็บผิดที่ส่วนไหน (รูปภาพ หัวข้อ ช่องกรอกข้อมูล หรือสีข้อความ) */

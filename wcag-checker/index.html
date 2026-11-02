@@ -6,22 +6,20 @@
 <title>เครื่องมือประเมินการเข้าถึงเว็บไซต์ตามมาตรฐาน WCAG เบื้องต้น</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%225%22 fill=%22%23161616%22/%3E%3Crect x=%225%22 y=%2219%22 width=%2222%22 height=%226%22 fill=%22%23ffd23f%22/%3E%3Cpath d=%22M8.5 13.5l4.5 4.5 10-11%22 fill=%22none%22 stroke=%22%23ffffff%22 stroke-width=%223.2%22 stroke-linecap=%22square%22/%3E%3C/svg%3E">
 <meta name="description" content="เว็บแอปพลิเคชันสำหรับประเมินและแนะนำการปรับปรุงเว็บไซต์เพื่อผู้พิการตามมาตรฐาน WCAG เบื้องต้น แบบกึ่งอัตโนมัติ">
-<link rel="preload" href="./fonts/plex-thai-looped-thai-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="./fonts/plex-thai-thai-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="./fonts/sarabun-thai-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="./fonts/sarabun-thai-700.woff2" as="font" type="font/woff2" crossorigin>
 <style>
   /* ============================================================
-     ฟอนต์ IBM Plex (สัญญาอนุญาต SIL OFL 1.1 ดู fonts/OFL.txt)
-     เก็บไว้ในโครงงานเอง ไม่โหลดจากบริการภายนอก
-     ตัวเนื้อความใช้แบบมีหัว (Looped) เพราะอ่านง่ายกว่าสำหรับข้อความยาว
+     ฟอนต์ Sarabun พัฒนาจาก TH Sarabun New ฟอนต์ที่หน่วยงานราชการไทยใช้กับเอกสารทางการ
+     จึงเข้ากับเครื่องมือตรวจมาตรฐาน และตรงกับเอกสารโครงงาน (สัญญาอนุญาต SIL OFL 1.1 ดู fonts/OFL-Sarabun.txt)
+     โค้ดใช้ IBM Plex Mono (fonts/OFL-IBM-Plex.txt) ทุกไฟล์เก็บในโครงงานเอง ไม่โหลดจากบริการภายนอก
      ============================================================ */
-  @font-face { font-family:"Plex Looped"; font-weight:400; font-display:swap; src:url(./fonts/plex-thai-looped-thai-400.woff2) format("woff2"); unicode-range:U+02D7,U+0303,U+0331,U+0E01-0E5B,U+200C-200D,U+25CC; }
-  @font-face { font-family:"Plex Looped"; font-weight:400; font-display:swap; src:url(./fonts/plex-thai-looped-latin-400.woff2) format("woff2"); unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-  @font-face { font-family:"Plex Looped"; font-weight:600 700; font-display:swap; src:url(./fonts/plex-thai-looped-thai-600.woff2) format("woff2"); unicode-range:U+02D7,U+0303,U+0331,U+0E01-0E5B,U+200C-200D,U+25CC; }
-  @font-face { font-family:"Plex Looped"; font-weight:600 700; font-display:swap; src:url(./fonts/plex-thai-looped-latin-600.woff2) format("woff2"); unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-  @font-face { font-family:"Plex Thai"; font-weight:600; font-display:swap; src:url(./fonts/plex-thai-thai-600.woff2) format("woff2"); unicode-range:U+02D7,U+0303,U+0331,U+0E01-0E5B,U+200C-200D,U+25CC; }
-  @font-face { font-family:"Plex Thai"; font-weight:600; font-display:swap; src:url(./fonts/plex-thai-latin-600.woff2) format("woff2"); unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-  @font-face { font-family:"Plex Thai"; font-weight:700; font-display:swap; src:url(./fonts/plex-thai-thai-700.woff2) format("woff2"); unicode-range:U+02D7,U+0303,U+0331,U+0E01-0E5B,U+200C-200D,U+25CC; }
-  @font-face { font-family:"Plex Thai"; font-weight:700; font-display:swap; src:url(./fonts/plex-thai-latin-700.woff2) format("woff2"); unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+  @font-face { font-family:"Sarabun"; font-weight:400; font-display:swap; src:url(./fonts/sarabun-thai-400.woff2) format("woff2"); unicode-range:U+02D7,U+0303,U+0331,U+0E01-0E5B,U+200C-200D,U+25CC; }
+  @font-face { font-family:"Sarabun"; font-weight:400; font-display:swap; src:url(./fonts/sarabun-latin-400.woff2) format("woff2"); unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+  @font-face { font-family:"Sarabun"; font-weight:600; font-display:swap; src:url(./fonts/sarabun-thai-600.woff2) format("woff2"); unicode-range:U+02D7,U+0303,U+0331,U+0E01-0E5B,U+200C-200D,U+25CC; }
+  @font-face { font-family:"Sarabun"; font-weight:600; font-display:swap; src:url(./fonts/sarabun-latin-600.woff2) format("woff2"); unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+  @font-face { font-family:"Sarabun"; font-weight:700; font-display:swap; src:url(./fonts/sarabun-thai-700.woff2) format("woff2"); unicode-range:U+02D7,U+0303,U+0331,U+0E01-0E5B,U+200C-200D,U+25CC; }
+  @font-face { font-family:"Sarabun"; font-weight:700; font-display:swap; src:url(./fonts/sarabun-latin-700.woff2) format("woff2"); unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
   @font-face { font-family:"Plex Mono"; font-weight:400; font-display:swap; src:url(./fonts/plex-mono-latin-400.woff2) format("woff2"); }
   @font-face { font-family:"Plex Mono"; font-weight:600 700; font-display:swap; src:url(./fonts/plex-mono-latin-600.woff2) format("woff2"); }
 
@@ -43,9 +41,9 @@
     --warn:#8a5000;  --warn-bg:#fbf1de;  --warn-line:#e1c48d;
     --bad:#b42318;   --bad-bg:#fcebe9;   --bad-line:#eab3ad;
 
-    --f-body:"Plex Looped","Noto Sans Thai Looped","Sarabun",system-ui,sans-serif;
-    --f-head:"Plex Thai","Noto Sans Thai","Sarabun",system-ui,sans-serif;
-    --f-mono:"Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Plex Looped",monospace;
+    --f-body:"Sarabun","TH Sarabun New","Noto Sans Thai",Tahoma,sans-serif;
+    --f-head:"Sarabun","TH Sarabun New","Noto Sans Thai",Tahoma,sans-serif;
+    --f-mono:"Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Sarabun",monospace;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -82,7 +80,7 @@
   }
   body {
     margin:0; background:var(--page); color:var(--ink);
-    font-family:var(--f-body); font-size:16px; line-height:1.75;
+    font-family:var(--f-body); font-size:17px; line-height:1.75;
     -webkit-font-smoothing:antialiased;
   }
   h1, h2, h3, h4, h5, legend, button, .figures dd, .score-num, .part-num { font-family:var(--f-head); }
@@ -392,11 +390,75 @@
   footer.site { border-top:1px solid var(--rule); padding-block:22px 40px; color:var(--ink-2); font-size:.86rem; }
   footer.site p { max-width:90ch; }
 
+  /* ---------- ภาพประกอบ (สีจากตัวแปรของธีม ใช้ได้ทั้งโหมดสว่างและมืด) ---------- */
+  .il-page { fill:var(--page); } .il-paper2 { fill:var(--paper-2); } .il-paper3 { fill:var(--paper-3); }
+  .il-rule { fill:var(--rule); } .il-ink { fill:var(--ink); } .il-ink2 { fill:var(--ink-2); }
+  .il-faint { fill:var(--paper-3); } .il-mark { fill:var(--mark); } .il-none { fill:none; }
+  .il-stroke { stroke:var(--ink); stroke-width:2; } .il-stroke2 { stroke:var(--control); stroke-width:1.5; }
+  .il-stroke-thick { stroke:var(--ink); stroke-width:6; }
+  .il-line { stroke:var(--ink); stroke-width:2.4; fill:none; stroke-linecap:round; }
+  .il-line2 { stroke:var(--control); stroke-width:1.5; fill:none; }
+  .il-dash { stroke:var(--control); stroke-width:1.8; fill:none; stroke-dasharray:5 4; }
+  .il-lens { fill:var(--mark); opacity:.22; }
+  .il-handle { stroke:var(--ink); stroke-width:10; stroke-linecap:round; fill:none; }
+  .il-txt, .il-font { font-family:var(--f-body); } .il-txt { fill:var(--ink); }
+  .il-txt-inv { fill:var(--page); font-family:var(--f-body); }
+  .il-txt-mono { fill:var(--ink); font-family:var(--f-mono); }
+  .il-marker circle { fill:var(--mark); stroke:var(--ink); stroke-width:2; }
+  .il-marker text { fill:#161616; font:700 15px var(--f-head); }
+
+  /* ---------- ส่วนนำ: ข้อความ + ภาพประกอบ ---------- */
+  .intro { grid-template-columns:minmax(0, 1.15fr) minmax(0, 1fr); align-items:center; padding-block:40px 28px; }
+  .intro-cta { margin:22px 0 0; display:flex; flex-wrap:wrap; gap:12px 22px; align-items:center; }
+  .btn-link {
+    display:inline-block; padding:12px 26px; font-family:var(--f-head); font-weight:600; font-size:1.05rem;
+    background:var(--btn); color:var(--btn-ink); border:2px solid var(--btn); border-radius:2px; text-decoration:none;
+  }
+  .btn-link:hover { background:var(--btn-hover); border-color:var(--btn-hover); }
+  .hero-fig { margin:0; }
+  .hero-svg { display:block; width:100%; height:auto; max-width:520px; margin-left:auto; }
+  .hero-fig figcaption { display:flex; flex-wrap:wrap; gap:6px 14px; justify-content:flex-end; margin-top:10px; font-size:.9rem; color:var(--ink-2); }
+  .hc { display:inline-flex; align-items:center; gap:6px; color:var(--ink); font-weight:600; }
+  .hc b { display:inline-grid; place-items:center; width:20px; height:20px; border-radius:50%; background:var(--mark); color:#161616; border:1.5px solid var(--ink); font-size:.75rem; }
+  .spec { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); margin:0 0 36px; }
+  .spec > div { display:block; padding:10px 16px 12px 0; border-bottom:0; }
+  .spec > div + div { border-left:1px solid var(--rule); padding-left:16px; }
+  .spec dt { font-size:.86rem; }
+  .spec dd { font-size:.98rem; }
+
+  /* ---------- มาตรฐานที่ตรวจ หมายถึงอะไร ---------- */
+  .standards { margin-top:48px; }
+  .std-cards { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:28px; }
+  .std-card { display:flex; flex-direction:column; gap:10px; scroll-margin-top:20px; }
+  .std-card:target .std-ill { box-shadow:0 0 0 4px var(--mark); }
+  .std-ill { background:var(--paper-2); border:1px solid var(--rule); padding:14px; }
+  .std-ill svg { display:block; width:100%; height:auto; }
+  .std-tagline { margin:6px 0 0; font-size:.86rem; color:var(--ink-2); }
+  .std-tagline .rule-id { margin-right:6px; }
+  .std-card h3 { margin:0; font-size:1.25rem; line-height:1.4; }
+  .std-card h3 .en { display:block; font-size:.9rem; font-weight:400; color:var(--ink-2); }
+  .std-def { margin:0; font-size:.95rem; }
+  .std-def dt { font-family:var(--f-head); font-weight:700; margin-top:10px; }
+  .std-def dd { margin:2px 0 0; }
+  .std-def ul { margin:4px 0 0; padding-left:1.1em; }
+  .std-def li + li { margin-top:4px; }
+  .std-more { margin:auto 0 0; padding-top:6px; font-size:.9rem; }
+
+  /* ---------- ไอคอนในแดชบอร์ด ---------- */
+  .part-name { display:inline-flex; align-items:center; gap:8px; }
+  .part-ico { width:22px; height:22px; flex:0 0 auto; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linejoin:round; stroke-linecap:round; }
+
   /* ---------- จอแคบ ---------- */
   @media (max-width:960px) {
     .layout { grid-template-columns:minmax(0, 1fr); gap:0; padding-top:32px; }
     .rail { display:none; }
-    .intro { grid-template-columns:minmax(0, 1fr); padding-block:32px 28px; }
+    .intro { grid-template-columns:minmax(0, 1fr); padding-block:32px 24px; }
+    .hero-svg { margin:0; max-width:460px; }
+    .hero-fig figcaption { justify-content:flex-start; }
+    .std-cards { grid-template-columns:minmax(0, 1fr); gap:36px; }
+    .std-card { display:grid; grid-template-columns:minmax(0, 260px) minmax(0, 1fr); column-gap:24px; align-items:start; }
+    .std-card > :not(.std-ill) { grid-column:2; }
+    .std-ill { grid-row:1 / span 6; }
     .limits ol { grid-template-columns:minmax(0, 1fr); }
     .part-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
     .part:nth-child(3) { border-left:0; padding-left:0; }
@@ -404,6 +466,10 @@
     a.part:nth-child(3):hover { padding-left:10px; }
   }
   @media (max-width:640px) {
+    .spec { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    .spec > div:nth-child(3) { border-left:0; padding-left:0; }
+    .spec > div:nth-child(n+3) { border-top:1px solid var(--rule); }
+    .std-card { display:flex; }
     .score { grid-template-columns:minmax(0, 1fr); }
     .codes { grid-template-columns:minmax(0, 1fr); }
     .std { grid-template-columns:minmax(0, 1fr); gap:0; }
@@ -423,7 +489,7 @@
 
   /* ---------- การพิมพ์รายงาน ---------- */
   @media print {
-    .no-print, .topbar, .rail, .skip-link, footer.site { display:none !important; }
+    .no-print, .topbar, .rail, .skip-link, footer.site, .hero-fig, .intro-cta { display:none !important; }
     body { font-size:11.5pt; background:#fff; color:#000; }
     .layout { display:block; padding:0; }
     .wrap { max-width:none; padding:0; }
@@ -455,20 +521,64 @@
 
 <div class="wrap">
   <div class="intro">
-    <div>
+    <div class="intro-text">
       <h1><span class="nw">เครื่องมือประเมิน</span><wbr><span class="nw">และแนะนำ</span><wbr><span class="nw">การปรับปรุงเว็บไซต์</span><wbr><span class="nw">เพื่อผู้พิการ</span></h1>
       <p class="intro-lead">
         วางโค้ด HTML หรือระบุลิงก์ ระบบตรวจโครงสร้างให้อัตโนมัติ แล้วให้ผู้ประเมินตอบอีกสามข้อที่โปรแกรมตัดสินแทนไม่ได้
         ผลที่ได้บอกว่าหน้าเว็บผิดที่ส่วนไหน ผิดมาตรฐานข้อใด และควรแก้อย่างไร
       </p>
+      <p class="intro-cta">
+        <a class="btn-link" href="#input-section">เริ่มตรวจโค้ด</a>
+        <a href="#standards-section">มาตรฐานที่ตรวจหมายถึงอะไร</a>
+      </p>
     </div>
-    <dl class="spec">
-      <div><dt>มาตรฐาน</dt><dd>WCAG 2.1 ระดับ A และ AA</dd></div>
-      <div><dt>หลักเกณฑ์</dt><dd>SC 1.1.1 · SC 1.3.1 · SC 1.4.3</dd></div>
-      <div><dt>วิธีตรวจ</dt><dd>อ่านโครงสร้าง HTML ร่วมกับแบบประเมิน 3 ข้อ</dd></div>
-      <div><dt>ผลลัพธ์</dt><dd>คะแนน 0–100 พร้อมที่มาทุกขั้น</dd></div>
-    </dl>
+    <figure class="hero-fig">
+      <!-- ภาพหน้าเว็บจำลองที่กำลังถูกตรวจ หมายเลขตรงกับ 4 ส่วนในแดชบอร์ดผลการประเมิน -->
+      <svg class="hero-svg" viewBox="0 0 520 370" aria-hidden="true" focusable="false">
+        <rect x="10" y="10" width="500" height="340" rx="10" class="il-page"/>
+        <path d="M20 10h480a10 10 0 0 1 10 10v26H10V20a10 10 0 0 1 10-10z" class="il-paper2"/>
+        <path d="M10 46h500" class="il-line2"/>
+        <circle cx="32" cy="28" r="5" class="il-rule"/><circle cx="48" cy="28" r="5" class="il-rule"/><circle cx="64" cy="28" r="5" class="il-rule"/>
+        <rect x="84" y="19" width="250" height="18" rx="9" class="il-page il-stroke2"/>
+        <rect x="34" y="62" width="34" height="24" rx="3" class="il-ink"/>
+        <text x="51" y="79" text-anchor="middle" class="il-txt-inv" font-size="13" font-weight="700">H1</text>
+        <rect x="78" y="68" width="190" height="12" rx="2" class="il-ink"/>
+        <rect x="34" y="94" width="34" height="24" rx="3" class="il-ink2"/>
+        <text x="51" y="111" text-anchor="middle" class="il-txt-inv" font-size="13" font-weight="700">H3</text>
+        <rect x="78" y="100" width="130" height="12" rx="2" class="il-ink2"/>
+        <rect x="34" y="130" width="172" height="112" rx="4" class="il-paper3"/>
+        <path d="M44 232 92 172 122 204 146 182 196 232z" class="il-ink2" opacity=".4"/>
+        <circle cx="172" cy="154" r="12" class="il-mark"/>
+        <rect x="224" y="134" width="252" height="10" rx="2" class="il-ink2"/>
+        <rect x="224" y="152" width="232" height="10" rx="2" class="il-ink2"/>
+        <rect x="224" y="170" width="200" height="10" rx="2" class="il-faint"/>
+        <rect x="224" y="212" width="190" height="30" rx="4" class="il-page il-stroke2"/>
+        <rect x="236" y="223" width="84" height="8" rx="2" class="il-faint"/>
+        <rect x="422" y="212" width="54" height="30" rx="4" class="il-ink"/>
+        <rect x="34" y="262" width="442" height="10" rx="2" class="il-paper3"/>
+        <rect x="34" y="280" width="410" height="10" rx="2" class="il-paper3"/>
+        <rect x="34" y="298" width="300" height="10" rx="2" class="il-paper3"/>
+        <rect x="10" y="10" width="500" height="340" rx="10" class="il-none il-stroke"/>
+        <circle cx="420" cy="294" r="34" class="il-lens"/>
+        <circle cx="420" cy="294" r="34" class="il-none il-stroke-thick"/>
+        <path d="M445 318l38 36" class="il-handle"/>
+        <g class="il-marker"><circle cx="40" cy="136" r="14"/><text x="40" y="141" text-anchor="middle">1</text></g>
+        <g class="il-marker"><circle cx="226" cy="106" r="14"/><text x="226" y="111" text-anchor="middle">2</text></g>
+        <g class="il-marker"><circle cx="418" cy="210" r="14"/><text x="418" y="215" text-anchor="middle">3</text></g>
+        <g class="il-marker"><circle cx="442" cy="175" r="14"/><text x="442" y="180" text-anchor="middle">4</text></g>
+      </svg>
+      <figcaption>
+        <span>เครื่องมือตรวจ 4 ส่วนของหน้าเว็บ</span>
+        <span class="hc"><b>1</b>รูปภาพ</span><span class="hc"><b>2</b>หัวข้อ</span><span class="hc"><b>3</b>ช่องกรอกข้อมูล</span><span class="hc"><b>4</b>สีข้อความ</span>
+      </figcaption>
+    </figure>
   </div>
+  <dl class="spec">
+    <div><dt>มาตรฐาน</dt><dd>WCAG 2.1 ระดับ A และ AA</dd></div>
+    <div><dt>หลักเกณฑ์</dt><dd>SC 1.1.1 · SC 1.3.1 · SC 1.4.3</dd></div>
+    <div><dt>วิธีตรวจ</dt><dd>อ่านโครงสร้าง HTML ร่วมกับแบบประเมิน 3 ข้อ</dd></div>
+    <div><dt>ผลลัพธ์</dt><dd>คะแนน 0–100 พร้อมที่มาทุกขั้น</dd></div>
+  </dl>
 </div>
 </header>
 
@@ -482,6 +592,18 @@
       <li>ผลการประเมินนี้ <strong>ไม่ใช่ใบรับรองความสอดคล้องกับมาตรฐาน WCAG 2.1</strong> และไม่ทดแทนการตรวจสอบโดยผู้เชี่ยวชาญด้านการเข้าถึงเว็บไซต์</li>
     </ol>
   </aside>
+
+  <section id="standards-section" class="standards no-print" aria-labelledby="h-standards">
+    <header class="sec-head">
+      <p class="kicker">ก่อนเริ่มตรวจ</p>
+      <h2 id="h-standards">มาตรฐานที่เครื่องมือนี้ตรวจ หมายถึงอะไร</h2>
+      <p class="lead">
+        ทั้งสามหลักเกณฑ์อยู่ในหลักการที่ 1 การรับรู้ได้ (Perceivable) ของ WCAG 2.1 คือข้อมูลบนหน้าเว็บต้องนำเสนอในแบบที่ผู้ใช้ทุกคนรับรู้ได้
+        ระดับ A คือขั้นต่ำที่ต้องมี ส่วนระดับ AA คือระดับที่มาตรฐานส่วนใหญ่ใช้เป็นเป้าหมาย
+      </p>
+    </header>
+    <div id="standards-cards" class="std-cards"></div>
+  </section>
 </div>
 
 <div class="wrap layout">
@@ -621,7 +743,7 @@
       มาตรฐานอ้างอิง:
       <a href="https://www.w3.org/TR/WCAG21/" target="_blank" rel="noopener">WCAG 2.1 (W3C, 2018)</a> ·
       <a href="./tests/runner.html">ผลการวัดความแม่นยำจากชุดทดสอบที่ผู้วิจัยพัฒนา</a> ·
-      ฟอนต์ IBM Plex สัญญาอนุญาต <a href="./fonts/OFL.txt">SIL OFL 1.1</a>
+      ฟอนต์ Sarabun และ IBM Plex Mono สัญญาอนุญาต SIL OFL 1.1 (<a href="./fonts/OFL-Sarabun.txt">Sarabun</a>, <a href="./fonts/OFL-IBM-Plex.txt">IBM Plex</a>)
     </p>
   </div>
 </footer>
