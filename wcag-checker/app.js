@@ -929,6 +929,42 @@
     });
 
     $('btn-analyze').addEventListener('click', onAnalyzeClick);
+
+    /* กล่องตรวจด่วนในหน้าแรก: ใส่ลิงก์ หรืออัปโหลดไฟล์ .html แล้วตรวจด้วยขั้นตอนเดิมทุกอย่าง */
+    function useMode(mode) {
+      var r = $(mode === 'url' ? 'mode-url' : 'mode-snippet');
+      r.checked = true; r.dispatchEvent(new Event('change'));
+    }
+    var quickForm = $('quick-form');
+    if (quickForm) quickForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var v = $('quick-url').value.trim();
+      if (!v) { setStatus($('quick-status'), 'กรุณาใส่ลิงก์เว็บไซต์ก่อน', 'bad'); $('quick-url').focus(); return; }
+      useMode('url'); $('url-input').value = v; setStatus($('quick-status'), '');
+      location.hash = '#input-section';
+      onAnalyzeClick();
+    });
+    var quickFile = $('quick-file');
+    if (quickFile) quickFile.addEventListener('change', function () {
+      var f = quickFile.files && quickFile.files[0];
+      if (!f) return;
+      if (!/\.html?$/i.test(f.name)) { setStatus($('quick-status'), 'รองรับเฉพาะไฟล์ .html และ .htm', 'bad'); quickFile.value = ''; return; }
+      if (f.size > 2 * 1024 * 1024) { setStatus($('quick-status'), 'ไฟล์ใหญ่เกิน 2 MB', 'bad'); quickFile.value = ''; return; }
+      var reader = new FileReader();
+      reader.onload = function () {
+        useMode('snippet'); $('html-input').value = String(reader.result || '');
+        setStatus($('quick-status'), 'อ่านไฟล์ ' + f.name + ' แล้ว', 'good');
+        quickFile.value = '';
+        runAnalysis($('html-input').value, 'ไฟล์ ' + f.name, 'snippet');
+      };
+      reader.onerror = function () { setStatus($('quick-status'), 'อ่านไฟล์ไม่สำเร็จ', 'bad'); };
+      reader.readAsText(f);
+    });
+    var demoBtn = $('btn-demo-report');
+    if (demoBtn) demoBtn.addEventListener('click', function () {
+      useMode('snippet'); $('html-input').value = SAMPLE_BAD;
+      runAnalysis(SAMPLE_BAD, 'โค้ดตัวอย่างที่มีข้อบกพร่อง', 'snippet');
+    });
     $('btn-save').addEventListener('click', onSaveClick);
     $('btn-test').addEventListener('click', onTestClick);
     $('btn-print').addEventListener('click', function () { window.print(); });
