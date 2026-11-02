@@ -538,8 +538,42 @@
     .btn-mint { width:100%; justify-content:center; }
   }
 
+
+  /* ---------- หลายหน้าในไฟล์เดียว ---------- */
+  [hidden] { display:none !important; }
+  main { margin-top:0; }
+  main:focus { outline:none; }
+  main > section, .view > section { background:var(--page); border:1px solid var(--rule); border-radius:var(--radius); padding:24px clamp(16px, 2.4vw, 28px) 28px; margin-bottom:var(--gap); scroll-margin-top:16px; }
+  .standards.view { background:none; border:0; padding:0; margin-top:0; }
+  .view > .board-2 { background:none; border:0; padding:0; }
+  .next-step { margin:24px 0 0; display:flex; flex-wrap:wrap; gap:10px; }
+  .steps a[aria-current="page"] { background:var(--paper-3); font-weight:600; }
+  .steps a[aria-current="page"] .n { color:var(--ink); }
+  .rail .steps + .rail-title { margin-top:18px; }
+  .steps-foot { margin-top:18px !important; }
+  #nav-results .cnt { font-size:.78rem; color:var(--ink-2); }
+  @media (max-width:960px) {
+    .sidebar { flex-wrap:wrap; gap:8px; padding-bottom:6px; }
+    .sidebar .rail { display:flex; width:100%; overflow-x:auto; gap:4px; padding-bottom:4px; }
+    .rail .rail-title, .steps .sub, #nav-results .cnt { display:none; }
+    .rail .steps { display:flex; gap:4px; flex:none; margin:0 !important; }
+    .steps a { white-space:nowrap; min-height:40px; align-items:center; }
+  }
+
+
+  /* หัวเรื่องหลักของแต่ละหน้าเป็น h1 หัวข้อย่อยในผลการประเมินเลื่อนลงหนึ่งระดับ */
+  .view .sec-head h1, #results-empty h1 { font-size:1.3rem; line-height:1.4; margin:0; font-weight:700; }
+  #results-body h2, .std-card h2 { font-size:1.08rem; line-height:1.45; margin:32px 0 10px; font-weight:700; scroll-margin-top:16px; }
+  #results-body h3 { font-size:1rem; line-height:1.45; margin:24px 0 8px; font-weight:600; scroll-margin-top:16px; }
+  .dash h2 { margin-top:32px; }
+  .std-card h2 { margin:0; font-size:1.15rem; line-height:1.4; }
+  .std-card h2 .en { display:block; font-size:.88rem; font-weight:400; color:var(--ink-2); }
+  h4.issue-msg { margin:0 0 14px; font-size:1.02rem; line-height:1.6; font-weight:600; }
+
   /* ---------- การพิมพ์รายงาน ---------- */
   @media print {
+    [data-view][hidden] { display:block !important; }
+    [data-view="standards"], [data-view="check"], [data-view="checklist"], [data-view="report"] { display:none !important; }
     .no-print, .sidebar, .skip-link, footer.site, .hero-fig, .intro-cta, .t-score, .t-fig, .t-contrast, .t-anatomy, .t-sites, .t-sec, .t-cta { display:none !important; }
     .board > .t { background:none !important; color:#000 !important; padding:0 0 8pt; min-height:0; }
     .t-lead { color:#000; }
@@ -569,26 +603,27 @@
     <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="7" fill="#1d5fbf"/><path d="M9 16.5l4.5 4.5L23 11" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="brand-name">ตรวจการเข้าถึงเว็บไซต์<small>WCAG 2.1 · ระดับ A และ AA</small></span>
   </div>
-  <nav class="rail no-print" aria-labelledby="rail-title">
+  <nav class="rail no-print" aria-label="เมนูหลัก">
+    <ul class="steps">
+      <li><a href="#home" data-nav="home"><span class="t">หน้าแรก</span></a></li>
+      <li><a href="#standards-section" data-nav="standards"><span class="t">มาตรฐานที่ตรวจ</span></a></li>
+    </ul>
     <p class="rail-title" id="rail-title">ขั้นตอนการประเมิน</p>
-    <ol class="steps">
-      <li><a href="#input-section"><span class="n">1</span><span class="t">นำเข้าโค้ด</span></a></li>
-      <li><a href="#checklist-section"><span class="n">2</span><span class="t">ตอบแบบประเมิน</span></a></li>
-      <li id="nav-results"><span class="pending"><span class="n">3</span><span>ผลการประเมิน<br><small>ยังไม่ได้ตรวจ</small></span></span></li>
-      <li><a href="#history-section"><span class="n">4</span><span class="t">บันทึกและรายงาน</span></a></li>
+    <ol class="steps" aria-labelledby="rail-title">
+      <li><a href="#input-section" data-nav="check"><span class="n">1</span><span class="t">นำเข้าโค้ด</span></a></li>
+      <li><a href="#checklist-section" data-nav="checklist"><span class="n">2</span><span class="t">ตอบแบบประเมิน</span></a></li>
+      <li id="nav-results"><a href="#results-section" data-nav="results"><span class="n">3</span><span class="t">ผลการประเมิน</span><span class="cnt">ยังไม่ได้ตรวจ</span></a></li>
+      <li><a href="#history-section" data-nav="report"><span class="n">4</span><span class="t">บันทึกและรายงาน</span></a></li>
     </ol>
-  </nav>
-  <nav class="side-links no-print" aria-labelledby="side-title">
-    <p class="rail-title" id="side-title">ข้อมูลประกอบ</p>
-    <ul>
-      <li><a href="#standards-section">มาตรฐานที่ตรวจหมายถึงอะไร</a></li>
-      <li><a href="#h-limits">ข้อจำกัดของเครื่องมือ</a></li>
-      <li><a href="./tests/runner.html">ผลวัดความแม่นยำ</a></li>
+    <ul class="steps steps-foot">
+      <li><a href="./tests/runner.html"><span class="t">ผลวัดความแม่นยำ</span></a></li>
     </ul>
   </nav>
 </aside>
 
 <div class="canvas">
+<main id="main" tabindex="-1">
+<div class="view" data-view="home" id="home">
 <header class="board" aria-labelledby="h-top">
   <div class="t t-dark t-name">
     <h1 id="h-top">ตรวจการเข้าถึงเว็บไซต์ตาม <span class="nw">WCAG 2.1</span></h1>
@@ -691,7 +726,7 @@
   </div>
 </header>
 
-<aside class="board board-2" aria-labelledby="h-limits">
+<section class="board board-2" aria-labelledby="h-limits">
   <div class="t t-surface limits">
     <h2 id="h-limits">ข้อจำกัดที่ต้องทราบก่อนใช้งาน</h2>
     <ol>
@@ -704,11 +739,12 @@
     <p class="big">16 / 16</p>
     <p>กรณีทดสอบความปลอดภัยผ่านทั้งหมด ระบบส่งไปบันทึกเฉพาะค่าสรุปเชิงตัวเลข ไม่ส่งและไม่เก็บโค้ด HTML ที่นำมาตรวจ</p>
   </div>
-</aside>
+</section>
+</div>
 
-<section id="standards-section" class="standards no-print" aria-labelledby="h-standards">
+<section id="standards-section" class="standards no-print view" data-view="standards" aria-labelledby="h-standards">
     <header class="sec-head">
-      <h2 id="h-standards">มาตรฐานที่เครื่องมือนี้ตรวจ หมายถึงอะไร</h2>
+      <h1 id="h-standards">มาตรฐานที่เครื่องมือนี้ตรวจ หมายถึงอะไร</h1>
       <p class="lead">
         ทั้งสามหลักเกณฑ์อยู่ในหลักการที่ 1 การรับรู้ได้ (Perceivable) ของ WCAG 2.1 คือข้อมูลบนหน้าเว็บต้องนำเสนอในแบบที่ผู้ใช้ทุกคนรับรู้ได้
         ระดับ A คือขั้นต่ำที่ต้องมี ส่วนระดับ AA คือระดับที่มาตรฐานส่วนใหญ่ใช้เป็นเป้าหมาย
@@ -717,12 +753,11 @@
     <div id="standards-cards" class="std-cards"></div>
   </section>
 
-<main id="main">
 
   <!-- ============ ขั้นที่ 1 : รับข้อมูล ============ -->
-  <section id="input-section" class="no-print" aria-labelledby="h-input">
+  <section id="input-section" class="no-print view" data-view="check" aria-labelledby="h-input">
     <header class="sec-head">
-      <h2 id="h-input">นำเข้าโค้ดที่ต้องการตรวจ</h2>
+      <h1 id="h-input">นำเข้าโค้ดที่ต้องการตรวจ</h1>
       <p class="lead">เลือกวิธีนำเข้าหนึ่งวิธี ทั้งสองวิธีใช้ตรรกะการวิเคราะห์ชุดเดียวกันหลังจากได้ HTML แล้ว</p>
     </header>
 
@@ -774,9 +809,9 @@
   </section>
 
   <!-- ============ ขั้นที่ 2 : แบบประเมิน Checklist ============ -->
-  <section id="checklist-section" class="no-print" aria-labelledby="h-checklist">
+  <section id="checklist-section" class="no-print view" data-view="checklist" aria-labelledby="h-checklist">
     <header class="sec-head">
-      <h2 id="h-checklist">แบบประเมินสำหรับผู้ประเมิน (Checklist)</h2>
+      <h1 id="h-checklist">แบบประเมินสำหรับผู้ประเมิน (Checklist)</h1>
       <p class="lead">
         สามข้อนี้เป็นส่วนที่โปรแกรมตัดสินแทนไม่ได้ จึงต้องอาศัยดุลยพินิจของผู้ประเมิน
         หากยังไม่แน่ใจให้เลือก &ldquo;ยังไม่ได้ตรวจ&rdquo; ระบบจะตัดข้อนั้นออกจากการคำนวณคะแนน ไม่นับเป็นทั้งผ่านและไม่ผ่าน
@@ -784,20 +819,29 @@
       </p>
     </header>
     <div id="checklist-container"></div>
+    <p class="next-step"><a class="btn-link" href="#results-section">ถัดไป: ดูผลการประเมิน</a></p>
   </section>
 
-  <!-- ============ ขั้นที่ 3 : ผลการประเมิน ============ -->
+  <div class="view" data-view="results">
+  <section id="results-empty" class="no-print" aria-labelledby="h-results-empty">
+    <h1 id="h-results-empty">ผลการประเมิน</h1>
+    <p class="lead">ยังไม่มีผล ให้นำเข้าโค้ดแล้วกด &ldquo;ตรวจสอบโค้ด&rdquo; ก่อน ผลจะแสดงที่หน้านี้</p>
+    <p class="next-step"><a class="btn-link" href="#input-section">ไปที่ขั้นที่ 1 นำเข้าโค้ด</a></p>
+  </section>
+  <!-- ขั้นที่ 3 : ผลการประเมิน ============ -->
   <section id="results-section" class="hidden" aria-labelledby="h-results" tabindex="-1">
     <header class="sec-head">
-      <h2 id="h-results">ผลการประเมิน</h2>
+      <h1 id="h-results">ผลการประเมิน</h1>
     </header>
     <div id="results-body"></div>
+    <p class="next-step no-print"><a class="btn-ghost" href="#checklist-section">แก้คำตอบในแบบประเมิน</a> <a class="btn-link" href="#history-section">ถัดไป: บันทึกและออกรายงาน</a></p>
   </section>
+  </div>
 
   <!-- ============ ขั้นที่ 4 : บันทึกและออกรายงาน ============ -->
-  <section id="history-section" class="no-print" aria-labelledby="h-history">
+  <section id="history-section" class="no-print view" data-view="report" aria-labelledby="h-history">
     <header class="sec-head">
-      <h2 id="h-history">บันทึกประวัติและออกรายงาน</h2>
+      <h1 id="h-history">บันทึกประวัติและออกรายงาน</h1>
       <p class="lead">
         ระบบส่งเฉพาะค่าสรุปเชิงตัวเลขไปบันทึกใน Google Sheets ผ่าน Google Apps Script
         <strong>ไม่ส่งและไม่จัดเก็บโค้ด HTML ต้นฉบับ</strong> ที่นำมาตรวจ

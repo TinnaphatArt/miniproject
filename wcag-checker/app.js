@@ -175,7 +175,7 @@
       return '<article class="std-card" id="' + stdAnchor(sc) + '" aria-labelledby="' + stdAnchor(sc) + '-h">' +
         '<div class="std-ill"><svg viewBox="0 0 320 160" aria-hidden="true" focusable="false">' + STD_ILLUSTRATION[sc] + '</svg></div>' +
         '<p class="std-tagline"><span class="rule-id">' + esc(sc) + '</span> ระดับ ' + esc(c.level) + ' · แนวทาง ' + esc(c.guideline) + '</p>' +
-        '<h3 id="' + stdAnchor(sc) + '-h">' + esc(c.nameTh) + ' <span class="en">' + esc(c.nameEn) + '</span></h3>' +
+        '<h2 id="' + stdAnchor(sc) + '-h">' + esc(c.nameTh) + ' <span class="en">' + esc(c.nameEn) + '</span></h2>' +
         '<dl class="std-def"><dt>หมายถึง</dt><dd>' + esc(c.meaningTh) + '</dd>' +
         '<dt>ผู้ได้รับผลกระทบ</dt><dd>' + esc(c.whoTh) + '</dd>' +
         '<dt>เครื่องมือนี้ตรวจ</dt><dd><ul>' + c.checksTh.map(function (k) {
@@ -214,7 +214,7 @@
       '<p class="issue-meta"><span class="sev ' + esc(sev) + '">' + esc(SEVERITY_LABEL[sev] || sev) + '</span>' +
       '<span class="rule-id">' + esc(p.ruleId) + '</span>' +
       '<span>' + (part ? esc(part) + ' · ' : '') + esc(isChecklist ? 'คำตอบจากแบบประเมิน' : '<' + p.tag + '>') + '</span></p>' +
-      '<h5 class="issue-msg">' + esc(p.message) + '</h5>' +
+      '<h4 class="issue-msg">' + esc(p.message) + '</h4>' +
       '<div class="codes' + (p.suggestion ? '' : ' single') + '">' +
       '<div class="code-col found"><p class="code-cap">' + (isChecklist ? 'ที่มา' : 'โค้ดที่พบ') + '</p>' +
       '<code class="snippet">' + esc(p.snippet) + '</code>' +
@@ -233,7 +233,7 @@
     var list = A.PAGE_PARTS.map(function (part) { return parts[part.key]; });
     var worst = list.slice().sort(function (a, b) { return b.fail - a.fail; })[0];
     var out = ['<div class="dash" role="region" aria-labelledby="h-dash">',
-      '<h3 id="h-dash">ผิดที่ส่วนไหนของหน้าเว็บ</h3>'];
+      '<h2 id="h-dash">ผิดที่ส่วนไหนของหน้าเว็บ</h2>'];
 
     var lead;
     if (result.issueCount) {
@@ -319,7 +319,7 @@
           return esc(k) + ' ' + r.where[k] + ' จุด'; }).join(', ') + '</td></tr>');
     });
     if (rows.length) {
-      out.push('<h4>มาตรฐานที่ละเมิดในหน้านี้</h4>');
+      out.push('<h3>มาตรฐานที่ละเมิดในหน้านี้</h3>');
       out.push('<div class="table-scroll" tabindex="0" role="region" aria-label="ตารางมาตรฐานที่ละเมิดในหน้านี้"><table class="std-table"><thead><tr>' +
         '<th scope="col">หลักเกณฑ์ WCAG 2.1</th><th scope="col">ระดับ</th><th scope="col">แนวทาง</th>' +
         '<th scope="col" class="num">จุดที่ผิด</th><th scope="col">พบที่ส่วน</th></tr></thead><tbody>' +
@@ -370,7 +370,7 @@
       'ไม่ได้แปลว่าเว็บไซต์ไม่มีปัญหาในหลักเกณฑ์นั้น</p></div>');
 
     /* ---- ตารางความครอบคลุมรายหลักเกณฑ์ ---- */
-    h.push('<h3 id="h-coverage">ความครอบคลุมและอัตราไม่ผ่านรายหลักเกณฑ์</h3>');
+    h.push('<h2 id="h-coverage">ความครอบคลุมและอัตราไม่ผ่านรายหลักเกณฑ์</h2>');
 
     /* แถบสัดส่วนช่วยให้เห็นทันทีว่าคะแนนมาจากการตรวจได้กี่จุด ไม่ใช่ดูแต่ตัวเลขคะแนน */
     h.push('<div class="coverage">');
@@ -458,7 +458,7 @@
       '</strong></td></tr></tfoot></table></div></details>');
 
     /* ---- รายการจุดบกพร่อง ---- */
-    h.push('<h3 id="h-issues">จุดที่ต้องแก้ไข (' + result.issueCount + ' จุด)</h3>');
+    h.push('<h2 id="h-issues">จุดที่ต้องแก้ไข (' + result.issueCount + ' จุด)</h2>');
     if (!result.issueCount) {
       h.push('<div class="note good" role="note"><p>ไม่พบข้อบกพร่องในกฎย่อยที่ระบบตรวจได้ ' +
         'อย่างไรก็ตามยังต้องตรวจสอบหลักเกณฑ์อื่นของ WCAG ที่อยู่นอกขอบเขตของเครื่องมือนี้ด้วย</p></div>');
@@ -467,7 +467,7 @@
         var group = result.issues.filter(function (p) { return A.RULE_PART[p.ruleId] === part.key; });
         if (!group.length) return;
         var c = A.CRITERIA[part.sc];
-        h.push('<h4 id="part-' + part.key + '" class="part-h">' + esc(part.label) + ' — ' + group.length + ' จุด ' +
+        h.push('<h3 id="part-' + part.key + '" class="part-h">' + esc(part.label) + ' — ' + group.length + ' จุด ' +
           '<span class="muted">ละเมิด ' + esc(part.sc) + ' ' + esc(c.nameTh) + ' ระดับ ' + esc(c.level) + '</span></h4>');
         group.forEach(function (p) { h.push(renderIssue(p)); });
       });
@@ -475,13 +475,13 @@
 
     /* ---- รายการที่ต้องตรวจเพิ่ม ---- */
     if (result.needsReviewCount) {
-      h.push('<h3 id="h-review">จุดที่ต้องตรวจเพิ่มด้วยตนเอง (' + result.needsReviewCount + ' จุด)</h3>');
+      h.push('<h2 id="h-review">จุดที่ต้องตรวจเพิ่มด้วยตนเอง (' + result.needsReviewCount + ' จุด)</h2>');
       h.push('<p class="lead">ระบบตัดสินแทนไม่ได้ว่าผ่านหรือไม่ผ่าน จุดเหล่านี้จึงยังไม่ถูกนับในตัวหารของคะแนน ' +
         'ตอบแบบประเมิน Checklist ในขั้นที่ 2 เพื่อให้ระบบนำมาคิดคะแนน</p>');
       A.PAGE_PARTS.forEach(function (part) {
         var group = result.needsReview.filter(function (p) { return A.RULE_PART[p.ruleId] === part.key; });
         if (!group.length) return;
-        h.push('<h4 id="review-' + part.key + '" class="part-h">' + esc(part.label) + ' — ' + group.length + ' จุด</h4>');
+        h.push('<h3 id="review-' + part.key + '" class="part-h">' + esc(part.label) + ' — ' + group.length + ' จุด</h3>');
         group.forEach(function (p) { h.push(renderIssue(p)); });
       });
     }
@@ -531,7 +531,7 @@
       ['#h-coverage', 'ความครอบคลุม', '', ''],
       ['#h-issues', 'จุดที่ต้องแก้', String(result.issueCount), result.issueCount ? 'bad' : '']];
     if (result.needsReviewCount) sub.push(['#h-review', 'ต้องตรวจเพิ่ม', String(result.needsReviewCount), '']);
-    li.innerHTML = '<a href="#results-section"><span class="n">3</span><span class="t">ผลการประเมิน</span></a>' +
+    li.innerHTML = '<a href="#results-section" data-nav="results"><span class="n">3</span><span class="t">ผลการประเมิน</span></a>' +
       '<ol class="sub">' + sub.map(function (s) {
         return '<li><a href="' + s[0] + '"><span class="t">' + esc(s[1]) + '</span>' +
           (s[2] ? '<span class="cnt ' + s[3] + '">' + esc(s[2]) + '</span>' : '') + '</a></li>';
@@ -539,18 +539,61 @@
     updateRailCurrent();
   }
 
-  /* ไฮไลต์ขั้นที่ผู้ใช้กำลังดูอยู่ในเมนูด้านซ้าย */
-  var RAIL_SECTIONS = ['input-section', 'checklist-section', 'results-section', 'history-section'];
+  /* ================================================================ *
+   * แบ่งเป็นหลายหน้าด้วย hash ในไฟล์เดียว ข้อมูลที่กรอกและผลตรวจจึงไม่หายเมื่อสลับหน้า
+   * ลิงก์ #id ใดก็ได้จะเปิดหน้าที่มีองค์ประกอบนั้น แล้วเลื่อนไปที่จุดนั้น
+   * ================================================================ */
+  var VIEW_TITLES = { home: 'หน้าแรก', standards: 'มาตรฐานที่ตรวจ', check: 'นำเข้าโค้ด',
+    checklist: 'แบบประเมิน', results: 'ผลการประเมิน', report: 'บันทึกและรายงาน' };
+  var BASE_TITLE = document.title;
+  var currentView = null;
+
+  function viewOf(el) {
+    var v = el && el.closest('[data-view]');
+    return v ? v.getAttribute('data-view') : null;
+  }
+
   function updateRailCurrent() {
-    var current = null;
-    RAIL_SECTIONS.forEach(function (id) {
-      var el = $(id);
-      if (el && !el.classList.contains('hidden') && el.getBoundingClientRect().top < window.innerHeight * 0.35) current = id;
-    });
-    document.querySelectorAll('.steps > li > a').forEach(function (a) {
-      if (a.getAttribute('href') === '#' + current) a.setAttribute('aria-current', 'location');
+    document.querySelectorAll('[data-nav]').forEach(function (a) {
+      if (a.getAttribute('data-nav') === currentView) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');
     });
+  }
+
+  function showView(name, target, moveFocus) {
+    var changed = name !== currentView;
+    currentView = name;
+    document.querySelectorAll('[data-view]').forEach(function (v) { v.hidden = v.getAttribute('data-view') !== name; });
+    var empty = $('results-empty');
+    if (empty) empty.hidden = !$('results-section').classList.contains('hidden');
+    updateRailCurrent();
+    document.title = (name === 'home' ? '' : VIEW_TITLES[name] + ' · ') + BASE_TITLE;
+    var deep = target && !target.hasAttribute('data-view') && !target.classList.contains('hidden');
+    if (deep) target.scrollIntoView({ block: 'start' });
+    else window.scrollTo(0, 0);
+    if (moveFocus && (changed || deep)) {
+      /* ย้ายโฟกัสไปหัวข้อของหน้าใหม่ โปรแกรมอ่านหน้าจอจึงรู้ว่าเปลี่ยนหน้าแล้ว */
+      var view = document.querySelector('[data-view="' + name + '"]:not([hidden])');
+      var h = deep ? target : view && view.querySelector('h1, h2:not(.sr-only)');
+      if (name === 'results' && !$('results-section').classList.contains('hidden') && !deep) h = $('results-section');
+      if (h) {
+        if (!h.hasAttribute('tabindex')) h.setAttribute('tabindex', '-1');
+        h.focus({ preventScroll: true });
+      }
+    }
+  }
+
+  function route(moveFocus) {
+    var id = '';
+    try { id = decodeURIComponent(location.hash.slice(1)); } catch (e) { id = ''; }
+    var el = id ? document.getElementById(id) : null;
+    var name = viewOf(el);
+    if (!name && el) {               /* ลิงก์ข้ามไปเนื้อหาหลัก: อยู่หน้าเดิม */
+      if (!currentView) showView('home', null, false);
+      el.focus({ preventScroll: true });
+      return;
+    }
+    showView(name || 'home', el, moveFocus);
   }
 
   /* ================================================================ *
@@ -586,8 +629,8 @@
     setStatus($('input-status'), 'ตรวจสอบเรียบร้อย', 'good');
 
     if (!keepScroll) {
-      $('results-section').focus();
-      $('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (location.hash === '#results-section') route(true);
+      else location.hash = '#results-section';
     }
   }
 
@@ -848,13 +891,10 @@
     renderStandards();
     renderChecklist();
 
-    var railTick = false;
-    window.addEventListener('scroll', function () {
-      if (railTick) return;
-      railTick = true;
-      window.requestAnimationFrame(function () { railTick = false; updateRailCurrent(); });
-    }, { passive: true });
-    updateRailCurrent();
+    window.addEventListener('hashchange', function () { route(true); });
+    route(false);
+    /* เบราว์เซอร์เลื่อนไปยังจุดยึดหลังโหลดเสร็จ จึงจัดตำแหน่งหน้าซ้ำอีกครั้ง */
+    window.addEventListener('load', function () { route(false); });
 
     document.querySelectorAll('input[name="mode"]').forEach(function (radio) {
       radio.addEventListener('change', function () {
