@@ -531,7 +531,7 @@
   }
   @media (max-width:640px) {
     .board { gap:6px; }
-    .t { padding:18px; }
+    .board > .t { padding:18px; }
     .t-name { padding:24px 18px 20px; }
     .t-name h1 { font-size:1.75rem; }
     .t-fig, .t-contrast, .t-anatomy, .t-sites { grid-column:1 / -1; }
@@ -1149,12 +1149,141 @@
   .view > section.caps { background:none; box-shadow:none; padding:0; border-radius:0; }
   .ring { top:76%; }
 
+  /* ---------- รอบขัดเกลา: ระยะห่าง แถบขั้นตอน เมนูจอแคบ หน้าผลว่าง ---------- */
+  /* ระยะห่างระหว่างส่วนในหน้าแรก (กฎ .view > section เดิมตั้งไว้แค่ 12px) */
+  .view > ul.feats { margin-bottom:96px; }
+  .view > section.caps, .view > section.how, .view > section.report2 { margin-bottom:96px; }
+  .view > .board-split, .view > .board-proof { margin-bottom:48px; }
+  .view > section.who-faq { margin-top:88px; }
+  .caps-lead { margin-bottom:32px; }
+
+  /* ภาพแล็ปท็อป: วงแหวนอยู่หลังจอ ไอคอนกระจกไม่บังตัวเลขบนจอ */
+  .laptop { z-index:1; }
+  .ring { z-index:0; }
+  .glass { z-index:2; }
+  .g4 { right:1%; bottom:-4%; }
+
+  /* ปุ่มหลัก: เงาสีน้ำเงินแทนเงาม่วงจากธีมเดิม */
+  button.primary, .btn-link { box-shadow:0 10px 24px -12px rgba(29,78,216,.75); }
+
+  /* ฟุตเตอร์ชิดล่างเสมอ แม้หน้าสั้น */
+  .app { display:flex; flex-direction:column; min-height:100vh; }
+  .app > .sidebar { align-self:stretch; }
+  .canvas { flex:1 0 auto; width:100%; display:flex; flex-direction:column; position:relative; isolation:isolate; }
+  .canvas > main { flex:1 0 auto; }
+
+  /* แถบสีหัวหน้าเครื่องมือ 4 หน้า การ์ดขาวซ้อนทับขอบล่างของแถบ */
+  body[data-page="check"] .canvas::before, body[data-page="checklist"] .canvas::before,
+  body[data-page="results"] .canvas::before, body[data-page="report"] .canvas::before {
+    content:""; position:absolute; z-index:-1; top:0; left:50%; width:100vw; margin-left:-50vw; height:236px; background:var(--grad); }
+  .pg-band { display:flex; justify-content:center; margin:-6px 0 26px; }
+  .pg-steps { list-style:none; margin:0; padding:0; display:flex; align-items:center; flex-wrap:wrap; justify-content:center; row-gap:6px; }
+  .pg-steps li { display:flex; align-items:center; }
+  .pg-steps li + li::before { content:""; width:clamp(14px, 4vw, 56px); height:2px; border-radius:1px; background:rgba(255,255,255,.4); margin:0 8px; }
+  .pg-steps li.done + li.done::before, .pg-steps li.done + li.cur::before { background:var(--yellow); }
+  .pg-steps a { display:flex; align-items:center; gap:10px; min-height:44px; padding:6px 12px 6px 6px; border-radius:999px; color:#e0e9ff; text-decoration:none; font-weight:600; }
+  .pg-steps a:hover { background:rgba(255,255,255,.12); color:#fff; }
+  .pg-steps a:focus-visible { outline:3px solid #fff; outline-offset:2px; }
+  .ps-n { width:32px; height:32px; flex:none; border-radius:50%; display:grid; place-items:center; box-shadow:inset 0 0 0 2px rgba(255,255,255,.7); font-size:.95rem; }
+  .ps-n svg { display:none; width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; }
+  .pg-steps .done .ps-n { background:#fff; color:#0b2463; box-shadow:none; }
+  .pg-steps .done .ps-n b { display:none; } .pg-steps .done .ps-n svg { display:block; }
+  .pg-steps .cur a { color:#fff; font-weight:700; }
+  .pg-steps .cur .ps-n { background:var(--yellow); color:#0b2463; box-shadow:0 0 0 5px rgba(251,191,36,.28); }
+  @media (max-width:760px) {
+    .pg-steps li:not(.cur) .ps-t { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+    .pg-steps a { padding:6px; }
+    .pg-steps .cur a { padding-right:14px; }
+    body[data-page] .canvas::before { height:200px; }
+  }
+
+  /* เมนูบนจอแคบ: ปุ่มเปิดปิดแทนแถบเลื่อนแนวนอน */
+  .menu-btn { display:none; }
+  @media (max-width:1100px) {
+    .sidebar { position:sticky; top:0; flex-wrap:wrap; padding:10px clamp(16px, 4vw, 48px); }
+    .js .menu-btn { display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 18px 0 14px; border-radius:999px; border:0; background:var(--p1); color:var(--link); font:inherit; font-weight:700; cursor:pointer; }
+    .menu-btn svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; }
+    .menu-btn .mb-x, .menu-btn[aria-expanded="true"] .mb-bars { display:none; }
+    .menu-btn[aria-expanded="true"] .mb-x { display:block; }
+    .js .sidebar:not(.nav-open) .rail { display:none; }
+    .sidebar .rail { width:100%; flex-direction:column; align-items:stretch; flex-wrap:nowrap; overflow:visible; gap:2px; padding:4px 0 8px; }
+    .rail .steps { flex-direction:column; gap:2px; }
+    .rail .steps li { flex:auto; }
+    .rail .steps a { height:auto; min-height:48px; line-height:1.4; padding:10px 16px; border-radius:12px; white-space:normal; }
+    .rail .steps a:hover { background:var(--paper-3) !important; }
+    .rail .steps a[aria-current="page"] { background:var(--p1) !important; }
+    .rail .steps a[aria-current="page"]::after { left:0; right:auto; top:10px; bottom:10px; width:4px; height:auto; }
+    .sidebar .nav-cta { display:inline-flex !important; justify-content:center; margin:8px 0 0; min-height:48px; }
+    main [id], main > section, .view > section { scroll-margin-top:80px; }
+  }
+
+  /* หน้าผลยังว่าง */
+  .view > section#results-empty { text-align:center; padding:44px 24px 48px; }
+  .es-art { display:block; width:min(300px, 86%); height:auto; margin:0 auto 14px; }
+  .es-blob { fill:#e8efff; }
+  #results-empty .lead { margin-left:auto; margin-right:auto; max-width:46ch; }
+  #results-empty .next-step { justify-content:center; align-items:center; }
+  #results-empty .next-step button { min-height:44px; padding:10px 22px; border-radius:999px; }
+
+  /* วงแหวนคะแนน: สีตามช่วงคะแนน และพื้นวงแหวนอ่อนตามสีเดียวกัน */
+  .score[data-tone="bad"]  .score-main::before { background:conic-gradient(var(--bad)  calc(var(--score, 0) * 1%), var(--bad-bg)  0); }
+  .score[data-tone="warn"] .score-main::before { background:conic-gradient(var(--warn) calc(var(--score, 0) * 1%), var(--warn-bg) 0); }
+  .score[data-tone="ok"]   .score-main::before { background:conic-gradient(var(--link) calc(var(--score, 0) * 1%), var(--p1)      0); }
+  .score[data-tone="good"] .score-main::before { background:conic-gradient(var(--good) calc(var(--score, 0) * 1%), var(--good-bg) 0); }
+  .scale-names span { white-space:nowrap; }
+
+  /* ช่องวางโค้ดสูงพอให้คอลัมน์ซ้ายสมดุลกับคอลัมน์ขวา */
+  @media (min-width:1001px) { #html-input { min-height:420px; } }
+
+  /* แบบประเมิน: แต่ละข้อเป็นการ์ด ตัวเลือกที่เลือกแล้วมีสีตามระดับ */
+  #checklist-container .q { padding:20px 22px 22px; margin:0 0 16px; border:0; border-radius:20px; background:var(--paper-2); }
+  .q-meta > span:first-child { padding:1px 10px; border-radius:999px; background:var(--page); font-weight:600; }
+  .q:has(input[value="pass"]:checked) .q-meta > span:first-child { background:var(--good-bg); color:var(--good); }
+  .q:has(input[value="improve"]:checked) .q-meta > span:first-child { background:var(--warn-bg); color:var(--warn); }
+  .q:has(input[value="fail"]:checked) .q-meta > span:first-child { background:var(--bad-bg); color:var(--bad); }
+  .answers label.lv-pass:has(input:checked) { border-color:var(--good); box-shadow:inset 0 0 0 1px var(--good); background:var(--good-bg); }
+  .answers label.lv-improve:has(input:checked) { border-color:var(--warn); box-shadow:inset 0 0 0 1px var(--warn); background:var(--warn-bg); }
+  .answers label.lv-fail:has(input:checked) { border-color:var(--bad); box-shadow:inset 0 0 0 1px var(--bad); background:var(--bad-bg); }
+  .answers .lv-pass input { accent-color:var(--good); } .answers .lv-improve input { accent-color:var(--warn); } .answers .lv-fail input { accent-color:var(--bad); }
+
+  /* เกจคะแนน: ตัวเลขอยู่กลางวงแหวน คำอธิบายช่วงคะแนนอยู่ด้านขวา */
+  .score-main { grid-template-columns:184px minmax(0, 1fr); column-gap:24px; align-content:center; }
+  .score-main::before { width:184px !important; height:184px !important; grid-row:1 / span 2; }
+  .score-main > .score-num { grid-column:1; grid-row:1 / span 2; place-self:center; flex-direction:column; align-items:center; gap:2px; margin:0; text-align:center; position:relative; }
+  .score-num b { font-size:2.75rem; line-height:1; }
+  .score-num span { font-size:.88rem; }
+  .score-main > .score-label { grid-row:1; align-self:end; }
+  .score-main > .score-band { grid-row:2; align-self:start; margin-top:8px; }
+  .mode-opt input:checked + label { box-shadow:0 4px 12px -6px rgba(29,78,216,.5); }
+  @media (max-width:560px) {
+    .score-main { grid-template-columns:136px minmax(0, 1fr); column-gap:16px; }
+    .score-main::before { width:136px !important; height:136px !important; }
+    .score-num b { font-size:2rem; }
+    .modes { display:grid !important; grid-template-columns:repeat(3, minmax(0, 1fr)); width:100%; overflow:visible; border-radius:18px; }
+    .mode-opt label { padding:8px 6px; text-align:center; white-space:normal; font-size:.88rem; line-height:1.35; border-radius:14px; height:100%; display:flex; align-items:center; justify-content:center; }
+    .pg-steps li + li::before { width:10px; margin:0 3px; }
+    .pg-steps a { padding:6px 4px; gap:6px; }
+    .pg-steps .cur a { padding-right:8px; }
+    .pg-steps .cur .ps-t { font-size:.92rem; }
+  }
+
+  /* การ์ดสรุปบนจอแคบ: ไอคอนอยู่บน ป้ายไม่ถูกบีบเหลือคำละบรรทัด */
+  @media (max-width:560px) {
+    .kpi { grid-template-columns:minmax(0, 1fr); row-gap:4px; }
+    .kpi-ico { grid-row:auto; width:34px; height:34px; border-radius:11px; margin-bottom:4px; }
+    .kpi-ico svg { width:18px; height:18px; }
+    .glass, .ring { display:none; }
+    .view > ul.feats, .view > section.caps, .view > section.how, .view > section.report2 { margin-bottom:64px; }
+    .view > section.who-faq { margin-top:64px; }
+  }
+
   /* ---------- การพิมพ์รายงาน ---------- */
   @media print {
     .caps { display:none !important; }
     .hero2-art, .hero2-cta, .hero2-checks, .quick, .feats, .how, .report2, .who-faq, .sec-h2, .board-split, .board-proof, .nav-cta { display:none !important; }
     .hero2 { width:auto; margin:0; padding:0; background:none; color:#000; } .hero2::after, .hero2::before { display:none; } .hero2 h1, .hero2-sub, .hero2-lead { color:#000; }
     footer.site { display:none !important; }
+    .pg-band, .menu-btn { display:none !important; } .canvas::before { display:none !important; }
     .flow, .t-split, .cta-band { display:none !important; }
     .code-col.found code.snippet, .code-col.fix code.snippet { background:#fff !important; color:#000 !important; border:1px solid #999 !important; }
     .hero-art, .board-h, .t-feature { display:none !important; }
@@ -1181,6 +1310,7 @@
 </style>
 </head>
 <body>
+<script>document.documentElement.classList.add('js');</script>
 <a class="skip-link" href="#main">ข้ามไปยังเนื้อหาหลัก</a>
 
 <div class="app">
@@ -1189,17 +1319,18 @@
     <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="16" fill="#1d4ed8"/><circle cx="16" cy="8.6" r="2.3" fill="#fff"/><path d="M8.8 12.3c2.4.8 4.8 1.2 7.2 1.2s4.8-.4 7.2-1.2M16 13.6v4.9l-3.1 6.3M16 18.5l3.1 6.3" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="brand-name">ตรวจการเข้าถึงเว็บไซต์<small>WCAG 2.1 · ระดับ A และ AA</small></span>
   </div>
-  <nav class="rail no-print" aria-label="เมนูหลัก">
+  <button type="button" class="menu-btn no-print" id="menu-btn" aria-expanded="false" aria-controls="main-nav"><svg class="mb-bars" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg class="mb-x" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18"/></svg><span>เมนู</span></button>
+  <nav class="rail no-print" id="main-nav" aria-label="เมนูหลัก">
     <ul class="steps">
       <li><a href="#home" data-nav="home"><span class="t">หน้าแรก</span></a></li>
       <li><a href="#standards-section" data-nav="standards"><span class="t">มาตรฐานที่ตรวจ</span></a></li>
     </ul>
     <p class="rail-title" id="rail-title">ขั้นตอนการประเมิน</p>
     <ol class="steps" aria-labelledby="rail-title">
-      <li><a href="#input-section" data-nav="check"><span class="n">1</span><span class="t">นำเข้าโค้ด</span></a></li>
-      <li><a href="#checklist-section" data-nav="checklist"><span class="n">2</span><span class="t">ตอบแบบประเมิน</span></a></li>
-      <li id="nav-results"><a href="#results-section" data-nav="results"><span class="n">3</span><span class="t">ผลการประเมิน</span><span class="cnt">ยังไม่ได้ตรวจ</span></a></li>
-      <li><a href="#history-section" data-nav="report"><span class="n">4</span><span class="t">บันทึกและรายงาน</span></a></li>
+      <li><a href="#input-section" data-nav="check"><span class="t">นำเข้าโค้ด</span></a></li>
+      <li><a href="#checklist-section" data-nav="checklist"><span class="t">แบบประเมิน</span></a></li>
+      <li id="nav-results"><a href="#results-section" data-nav="results"><span class="t">ผลการประเมิน</span><span class="cnt">ยังไม่ได้ตรวจ</span></a></li>
+      <li><a href="#history-section" data-nav="report"><span class="t">บันทึกและรายงาน</span></a></li>
     </ol>
     <a class="nav-cta" href="#input-section"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M6 4l10 6-10 6z" fill="currentColor"/></svg>เริ่มตรวจ</a>
     <ul class="steps steps-foot">
@@ -1210,6 +1341,14 @@
 
 <div class="canvas">
 <main id="main" tabindex="-1">
+<nav class="pg-band no-print" id="pg-band" aria-label="ขั้นตอนการประเมิน" hidden>
+  <ol class="pg-steps">
+    <li data-step="check"><a href="#input-section"><span class="ps-n" aria-hidden="true"><b>1</b><svg viewBox="0 0 20 20" focusable="false"><path d="M5.8 10.2l2.7 2.7 5.7-5.8"/></svg></span><span class="ps-t">นำเข้าโค้ด</span><span class="ps-s sr-only"></span></a></li>
+    <li data-step="checklist"><a href="#checklist-section"><span class="ps-n" aria-hidden="true"><b>2</b><svg viewBox="0 0 20 20" focusable="false"><path d="M5.8 10.2l2.7 2.7 5.7-5.8"/></svg></span><span class="ps-t">ตอบแบบประเมิน</span><span class="ps-s sr-only"></span></a></li>
+    <li data-step="results"><a href="#results-section"><span class="ps-n" aria-hidden="true"><b>3</b><svg viewBox="0 0 20 20" focusable="false"><path d="M5.8 10.2l2.7 2.7 5.7-5.8"/></svg></span><span class="ps-t">ดูผลการประเมิน</span><span class="ps-s sr-only"></span></a></li>
+    <li data-step="report"><a href="#history-section"><span class="ps-n" aria-hidden="true"><b>4</b><svg viewBox="0 0 20 20" focusable="false"><path d="M5.8 10.2l2.7 2.7 5.7-5.8"/></svg></span><span class="ps-t">บันทึกและรายงาน</span><span class="ps-s sr-only"></span></a></li>
+  </ol>
+</nav>
 <div class="view" data-view="home" id="home">
 <header class="hero2" aria-labelledby="h-top">
   <div class="hero2-in">
@@ -1592,9 +1731,24 @@
 
   <div class="view" data-view="results">
   <section id="results-empty" class="no-print" aria-labelledby="h-results-empty">
+    <svg class="es-art" viewBox="0 0 260 160" aria-hidden="true" focusable="false">
+      <circle class="es-blob" cx="132" cy="84" r="74"/>
+      <rect x="62" y="30" width="146" height="104" rx="12" fill="#fff" stroke="#c7d2fe" stroke-width="2"/>
+      <path d="M62 42a12 12 0 0 1 12-12h122a12 12 0 0 1 12 12v8H62z" fill="#1d4ed8"/>
+      <circle cx="75" cy="40" r="2.6" fill="#fff"/><circle cx="84" cy="40" r="2.6" fill="#fff"/><circle cx="93" cy="40" r="2.6" fill="#fff"/>
+      <rect x="74" y="62" width="46" height="34" rx="6" fill="#bfdbfe"/>
+      <path d="M78 92l11-13 8 8 6-6 13 11z" fill="#60a5fa"/><circle cx="110" cy="70" r="4" fill="#fbbf24"/>
+      <rect x="128" y="64" width="66" height="6" rx="3" fill="#cbd5e1"/><rect x="128" y="76" width="50" height="6" rx="3" fill="#cbd5e1"/><rect x="128" y="88" width="58" height="6" rx="3" fill="#cbd5e1"/>
+      <rect x="74" y="106" width="120" height="8" rx="4" fill="#e2e8f0"/><rect x="74" y="119" width="78" height="8" rx="4" fill="#e2e8f0"/>
+      <circle cx="184" cy="102" r="24" fill="#fff" fill-opacity=".45" stroke="#0b2463" stroke-width="6"/>
+      <path d="M201 119l20 20" stroke="#0b2463" stroke-width="10" stroke-linecap="round"/>
+      <rect x="14" y="38" width="40" height="24" rx="12" fill="#fee2e2"/><path d="M29 45l10 10M39 45 29 55" stroke="#b91c1c" stroke-width="2.6" stroke-linecap="round"/>
+      <rect x="6" y="74" width="40" height="24" rx="12" fill="#fef3c7"/><path d="M26 80v7M26 91.5v.5" stroke="#92400e" stroke-width="2.8" stroke-linecap="round"/>
+      <rect x="18" y="110" width="40" height="24" rx="12" fill="#dcfce7"/><path d="M32 122.5l4 4 8-8.5" fill="none" stroke="#166534" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
     <h1 id="h-results-empty">ผลการประเมิน</h1>
     <p class="lead">ยังไม่มีผล ให้นำเข้าโค้ดแล้วกด &ldquo;ตรวจสอบโค้ด&rdquo; ก่อน ผลจะแสดงที่หน้านี้</p>
-    <p class="next-step"><a class="btn-link" href="#input-section">ไปที่ขั้นที่ 1 นำเข้าโค้ด</a></p>
+    <p class="next-step"><a class="btn-link" href="#input-section">ไปที่ขั้นที่ 1 นำเข้าโค้ด</a> <button type="button" class="secondary js-demo-report">ลองดูผลจากโค้ดตัวอย่าง</button></p>
   </section>
   <!-- ขั้นที่ 3 : ผลการประเมิน ============ -->
   <section id="results-section" class="hidden" aria-labelledby="h-results" tabindex="-1">

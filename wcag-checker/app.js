@@ -577,7 +577,7 @@
       ['#h-coverage', 'ความครอบคลุม', '', ''],
       ['#h-issues', 'จุดที่ต้องแก้', String(result.issueCount), result.issueCount ? 'bad' : '']];
     if (result.needsReviewCount) sub.push(['#h-review', 'ต้องตรวจเพิ่ม', String(result.needsReviewCount), '']);
-    li.innerHTML = '<a href="#results-section" data-nav="results"><span class="n">3</span><span class="t">ผลการประเมิน</span></a>' +
+    li.innerHTML = '<a href="#results-section" data-nav="results"><span class="t">ผลการประเมิน</span></a>' +
       '<ol class="sub">' + sub.map(function (s) {
         return '<li><a href="' + s[0] + '"><span class="t">' + esc(s[1]) + '</span>' +
           (s[2] ? '<span class="cnt ' + s[3] + '">' + esc(s[2]) + '</span>' : '') + '</a></li>';
@@ -604,11 +604,33 @@
       if (a.getAttribute('data-nav') === currentView) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');
     });
+    updateStepper();
+  }
+
+  /* แถบขั้นตอนบนหัวหน้าเครื่องมือ: บอกขั้นปัจจุบัน (aria-current="step") และขั้นที่ทำเสร็จแล้ว
+   * สถานะเสร็จมาจากข้อมูลจริง: มีผลตรวจแล้ว และตอบแบบประเมินครบทุกข้อ */
+  var STEP_VIEWS = ['check', 'checklist', 'results', 'report'];
+  function updateStepper() {
+    var band = $('pg-band');
+    if (!band) return;
+    band.hidden = STEP_VIEWS.indexOf(currentView) < 0;
+    var hasResult = !$('results-section').classList.contains('hidden');
+    var allAnswered = Object.keys(readChecklist()).length === A.CHECKLIST_QUESTIONS.length;
+    var done = { check: hasResult, checklist: hasResult && allAnswered, results: hasResult, report: false };
+    band.querySelectorAll('li[data-step]').forEach(function (li) {
+      var k = li.getAttribute('data-step'), a = li.querySelector('a'), s = li.querySelector('.ps-s');
+      var cur = k === currentView, isDone = !!done[k] && !cur;
+      li.classList.toggle('cur', cur);
+      li.classList.toggle('done', isDone);
+      if (cur) a.setAttribute('aria-current', 'step'); else a.removeAttribute('aria-current');
+      s.textContent = isDone ? ' (เสร็จแล้ว)' : '';
+    });
   }
 
   function showView(name, target, moveFocus) {
     var changed = name !== currentView;
     currentView = name;
+    document.body.setAttribute('data-page', name);
     document.querySelectorAll('[data-view]').forEach(function (v) { v.hidden = v.getAttribute('data-view') !== name; });
     var empty = $('results-empty');
     if (empty) empty.hidden = !$('results-section').classList.contains('hidden');
@@ -672,8 +694,12 @@
     renderResults(result, highlighted);
     /* วงแหวนคะแนนรอบตัวเลข (ตกแต่ง ตัวเลขจริงอยู่ในข้อความ) */
     var scoreBox = document.querySelector('#results-body .score');
-    if (scoreBox) scoreBox.style.setProperty('--score', result.score === null ? 0 : result.score);
+    if (scoreBox) {
+      scoreBox.style.setProperty('--score', result.score === null ? 0 : result.score);
+      if (result.interpretation) scoreBox.setAttribute('data-tone', result.interpretation.tone);
+    }
     $('results-section').classList.remove('hidden');
+    updateStepper();
     updatePayloadPreview();
     setStatus($('input-status'), 'ตรวจสอบเรียบร้อย', 'good');
 
@@ -993,11 +1019,32 @@
     });
     var quickFile = $('quick-file');
     if (quickFile) quickFile.addEventListener('change', function () { readHtmlFile(quickFile, $('quick-status')); });
-    var demoBtn = $('btn-demo-report');
-    if (demoBtn) demoBtn.addEventListener('click', function () {
-      useMode('snippet'); $('html-input').value = SAMPLE_BAD;
-      runAnalysis(SAMPLE_BAD, 'โค้ดตัวอย่างที่มีข้อบกพร่อง', 'snippet');
+    /* ปุ่มลองดูรายงานจากโค้ดตัวอย่าง (หน้าแรก และหน้าผลที่ยังว่าง) */
+    document.querySelectorAll('#btn-demo-report, .js-demo-report').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        useMode('snippet'); $('html-input').value = SAMPLE_BAD;
+        runAnalysis(SAMPLE_BAD, 'โค้ดตัวอย่างที่มีข้อบกพร่อง', 'snippet');
+      });
     });
+
+    /* เมนูบนจอแคบ: ปุ่มเปิดปิด กด Esc หรือคลิกนอกเมนูเพื่อปิด และปิดเองเมื่อเปลี่ยนหน้า */
+    var menuBtn = $('menu-btn'), bar = document.querySelector('.sidebar');
+    if (menuBtn && bar) {
+      var setMenu = function (open, refocus) {
+        bar.classList.toggle('nav-open', open);
+        menuBtn.setAttribute('aria-expanded', String(open));
+        if (!open && refocus) menuBtn.focus();
+      };
+      menuBtn.addEventListener('click', function () { setMenu(menuBtn.getAttribute('aria-expanded') !== 'true'); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && bar.classList.contains('nav-open')) setMenu(false, true);
+      });
+      document.addEventListener('click', function (e) {
+        if (bar.classList.contains('nav-open') && !bar.contains(e.target)) setMenu(false);
+      });
+      window.addEventListener('hashchange', function () { setMenu(false); });
+      $('main-nav').addEventListener('click', function (e) { if (e.target.closest('a')) setMenu(false); });
+    }
     $('btn-save').addEventListener('click', onSaveClick);
     $('btn-test').addEventListener('click', onTestClick);
     $('btn-print').addEventListener('click', function () { window.print(); });
