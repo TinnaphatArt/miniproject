@@ -358,6 +358,7 @@
       '<div><dt>ต้องตรวจเพิ่ม</dt><dd>' + result.needsReviewCount + '</dd></div>' +
       '<div><dt>องค์ประกอบทั้งหมด</dt><dd>' + result.elementCount + '</dd></div>' +
       '</dl>' +
+      renderSeverityStrip(result) +
       '<p class="score-src">แหล่งข้อมูล: ' + esc(state.sourceLabel || 'วางโค้ดเอง') +
       ' · วิเคราะห์โครงสร้างโค้ด ' + result.analysisMs.toFixed(2) + ' มิลลิวินาที' +
       (state.fetchMs !== null ? ' · ดึงข้อมูลผ่านบริการตัวกลาง ' + state.fetchMs + ' มิลลิวินาที' : '') +
@@ -522,6 +523,24 @@
     { from: 75, to: 90, tone: 'ok', name: 'ดี' },
     { from: 90, to: 100, tone: 'good', name: 'ดีมาก' }
   ];
+
+  /* แถบจำนวนจุดที่ต้องแก้แยกตามความรุนแรง ตัวเลขอยู่ในคำอธิบายใต้แถบ (แถบเป็นภาพตกแต่ง) */
+  function renderSeverityStrip(result) {
+    var order = ['critical', 'should_fix', 'advisory'];
+    var count = { critical: 0, should_fix: 0, advisory: 0 };
+    (result.issues || []).forEach(function (it) {
+      var s = count.hasOwnProperty(it.severity) ? it.severity : 'should_fix';
+      count[s] += 1;
+    });
+    var total = order.reduce(function (n, k) { return n + count[k]; }, 0);
+    var bar = total ? '<div class="sev-bar" aria-hidden="true">' + order.map(function (k) {
+      return count[k] ? '<span class="sb-' + k + '" style="flex-grow:' + count[k] + '"></span>' : '';
+    }).join('') + '</div>' : '';
+    return '<div class="sev-strip"><p class="sev-cap">จุดที่ต้องแก้แยกตามความรุนแรง</p>' + bar +
+      '<ul class="sev-legend">' + order.map(function (k) {
+        return '<li><i class="sb-' + k + '" aria-hidden="true"></i>' + esc(SEVERITY_LABEL[k]) + ' <b>' + count[k] + '</b> จุด</li>';
+      }).join('') + '</ul></div>';
+  }
 
   /* เมนูขั้นตอนด้านซ้าย: เมื่อมีผลแล้วให้ขั้นที่ 3 ลิงก์ไปยังหัวข้อย่อยของผลพร้อมจำนวน */
   function renderResultsNav(result) {

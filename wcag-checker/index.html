@@ -739,8 +739,93 @@
   @media (max-width:960px) { .pour { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
   @media (max-width:520px) { .pour { grid-template-columns:minmax(0, 1fr); } .score-main::before { width:84px; height:84px; } }
 
+
+  /* ---------- แนวทางจาก PDF A11yChecker หน้า 2, 5, 8, 9, 10, 11 ---------- */
+  :root { --code-bad-bg:#fff1f2; --code-bad:#4c0519; --code-bad-ink:#ffe4e6; --code-good-bg:#f0fdf4; --code-good:#052e16; --code-good-ink:#dcfce7; --sev-c:#dc2626; --sev-s:#f59e0b; --sev-a:#6366f1; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --code-bad-bg:#2a1418; --code-good-bg:#11241a; } }
+  :root[data-theme="dark"] { --code-bad-bg:#2a1418; --code-good-bg:#11241a; }
+
+  /* ขั้นตอนการใช้งาน (หน้า 9) */
+  .flow { grid-column:1 / -1; list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:28px; counter-reset:none; }
+  .flow li { position:relative; }
+  .flow li + li::before { content:""; position:absolute; left:-22px; top:50%; width:14px; height:14px; margin-top:-7px; border-top:3px solid var(--link); border-right:3px solid var(--link); transform:rotate(45deg); opacity:.55; }
+  .flow a, .flow li > div { height:100%; display:flex; flex-direction:column; gap:6px; padding:20px 22px; border-radius:24px; background:var(--page); box-shadow:var(--shadow); color:var(--ink); text-decoration:none; transition:transform .2s; }
+  .flow a:hover { transform:translateY(-4px); }
+  .flow li:nth-child(2) > div { background:var(--grad); color:#fff; }
+  .flow li:nth-child(2) .flow-n { background:rgba(255,255,255,.2); color:#fff; }
+  .flow li:nth-child(2) span:last-child { color:rgba(255,255,255,.92); }
+  .flow-n { align-self:flex-start; font-size:.8rem; font-weight:700; padding:2px 12px; border-radius:999px; background:var(--p1); color:var(--link); }
+  .flow b { font-size:1.12rem; }
+  .flow span:last-child { font-size:.92rem; color:var(--ink-2); }
+
+  /* อัตโนมัติ + ผู้ประเมิน (หน้า 5) */
+  .t-split { grid-column:span 6; background:var(--page); display:flex; flex-direction:column; gap:6px; }
+  .t-auto { box-shadow:0 0 0 2px var(--link), var(--shadow) !important; }
+  .split-k { margin:0; font-weight:700; color:var(--link); }
+  .t-manual .split-k { color:var(--ink-2); }
+  .split-big { margin:0 0 6px; font-size:3rem; font-weight:700; line-height:1; letter-spacing:-.02em; color:var(--link); }
+  .t-manual .split-big { color:var(--ink-2); }
+  .split-big span { font-size:1.05rem; font-weight:600; letter-spacing:0; margin-left:6px; }
+  .split-list { list-style:none; margin:0; padding:12px 0 0; border-top:1px solid var(--rule); display:flex; flex-direction:column; gap:8px; }
+  .split-list li { padding-left:28px; position:relative; font-size:.95rem; }
+  .split-list li::before { content:""; position:absolute; left:4px; top:.45em; width:12px; height:7px; border-left:2.5px solid var(--link); border-bottom:2.5px solid var(--link); transform:rotate(-45deg); }
+  .t-manual .split-list li::before { width:12px; height:12px; border:0; border-radius:50%; background:var(--paper-3); box-shadow:inset 0 0 0 2px var(--ink-2); transform:none; top:.35em; }
+  .split-list b { font-family:var(--f-mono); font-size:.82rem; margin-right:6px; }
+
+  /* แถบปิดท้าย (หน้า 11) */
+  .cta-band { margin:28px 0 8px; padding:48px 24px; border-radius:28px; background:var(--deep); color:#fff; text-align:center; display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .view > section.cta-band { background:var(--deep); box-shadow:none; padding:48px 24px; border-radius:28px; }
+  .cta-band h2 { margin:0; font-size:clamp(1.5rem, 1.1rem + 1.4vw, 2.2rem); color:#fff; }
+  .cta-band p { margin:0; color:#c7cbe6; max-width:46ch; }
+  .cta-ico { width:64px; height:64px; border-radius:50%; display:grid; place-items:center; background:rgba(255,255,255,.08); color:#7dd3fc; }
+  .cta-ico svg { width:40px; height:40px; }
+
+  /* ระดับ A / AA / AAA (หน้า 10) */
+  .lv-table { margin:0 0 28px; border-radius:20px; background:var(--page); box-shadow:var(--shadow); }
+  .lv-table table { min-width:560px; }
+  .lv-table thead th { background:var(--deep); color:#fff; font-weight:700; padding:14px 16px; border:0; }
+  .lv-table tbody th, .lv-table td { padding:14px 16px; }
+  .lv-a { color:#2b48d6; } .lv-aa { color:#15803d; } .lv-aaa { color:#7e22ce; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .lv-a { color:#a5b4fc; } :root:not([data-theme="light"]) .lv-aa { color:#86efac; } :root:not([data-theme="light"]) .lv-aaa { color:#d8b4fe; } }
+
+  /* แถบความรุนแรง (หน้า 2) */
+  .sev-strip { grid-column:1 / -1; padding:14px 16px; border-radius:16px; background:var(--paper-2); }
+  .sev-cap { margin:0 0 8px; font-size:.86rem; color:var(--ink-2); }
+  .sev-bar { display:flex; gap:3px; height:12px; border-radius:6px; overflow:hidden; margin-bottom:10px; }
+  .sev-bar span, .sev-legend i { background:var(--sev-s); }
+  .sb-critical { background:var(--sev-c) !important; } .sb-advisory { background:var(--sev-a) !important; }
+  .sev-legend { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:6px 20px; font-size:.9rem; }
+  .sev-legend i { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; }
+
+  /* โค้ดผิด / โค้ดที่แก้แล้ว (หน้า 8) */
+  .code-col { border-radius:18px; padding:14px 16px 12px; }
+  .code-col.found { background:var(--code-bad-bg); }
+  .code-col.fix { background:var(--code-good-bg); }
+  .code-col .code-cap { display:flex; align-items:center; gap:8px; font-weight:700; }
+  .code-col.found .code-cap { color:var(--bad); }
+  .code-col.fix .code-cap { color:var(--good); }
+  .code-col.found > .code-cap:first-child::before, .code-col.fix > .code-cap:first-child::before { content:""; width:18px; height:18px; flex:none; border-radius:50%; }
+  .code-col.found > .code-cap:first-child::before { background:var(--bad); -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 1 21h22z M11 9h2v6h-2z M11 17h2v2h-2z' fill-rule='evenodd'/%3E%3C/svg%3E") center/contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 1 21h22z M11 9h2v6h-2z M11 17h2v2h-2z' fill-rule='evenodd'/%3E%3C/svg%3E") center/contain no-repeat; border-radius:0; }
+  .code-col.fix > .code-cap:first-child::before { background:var(--good); -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1a11 11 0 1 0 0 22 11 11 0 0 0 0-22zm-1.5 15.5-4.5-4.5 1.6-1.6 2.9 2.9 6.4-6.4 1.6 1.6z'/%3E%3C/svg%3E") center/contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1a11 11 0 1 0 0 22 11 11 0 0 0 0-22zm-1.5 15.5-4.5-4.5 1.6-1.6 2.9 2.9 6.4-6.4 1.6 1.6z'/%3E%3C/svg%3E") center/contain no-repeat; }
+  .code-col.found code.snippet { background:var(--code-bad); color:var(--code-bad-ink); border:0; border-radius:12px; padding:12px 14px; }
+  .code-col.fix code.snippet { background:var(--code-good); color:var(--code-good-ink); border:0; border-radius:12px; padding:12px 14px; }
+
+  @media (max-width:1100px) {
+    .flow { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    .flow li:nth-child(3)::before { display:none; }
+  }
+  @media (max-width:760px) {
+    .t-split { grid-column:1 / -1; }
+  }
+  @media (max-width:640px) {
+    .flow { grid-template-columns:minmax(0, 1fr); gap:24px; }
+    .flow li + li::before { display:block !important; left:50%; top:-18px; margin:0 0 0 -7px; transform:rotate(135deg); }
+  }
+
   /* ---------- การพิมพ์รายงาน ---------- */
   @media print {
+    .flow, .t-split, .cta-band { display:none !important; }
+    .code-col.found code.snippet, .code-col.fix code.snippet { background:#fff !important; color:#000 !important; border:1px solid #999 !important; }
     .hero-art, .board-h, .t-feature { display:none !important; }
     [data-view][hidden] { display:block !important; }
     [data-view="standards"], [data-view="check"], [data-view="checklist"], [data-view="report"] { display:none !important; }
@@ -825,6 +910,37 @@
   <div class="t t-feature f-field"><svg class="f-ico" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none"><path fill="#b4acbc" d="M20.343 2.293A1 1 0 0 0 19.636 2H7a2 2 0 0 0-2 2v24a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V9.364a1 1 0 0 0-.293-.707z"/><path fill="#f3eef8" d="M19.682 3H7a1 1 0 0 0-1 1v24a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V9.453z"/><path fill="#998ea4" d="M9.5 12h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1m0 3a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1zM9 18.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1z"/><path fill="#cdc4d6" d="M26 9.453h-4.61a1.707 1.707 0 0 1-1.708-1.707V3z"/><path fill="#ff822d" d="m26.766 20.172l-1.08-3.231l-2.796-2.006l-10.607 7.849l1.148 3.156l2.727 2.082z"/><path fill="#ffce7c" d="m11.106 26.655l.171.893l.836.468l4.039-.006l-3.86-5.216z"/><path fill="#402a32" d="m10.687 28.018l.418-1.363l1.007 1.36z"/><path fill="#f92f60" d="M26.52 12.249a2 2 0 0 1 2.798.418l1.496 2.022a2 2 0 0 1-.418 2.797l-2.058 1.524l-2.805-2.069l-1.071-3.17z"/><path fill="#d3d3d3" d="m24.462 13.772l3.876 5.238l-1.572 1.162l-3.875-5.237z"/></g></svg><h3>ช่องกรอกข้อมูล</h3><p>ทุกช่องต้องมีป้ายกำกับที่ผูกกับช่อง placeholder ไม่นับ</p><span class="f-sc">SC 1.3.1</span></div>
   <div class="t t-feature f-color"><svg class="f-ico" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none"><path fill="#fbb8ab" d="M21.993 5.854c-6.707-3.42-14.656-2.1-18.279 3.883S2.398 23.68 8.87 27.517c3.18 1.886 8.312 3.811 10.398 1.244c2.044-2.516-.972-4.11-.268-5.502c1.133-2.24 6.2.699 9.515-2.922c3.734-4.082.009-11.151-6.522-14.483M24 19c-1.745 0-3-1.273-3-3s1.255-3 3-3s3 1.273 3 3s-1.255 3-3 3"/><path fill="#8d65c5" d="M14.25 11a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/><path fill="#f70a8d" d="M8.25 15a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/><path fill="#00d26a" d="M8.25 22a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/><path fill="#3f5fff" d="M13.75 26.5a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/></g></svg><h3>สีข้อความ</h3><p>ข้อความกับพื้นหลังต้องคมชัดอย่างน้อย 4.5 : 1</p><span class="f-sc">SC 1.4.3</span></div>
 
+
+  <h2 class="board-h">ขั้นตอนการใช้งาน</h2>
+  <ol class="flow">
+    <li><a href="#input-section"><span class="flow-n">ขั้นที่ 1</span><b>นำเข้าโค้ด</b><span>วางโค้ด HTML หรือระบุลิงก์เว็บไซต์</span></a></li>
+    <li><div><span class="flow-n">อัตโนมัติ</span><b>ระบบตรวจ 5 กฎ</b><span>อ่านโครงสร้าง HTML ทันทีที่กดตรวจสอบ</span></div></li>
+    <li><a href="#checklist-section"><span class="flow-n">ขั้นที่ 2</span><b>ตอบแบบประเมิน</b><span>3 ข้อที่โปรแกรมตัดสินแทนไม่ได้</span></a></li>
+    <li><a href="#results-section"><span class="flow-n">ขั้นที่ 3–4</span><b>ดูผลและออกรายงาน</b><span>คะแนน จุดที่ผิด วิธีแก้ และบันทึกผล</span></a></li>
+  </ol>
+
+  <h2 class="board-h">ตรวจอัตโนมัติ ร่วมกับผู้ประเมิน</h2>
+  <div class="t t-split t-auto">
+    <p class="split-k">ระบบตรวจอัตโนมัติ</p>
+    <p class="split-big">5 <span>กฎตรวจ</span></p>
+    <ul class="split-list">
+      <li><b>R-ALT-01</b> ภาพที่ไม่มี alt</li>
+      <li><b>R-ALT-02</b> ภาพที่ alt ว่าง ส่งต่อให้ผู้ประเมิน</li>
+      <li><b>R-HEAD-01</b> หัวข้อกระโดดข้ามระดับ</li>
+      <li><b>R-LABEL-01</b> ช่องกรอกที่ไม่มีป้ายกำกับ</li>
+      <li><b>R-CONTRAST-01</b> สีตัวอักษรกับพื้นหลังต่ำกว่าเกณฑ์</li>
+    </ul>
+  </div>
+  <div class="t t-split t-manual">
+    <p class="split-k">ผู้ประเมินตอบแบบประเมิน</p>
+    <p class="split-big">3 <span>ข้อ</span></p>
+    <ul class="split-list">
+      <li><b>CL-1.1.1</b> ภาพที่ alt ว่างเป็นภาพตกแต่งจริงหรือไม่</li>
+      <li><b>CL-1.3.1</b> ลำดับหัวข้อและป้ายกำกับสื่อความหมายหรือไม่</li>
+      <li><b>CL-1.4.3</b> ข้อความบนภาพหรือพื้นไล่สีอ่านได้ชัดหรือไม่</li>
+    </ul>
+  </div>
+
   <figure class="t t-surface t-score" data-ui>
     <figcaption class="t-cap">ตัวอย่างผลตรวจ (บทที่ 3.7.2)</figcaption>
     <p class="fx-score"><b>57.62</b><span>จาก 100</span><span class="tag bad">ต้องปรับปรุง</span></p>
@@ -889,6 +1005,14 @@
     <p>กรณีทดสอบความปลอดภัยผ่านทั้งหมด ระบบส่งไปบันทึกเฉพาะค่าสรุปเชิงตัวเลข ไม่ส่งและไม่เก็บโค้ด HTML ที่นำมาตรวจ</p>
   </div>
 </section>
+
+<section class="cta-band" aria-labelledby="h-cta">
+  <span class="cta-ico" aria-hidden="true"><svg viewBox="0 0 32 32" focusable="false"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="10" r="1.9" fill="currentColor"/><path d="M10.5 13.2c1.8.6 3.7.9 5.5.9s3.7-.3 5.5-.9M16 14.3v4.2l-2.6 5M16 18.5l2.6 5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  <h2 id="h-cta">ช่วยให้ทุกคนใช้เว็บไซต์ของคุณได้</h2>
+  <p>วางโค้ดหน้าเว็บ แล้วรู้ภายในไม่กี่วินาทีว่าต้องแก้ตรงไหนก่อน</p>
+  <a class="btn-mint" href="#input-section">เริ่มตรวจโค้ด</a>
+</section>
+
 </div>
 
 <section id="standards-section" class="standards no-print view" data-view="standards" aria-labelledby="h-standards">
@@ -906,6 +1030,18 @@
       <div class="pour-card"><span class="pour-ico" style="background:var(--p3)" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="2.5" y="6.5" width="19" height="11" rx="2"/><path d="M6 10h.01M9 10h.01M12 10h.01M15 10h.01M18 10h.01M7 14h10"/></svg></span><h3>2. Operable ใช้งานได้</h3><p>ใช้งานได้ด้วยคีย์บอร์ด มีเส้นโฟกัส มีเวลาพอ</p><span class="pour-tag">ยังไม่ได้ตรวจ</span></div>
       <div class="pour-card"><span class="pour-ico" style="background:var(--p4)" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M9 4.5a3 3 0 0 0-3 3 3 3 0 0 0-1.5 5.5A3 3 0 0 0 9 19.5h0V4.5zM15 4.5a3 3 0 0 1 3 3 3 3 0 0 1 1.5 5.5A3 3 0 0 1 15 19.5h0V4.5z"/></svg></span><h3>3. Understandable เข้าใจได้</h3><p>ภาษาและฟอร์มชัดเจน แจ้งข้อผิดพลาดให้เข้าใจ</p><span class="pour-tag">ยังไม่ได้ตรวจ</span></div>
       <div class="pour-card"><span class="pour-ico" style="background:var(--p2)" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg></span><h3>4. Robust รองรับได้</h3><p>โค้ดถูกต้องตามมาตรฐาน ทำงานกับเทคโนโลยีช่วยเหลือได้</p><span class="pour-tag">ยังไม่ได้ตรวจ</span></div>
+    </div>
+
+    <h2 class="pour-h">ระดับความสอดคล้องของ WCAG</h2>
+    <div class="table-scroll lv-table" tabindex="0" role="region" aria-label="ตารางระดับความสอดคล้องของ WCAG">
+      <table>
+        <thead><tr><th scope="col">ระดับ</th><th scope="col">ความหมาย</th><th scope="col">เครื่องมือนี้ตรวจ</th></tr></thead>
+        <tbody>
+          <tr><th scope="row" class="lv-a">ระดับ A</th><td>ขั้นพื้นฐานที่สุด ขจัดอุปสรรคสำคัญที่ทำให้ใช้งานหน้าเว็บไม่ได้</td><td>SC 1.1.1 และ SC 1.3.1</td></tr>
+          <tr><th scope="row" class="lv-aa">ระดับ AA</th><td>เป้าหมายที่หน่วยงานและกฎหมายส่วนใหญ่ใช้</td><td>SC 1.4.3</td></tr>
+          <tr><th scope="row" class="lv-aaa">ระดับ AAA</th><td>ระดับสูงสุด ใช้กับเนื้อหาบางส่วนที่ต้องการการเข้าถึงขั้นสูง</td><td>ยังไม่ได้ตรวจ</td></tr>
+        </tbody>
+      </table>
     </div>
     <div id="standards-cards" class="std-cards"></div>
   </section>
