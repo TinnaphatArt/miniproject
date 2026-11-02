@@ -718,6 +718,27 @@
     .rail .steps li { flex:none; }
   }
 
+
+  /* แนวทางจาก PDF A11yChecker: วงแหวนคะแนน และการ์ดหลักการ POUR */
+  .score-main { display:grid; grid-template-columns:auto minmax(0, 1fr); column-gap:20px; align-items:center; }
+  .score-main > * { grid-column:2; }
+  .score-main::before { content:""; grid-column:1; grid-row:1 / span 3; width:112px; height:112px; border-radius:50%;
+    background:conic-gradient(var(--hue) calc(var(--score, 0) * 1%), var(--paper-3) 0);
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 12px), #000 calc(100% - 11px));
+            mask:radial-gradient(farthest-side, transparent calc(100% - 12px), #000 calc(100% - 11px)); }
+  .pour-h { font-size:1.15rem; margin:8px 0 12px; }
+  .pour { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:16px; margin-bottom:28px; }
+  .pour-card { background:var(--page); border-radius:24px; padding:20px 22px; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:8px; }
+  .pour-card h3 { margin:6px 0 0; font-size:1.05rem; }
+  .pour-card p { margin:0; font-size:.92rem; color:var(--ink-2); }
+  .pour-ico { width:48px; height:48px; border-radius:16px; display:grid; place-items:center; color:var(--link); }
+  .pour-ico svg { width:26px; height:26px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .pour-tag { margin-top:auto; align-self:flex-start; font-size:.8rem; font-weight:700; padding:2px 10px; border-radius:999px; background:var(--paper-3); color:var(--ink-2); }
+  .pour-card.on { box-shadow:0 0 0 2px var(--link), var(--shadow); }
+  .pour-card.on .pour-tag { background:var(--p1); color:var(--link); }
+  @media (max-width:960px) { .pour { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+  @media (max-width:520px) { .pour { grid-template-columns:minmax(0, 1fr); } .score-main::before { width:84px; height:84px; } }
+
   /* ---------- การพิมพ์รายงาน ---------- */
   @media print {
     .hero-art, .board-h, .t-feature { display:none !important; }
@@ -749,7 +770,7 @@
 <div class="app">
 <aside class="sidebar" aria-label="เมนูเครื่องมือ">
   <div class="brand">
-    <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="brand-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2b48d6"/><stop offset=".55" stop-color="#6d28d9"/><stop offset="1" stop-color="#a21caf"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="#4338ca"/><path d="M9 16.5l4.5 4.5L23 11" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="brand-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2b48d6"/><stop offset=".55" stop-color="#6d28d9"/><stop offset="1" stop-color="#a21caf"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="#4338ca"/><circle cx="16" cy="16" r="11" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="16" cy="10" r="1.9" fill="#fff"/><path d="M10.5 13.2c1.8.6 3.7.9 5.5.9s3.7-.3 5.5-.9M16 14.3v4.2l-2.6 5M16 18.5l2.6 5" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="brand-name">ตรวจการเข้าถึงเว็บไซต์<small>WCAG 2.1 · ระดับ A และ AA</small></span>
   </div>
   <nav class="rail no-print" aria-label="เมนูหลัก">
@@ -878,6 +899,14 @@
         ระดับ A คือขั้นต่ำที่ต้องมี ส่วนระดับ AA คือระดับที่มาตรฐานส่วนใหญ่ใช้เป็นเป้าหมาย
       </p>
     </header>
+
+    <h2 class="pour-h">หลักการ 4 ข้อของ WCAG และส่วนที่เครื่องมือนี้ตรวจ</h2>
+    <div class="pour">
+      <div class="pour-card on"><span class="pour-ico" style="background:var(--p1)" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/></svg></span><h3>1. Perceivable รับรู้ได้</h3><p>ข้อมูลต้องนำเสนอในแบบที่ทุกคนรับรู้ได้ เช่น ข้อความแทนภาพ สีที่คมชัด</p><span class="pour-tag">เครื่องมือนี้ตรวจ 3 หลักเกณฑ์</span></div>
+      <div class="pour-card"><span class="pour-ico" style="background:var(--p3)" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="2.5" y="6.5" width="19" height="11" rx="2"/><path d="M6 10h.01M9 10h.01M12 10h.01M15 10h.01M18 10h.01M7 14h10"/></svg></span><h3>2. Operable ใช้งานได้</h3><p>ใช้งานได้ด้วยคีย์บอร์ด มีเส้นโฟกัส มีเวลาพอ</p><span class="pour-tag">ยังไม่ได้ตรวจ</span></div>
+      <div class="pour-card"><span class="pour-ico" style="background:var(--p4)" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M9 4.5a3 3 0 0 0-3 3 3 3 0 0 0-1.5 5.5A3 3 0 0 0 9 19.5h0V4.5zM15 4.5a3 3 0 0 1 3 3 3 3 0 0 1 1.5 5.5A3 3 0 0 1 15 19.5h0V4.5z"/></svg></span><h3>3. Understandable เข้าใจได้</h3><p>ภาษาและฟอร์มชัดเจน แจ้งข้อผิดพลาดให้เข้าใจ</p><span class="pour-tag">ยังไม่ได้ตรวจ</span></div>
+      <div class="pour-card"><span class="pour-ico" style="background:var(--p2)" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg></span><h3>4. Robust รองรับได้</h3><p>โค้ดถูกต้องตามมาตรฐาน ทำงานกับเทคโนโลยีช่วยเหลือได้</p><span class="pour-tag">ยังไม่ได้ตรวจ</span></div>
+    </div>
     <div id="standards-cards" class="std-cards"></div>
   </section>
 

@@ -625,6 +625,9 @@
     catch (e) { highlighted = null; }
 
     renderResults(result, highlighted);
+    /* วงแหวนคะแนนรอบตัวเลข (ตกแต่ง ตัวเลขจริงอยู่ในข้อความ) */
+    var scoreBox = document.querySelector('#results-body .score');
+    if (scoreBox) scoreBox.style.setProperty('--score', result.score === null ? 0 : result.score);
     $('results-section').classList.remove('hidden');
     updatePayloadPreview();
     setStatus($('input-status'), 'ตรวจสอบเรียบร้อย', 'good');
