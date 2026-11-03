@@ -1277,6 +1277,40 @@
     .view > section.who-faq { margin-top:64px; }
   }
 
+  /* ---------- ภาพประกอบบุคคล (สร้างด้วย Figma AI) ----------
+   * ภาพเป็นภาพตกแต่ง alt="" เพราะข้อความในการ์ดบอกความหมายครบ ภาพพื้นขาวจึงวางในกรอบมุมมนทั้งโหมดสว่างและมืด */
+  .view > section.who-faq { grid-template-columns:minmax(0, 1fr); gap:72px; }
+  .who-faq .who { background:none; box-shadow:none; padding:0; text-align:center; }
+  .who-faq .who h2 { font-size:clamp(1.5rem, 1.2rem + 1vw, 2rem); letter-spacing:-.01em; }
+  .who-faq .who > p { margin:6px 0 32px; }
+  .who-cards { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:22px; text-align:left; }
+  .who-card { display:flex; flex-direction:column; gap:6px; padding:14px 14px 20px; background:var(--page); border-radius:24px; box-shadow:var(--shadow); transition:transform .2s; }
+  .who-card:hover { transform:translateY(-4px); }
+  .who-card img { display:block; width:100%; height:auto; aspect-ratio:16 / 9; object-fit:cover; border-radius:16px; background:#fff; margin-bottom:10px; }
+  .who-card b { font-size:1.08rem; padding:0 6px; }
+  .who-card small { font-size:.94rem; color:var(--ink-2); padding:0 6px; line-height:1.6; }
+  .who-card .f-sc { margin:8px 6px 0; }
+  /* คำถามที่พบบ่อย: หัวข้อซ้าย คำถามขวา */
+  .who-faq .faq { display:grid; grid-template-columns:minmax(0, .8fr) minmax(0, 2fr); column-gap:40px; align-items:start; padding:32px 36px; }
+  .who-faq .faq > .faq-head { grid-column:1; grid-row:1 / span 6; }
+  .faq-head h2 { font-size:clamp(1.4rem, 1.15rem + .8vw, 1.8rem); }
+  .faq-head p { margin:8px 0 0; color:var(--ink-2); }
+  .who-faq .faq > details { grid-column:2; }
+  /* หัวหน้ามาตรฐาน: ข้อความซ้าย ภาพขวา */
+  .view .std-head h1 { font-size:clamp(1.5rem, 1.2rem + 1.1vw, 2.1rem); line-height:1.3; letter-spacing:-.01em; }
+  .std-head .lead { font-size:1.05rem; margin-top:10px; }
+  .std-head { display:grid; grid-template-columns:minmax(0, 1.5fr) minmax(0, 1fr); gap:24px 40px; align-items:center; }
+  .std-art { display:block; width:100%; max-width:400px; height:auto; justify-self:end; border-radius:24px; background:#fff; box-shadow:var(--shadow); }
+  @media (max-width:900px) {
+    .who-cards { grid-template-columns:minmax(0, 1fr); max-width:520px; margin:0 auto; }
+    .who-faq .faq { grid-template-columns:minmax(0, 1fr); padding:24px 20px; }
+    .who-faq .faq > .faq-head { grid-row:auto; margin-bottom:14px; }
+    .who-faq .faq > details { grid-column:1; }
+    .std-head { grid-template-columns:minmax(0, 1fr); }
+    .std-art { justify-self:start; max-width:340px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .who-card:hover { transform:none; } }
+
   /* ---------- ทรานซิชันตอนเปลี่ยนหน้า ----------
    * เบราว์เซอร์ที่รองรับ View Transitions: ภาพทั้งจอจางข้ามกัน แถบเมนู (topbar) และแถบขั้นตอน (stepper) อยู่นิ่ง
    * วงขั้นปัจจุบัน (step-cur) เลื่อนจากขั้นเดิมไปขั้นใหม่ ส่วนเนื้อหาหน้าใหม่เลื่อนเข้าด้วยคลาส .view-enter
@@ -1596,15 +1630,32 @@
   <div class="who">
     <h2>เว็บไซต์ที่ดี ต้องเข้าถึงได้สำหรับทุกคน</h2>
     <p>ทั้งสามหลักเกณฑ์ที่ระบบตรวจ ช่วยคนกลุ่มนี้ได้โดยตรง</p>
-    <ul class="who-list">
-      <li><span class="wi"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none"><path fill="#d3883e" d="m2 2l14 3l14-3v28l-14-3l-14 3z"/><path fill="#f3ad61" d="M30 2H2l14 14z"/><path fill="#b97028" d="M30 30H2l14-14z"/><path fill="#aeddff" d="M5 5h22v4.164L18 22L5 19v-3l1.5-3L5 10z"/><path fill="#fff" d="M24.667 10.114A3 3 0 0 1 27 9v6a3 3 0 0 1-2.009-.772a3 3 0 1 1-2.73-3.217a2 2 0 0 1 2.406-.897M5 16v-6c.981 0 1.853.471 2.4 1.2A1 1 0 0 1 9 12a2 2 0 1 1 0 4z"/><path fill="#14a085" d="M8 17.5L5 19v8h22V12c-1.5 0-2.5.5-4 2l-4.5 4.5c-1 1-1.5 1.5-2.5 1l-4-2c-1.6-.8-3.167-.5-4 0"/><path fill="#96c34a" d="M27 26.812V27H5v-.189c2.564-2.579 6.538-4.311 11-4.311s8.436 1.732 11 4.311"/><path fill="#ff822d" d="M19.056 10.185a.75.75 0 0 0 0-1.37a.75.75 0 0 0-.685-1.186a.75.75 0 0 0-1.186-.685a.75.75 0 0 0-1.37 0a.75.75 0 0 0-1.186.685a.75.75 0 0 0-.685 1.186a.75.75 0 0 0 0 1.37a.75.75 0 0 0 .685 1.186a.75.75 0 0 0 1.186.685a.75.75 0 0 0 1.37 0a.75.75 0 0 0 1.186-.685a.75.75 0 0 0 .685-1.186"/><path fill="#f9c23c" d="M18.705 9.5a2.205 2.205 0 1 1-4.41 0a2.205 2.205 0 0 1 4.41 0"/></g></svg></span><b>ผู้พิการทางการเห็น</b><small>ใช้โปรแกรมอ่านหน้าจอฟังข้อความแทนภาพ</small></li>
-      <li><span class="wi"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none"><path fill="#b4acbc" d="M4.5 1A2.5 2.5 0 0 0 2 3.5v23A2.5 2.5 0 0 0 4.5 29H7v.5A1.5 1.5 0 0 0 8.5 31h17a1.5 1.5 0 0 0 1.5-1.5v-23A1.5 1.5 0 0 0 25.5 5h-4.586l-3.268-3.268A2.5 2.5 0 0 0 15.88 1z"/><path fill="#f3eef8" d="M3 3.5A1.5 1.5 0 0 1 4.5 2h11.379a1.5 1.5 0 0 1 1.06.44l5.622 5.62A1.5 1.5 0 0 1 23 9.122V26.5a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 3 26.5z"/><path fill="#998ea4" d="M6.5 11a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1zM6 17.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1z"/><path fill="#cdc4d6" d="M16 2.005a1.5 1.5 0 0 1 .94.434l5.62 5.622a1.5 1.5 0 0 1 .435.939H17.5A1.5 1.5 0 0 1 16 7.5z"/><path fill="#f70a8d" d="M22.36 13.118a.5.5 0 0 1 .323-.118H25.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2.817a.5.5 0 0 1-.322-.118l-1.187-1a.5.5 0 0 1 0-.764z"/><path fill="#f9c23c" d="M25.36 20.118a.5.5 0 0 1 .323-.118H28.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2.817a.5.5 0 0 1-.322-.118l-1.187-1a.5.5 0 0 1 0-.764z"/></g></svg></span><b>ผู้ใช้คีย์บอร์ดและโปรแกรมอ่านหน้าจอ</b><small>นำทางตามหัวข้อ รู้ว่าแต่ละช่องให้กรอกอะไร</small></li>
-      <li><span class="wi"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none"><path fill="#fbb8ab" d="M21.993 5.854c-6.707-3.42-14.656-2.1-18.279 3.883S2.398 23.68 8.87 27.517c3.18 1.886 8.312 3.811 10.398 1.244c2.044-2.516-.972-4.11-.268-5.502c1.133-2.24 6.2.699 9.515-2.922c3.734-4.082.009-11.151-6.522-14.483M24 19c-1.745 0-3-1.273-3-3s1.255-3 3-3s3 1.273 3 3s-1.255 3-3 3"/><path fill="#8d65c5" d="M14.25 11a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/><path fill="#f70a8d" d="M8.25 15a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/><path fill="#00d26a" d="M8.25 22a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/><path fill="#3f5fff" d="M13.75 26.5a2.25 2.25 0 1 0 0-4.5a2.25 2.25 0 0 0 0 4.5"/></g></svg></span><b>ผู้สูงอายุและผู้มีสายตาเลือนราง</b><small>อ่านข้อความที่สีคมชัดได้ง่ายกว่า</small></li>
-      <li><span class="wi"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none"><path fill="#b4acbc" d="M20.343 2.293A1 1 0 0 0 19.636 2H7a2 2 0 0 0-2 2v24a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V9.364a1 1 0 0 0-.293-.707z"/><path fill="#f3eef8" d="M19.682 3H7a1 1 0 0 0-1 1v24a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V9.453z"/><path fill="#998ea4" d="M9.5 12h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1m0 3a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1zM9 18.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1z"/><path fill="#cdc4d6" d="M26 9.453h-4.61a1.707 1.707 0 0 1-1.708-1.707V3z"/><path fill="#ff822d" d="m26.766 20.172l-1.08-3.231l-2.796-2.006l-10.607 7.849l1.148 3.156l2.727 2.082z"/><path fill="#ffce7c" d="m11.106 26.655l.171.893l.836.468l4.039-.006l-3.86-5.216z"/><path fill="#402a32" d="m10.687 28.018l.418-1.363l1.007 1.36z"/><path fill="#f92f60" d="M26.52 12.249a2 2 0 0 1 2.798.418l1.496 2.022a2 2 0 0 1-.418 2.797l-2.058 1.524l-2.805-2.069l-1.071-3.17z"/><path fill="#d3d3d3" d="m24.462 13.772l3.876 5.238l-1.572 1.162l-3.875-5.237z"/></g></svg></span><b>ทุกคนที่ใช้มือถือกลางแดด</b><small>ได้ประโยชน์จากสีที่คมชัดเช่นกัน</small></li>
+    <ul class="who-cards">
+      <li class="who-card">
+        <img src="./img/who-alt.webp" alt="" width="960" height="540" loading="lazy" decoding="async">
+        <b>ผู้พิการทางการเห็น</b>
+        <small>ใช้โปรแกรมอ่านหน้าจอฟังข้อความแทนภาพ</small>
+        <span class="f-sc">SC 1.1.1 ข้อความแทนภาพ</span>
+      </li>
+      <li class="who-card">
+        <img src="./img/who-structure.webp" alt="" width="960" height="540" loading="lazy" decoding="async">
+        <b>ผู้ใช้คีย์บอร์ดและโปรแกรมอ่านหน้าจอ</b>
+        <small>นำทางตามหัวข้อ รู้ว่าแต่ละช่องให้กรอกอะไร</small>
+        <span class="f-sc">SC 1.3.1 โครงสร้างและป้ายกำกับ</span>
+      </li>
+      <li class="who-card">
+        <img src="./img/who-contrast.webp" alt="" width="960" height="540" loading="lazy" decoding="async">
+        <b>ผู้สูงอายุและผู้มีสายตาเลือนราง</b>
+        <small>อ่านข้อความที่สีคมชัดได้ง่ายกว่า ทุกคนที่ใช้มือถือกลางแดดก็ได้ประโยชน์เช่นกัน</small>
+        <span class="f-sc">SC 1.4.3 ความคมชัดของสี</span>
+      </li>
     </ul>
   </div>
   <div class="faq">
-    <h2>คำถามที่พบบ่อย</h2>
+    <div class="faq-head">
+      <h2>คำถามที่พบบ่อย</h2>
+      <p>อยากรู้ว่าแต่ละหลักเกณฑ์หมายถึงอะไร อ่านต่อได้ที่หน้า <a href="#standards-section">มาตรฐานที่ตรวจ</a></p>
+    </div>
     <details><summary>WCAG คืออะไร</summary><p>Web Content Accessibility Guidelines แนวทางของ W3C ที่บอกว่าเว็บไซต์ต้องทำอย่างไรให้ทุกคนเข้าถึงได้ รวมถึงผู้พิการ เครื่องมือนี้อ้างอิง WCAG 2.1 ระดับ A และ AA</p></details>
     <details><summary>เครื่องมือนี้ตรวจอะไรได้บ้าง</summary><p>ตรวจ 3 หลักเกณฑ์ คือ SC 1.1.1 ข้อความแทนภาพ, SC 1.3.1 โครงสร้างหัวข้อและป้ายกำกับ และ SC 1.4.3 ความคมชัดของสี ด้วยกฎตรวจ 5 รหัส ร่วมกับแบบประเมิน 3 ข้อ</p></details>
     <details><summary>คะแนน 100 แปลว่าผ่าน WCAG หรือไม่</summary><p>ไม่ คะแนนสะท้อนเฉพาะกฎที่ระบบตรวจได้ ไม่ใช่ใบรับรองความสอดคล้อง และไม่ทดแทนการตรวจโดยผู้เชี่ยวชาญ</p></details>
@@ -1615,12 +1666,15 @@
 </div>
 
 <section id="standards-section" class="standards no-print view" data-view="standards" aria-labelledby="h-standards">
-    <header class="sec-head">
-      <h1 id="h-standards">มาตรฐานที่เครื่องมือนี้ตรวจ หมายถึงอะไร</h1>
-      <p class="lead">
-        ทั้งสามหลักเกณฑ์อยู่ในหลักการที่ 1 การรับรู้ได้ (Perceivable) ของ WCAG 2.1 คือข้อมูลบนหน้าเว็บต้องนำเสนอในแบบที่ผู้ใช้ทุกคนรับรู้ได้
-        ระดับ A คือขั้นต่ำที่ต้องมี ส่วนระดับ AA คือระดับที่มาตรฐานส่วนใหญ่ใช้เป็นเป้าหมาย
-      </p>
+    <header class="sec-head std-head">
+      <div>
+        <h1 id="h-standards">มาตรฐานที่เครื่องมือนี้ตรวจ หมายถึงอะไร</h1>
+        <p class="lead">
+          ทั้งสามหลักเกณฑ์อยู่ในหลักการที่ 1 การรับรู้ได้ (Perceivable) ของ WCAG 2.1 คือข้อมูลบนหน้าเว็บต้องนำเสนอในแบบที่ผู้ใช้ทุกคนรับรู้ได้
+          ระดับ A คือขั้นต่ำที่ต้องมี ส่วนระดับ AA คือระดับที่มาตรฐานส่วนใหญ่ใช้เป็นเป้าหมาย
+        </p>
+      </div>
+      <img class="std-art" src="./img/checker-person.webp" alt="" width="760" height="570" loading="lazy" decoding="async">
     </header>
 
     <h2 class="pour-h">หลักการ 4 ข้อของ WCAG และส่วนที่เครื่องมือนี้ตรวจ</h2>
@@ -1832,6 +1886,7 @@
       มาตรฐานอ้างอิง:
       <a href="https://www.w3.org/TR/WCAG21/" target="_blank" rel="noopener">WCAG 2.1 (W3C, 2018)</a> ·
       <a href="./tests/runner.html">ผลการวัดความแม่นยำจากชุดทดสอบที่ผู้วิจัยพัฒนา</a> ·
+      ภาพประกอบบุคคลสร้างด้วย AI (Figma AI) ·
       ฟอนต์ Sarabun และ IBM Plex Mono สัญญาอนุญาต SIL OFL 1.1 (<a href="./fonts/OFL-Sarabun.txt">Sarabun</a>, <a href="./fonts/OFL-IBM-Plex.txt">IBM Plex</a>)
     </p>
   </div>
