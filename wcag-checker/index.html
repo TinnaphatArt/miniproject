@@ -1311,6 +1311,108 @@
   }
   @media (prefers-reduced-motion: reduce) { .who-card:hover { transform:none; } }
 
+  /* ---------- อินโฟกราฟิกเวกเตอร์ (วาดเองด้วย SVG/CSS จากข้อมูลจริงของโครงงาน) ----------
+   * ภาพและแถบทั้งหมดเป็นภาพตกแต่ง (aria-hidden) ตัวเลขทุกตัวอยู่ในข้อความข้าง ๆ ให้โปรแกรมอ่านหน้าจออ่านได้ครบ */
+
+  /* 1) ขั้นตอนการใช้งาน: หัวข้อกลาง การ์ด 4 ใบมีภาพประกอบประจำขั้น */
+  .view > section.how { grid-template-columns:minmax(0, 1fr); gap:30px; }
+  .how-text { text-align:center; max-width:640px; margin:0 auto; }
+  .how-text p { margin:0 0 18px; }
+  .how .flow a, .how .flow li > div { padding:14px 14px 22px; }
+  .how .flow li:nth-child(2) > div { box-shadow:var(--shadow); }
+  .how .flow-n { z-index:1; }
+  .flow-vis { display:block; margin:0 0 12px; border-radius:16px; background:linear-gradient(160deg, #e8efff, #f5f8ff); overflow:hidden; }
+  .flow-vis svg { display:block; width:100%; height:auto; }
+  .fv-code { font-family:var(--f-mono); font-size:9.5px; }
+  .fv-chip { font-family:var(--f-mono); font-size:8.5px; font-weight:700; text-anchor:middle; }
+  .fv-num { font-family:var(--f-body); font-size:11px; font-weight:700; fill:#0b2463; text-anchor:middle; }
+  .how .flow li + li::before { top:96px; }
+  @media (max-width:560px) { .how .flow li + li::before { display:none; } }
+  @media (prefers-reduced-motion: no-preference) {
+    .fv-scan { animation:fv-scan 3.2s ease-in-out infinite; }
+  }
+  @keyframes fv-scan { 0%, 100% { transform:translateY(0); } 50% { transform:translateY(44px); } }
+
+  /* 2) คะแนนคำนวณอย่างไร */
+  .view > section.score-info { background:none; box-shadow:none; padding:0; border-radius:0; margin:0 0 96px; }
+  .si-lead { margin:-6px 0 22px; color:var(--ink-2); }
+  .si-steps { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); gap:18px; }
+  .si-step { position:relative; display:flex; flex-direction:column; gap:12px; padding:22px 22px 24px; background:var(--page); border-radius:24px; box-shadow:var(--shadow); }
+  .si-step + .si-step::before { content:""; position:absolute; left:-15px; top:34px; width:12px; height:12px; border-top:3px solid var(--link); border-right:3px solid var(--link); transform:rotate(45deg); opacity:.55; }
+  .si-k { margin:0; display:flex; align-items:center; gap:10px; font-weight:700; }
+  .si-n { flex:none; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:var(--blue); color:#fff; font-size:.88rem; }
+  .si-legend { margin:0; display:flex; flex-wrap:wrap; gap:4px 14px; font-size:.82rem; color:var(--ink-2); }
+  .si-legend span { display:inline-flex; align-items:center; gap:6px; }
+  .si-rows { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+  .si-rows li { display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:6px 12px; align-items:center; padding:10px 14px; border-radius:14px; background:var(--paper-2); }
+  .si-sc { font-size:.9rem; }
+  .si-w { grid-column:2; grid-row:1; justify-self:end; font-size:.8rem; font-weight:700; padding:2px 10px; border-radius:999px; background:var(--p1); color:var(--link); }
+  .si-dots { display:flex; gap:5px; }
+  .si-fr { font-size:.88rem; color:var(--ink-2); text-align:right; }
+  .si-fr b { color:var(--ink); font-variant-numeric:tabular-nums; }
+  .si-dots i, .si-legend i { width:18px; height:18px; border-radius:50%; display:inline-block; position:relative; }
+  .si-legend i { width:14px; height:14px; }
+  .si-dots i.f, .si-legend i.f { background:var(--bad); }
+  .si-dots i.p, .si-legend i.p { background:var(--good); }
+  .si-dots i.f::after, .si-dots i.p::after, .si-legend i.f::after, .si-legend i.p::after { content:""; position:absolute; inset:0; background:var(--page); -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5 5l6 6M11 5l-6 6' stroke='%23000' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/100% no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5 5l6 6M11 5l-6 6' stroke='%23000' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/100% no-repeat; }
+  .si-dots i.p::after, .si-legend i.p::after { -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.3l2.3 2.3 4.7-5' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.3l2.3 2.3 4.7-5' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+  .si-dots i.r, .si-legend i.r { background:transparent; box-shadow:inset 0 0 0 2px var(--warn); }
+  .si-note { margin:0; font-size:.84rem; color:var(--ink-2); }
+  .si-wbar { display:flex; gap:2px; height:28px; margin-top:6px; }
+  .si-wbar span { position:relative; overflow:hidden; border-radius:4px; background:var(--bad-line); }
+  .si-wbar i { position:absolute; left:0; top:0; bottom:0; background:var(--bad); }
+  .si-wlab { display:flex; gap:2px; font-family:var(--f-mono); font-size:.74rem; color:var(--ink-2); }
+  .si-wlab span { text-align:center; }
+  .si-cap { margin:0; font-size:.84rem; color:var(--ink-2); }
+  .si-math { margin:0; font-size:.95rem; font-variant-numeric:tabular-nums; }
+  .si-math b { font-size:1.15rem; }
+  .si-score { margin:-6px 0 0; font-size:3rem; line-height:1; font-weight:700; letter-spacing:-.02em; color:var(--ink); }
+  .si-meter { position:relative; height:12px; border-radius:6px; background:var(--bad-line); }
+  .si-meter i { position:absolute; left:0; top:0; bottom:0; border-radius:6px 4px 4px 6px; background:var(--bad); }
+  .si-meter b { position:absolute; top:-3px; bottom:-3px; width:2px; margin-left:-1px; background:var(--page); }
+  .si-ticks { position:relative; height:1.2em; font-size:.74rem; color:var(--ink-2); font-variant-numeric:tabular-nums; }
+  .si-ticks span { position:absolute; transform:translateX(-50%); }
+  .si-ticks span:first-child { transform:none; }
+  .si-band { margin:0; font-size:.9rem; }
+  @media (max-width:1100px) {
+    .si-steps { grid-template-columns:minmax(0, 1fr); }
+    .si-step + .si-step::before { left:40px; top:-15px; transform:rotate(135deg); }
+  }
+
+  /* 3) แผนผังหลักเกณฑ์ WCAG 2.1 ระดับ A และ AA ที่เครื่องมือตรวจ */
+  .sc-map { margin:0 0 32px; padding:22px 24px 20px; background:var(--page); border-radius:24px; box-shadow:var(--shadow); }
+  .sc-legend { margin:0 0 14px; display:flex; flex-wrap:wrap; gap:6px 18px; font-size:.84rem; color:var(--ink-2); }
+  .sc-legend span { display:inline-flex; align-items:center; gap:6px; }
+  .sc-legend i { width:16px; height:16px; border-radius:5px; background:var(--paper-3); }
+  .sc-legend i.is-on { background:var(--blue); }
+  .sc-legend i.is-part { background:var(--p1); box-shadow:inset 0 0 0 2px var(--blue); }
+  .sc-grid { display:grid; grid-template-columns:auto minmax(0, 1.25fr) minmax(0, 1fr); gap:10px 22px; align-items:start; }
+  .sc-ch { margin:0; font-weight:700; font-size:.92rem; }
+  .sc-ch span { font-weight:400; color:var(--ink-2); margin-left:4px; }
+  .sc-rh { margin:0; padding-top:5px; font-size:.86rem; font-weight:600; color:var(--ink-2); white-space:nowrap; }
+  .sc-tiles { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:4px; }
+  .sc-tiles li { min-width:46px; padding:5px 6px; border-radius:8px; text-align:center; font-family:var(--f-mono); font-size:.74rem; line-height:1.2; background:var(--paper-3); color:var(--ink-2); }
+  .sc-tiles li.is-on { background:var(--blue); color:#fff; font-weight:700; }
+  .sc-tiles li.is-part { background:var(--p1); color:var(--link); font-weight:700; box-shadow:inset 0 0 0 2px var(--blue); }
+  .sc-tiles li.sc-lv { display:none; }
+  .sc-map figcaption { margin:16px 0 0; padding-top:14px; border-top:1px solid var(--rule); font-size:.9rem; color:var(--ink-2); }
+  @media (max-width:760px) {
+    .sc-grid { grid-template-columns:minmax(0, 1fr); gap:6px; }
+    .sc-grid > span, .sc-ch { display:none; }
+    .sc-rh { padding-top:10px; color:var(--ink); }
+    .sc-tiles li.sc-lv { display:block; min-width:0; padding:5px 4px; background:none; font-family:var(--f-body); font-weight:700; color:var(--ink-2); }
+  }
+
+  /* 4) ตารางเทียบผลกับเฉลย (confusion matrix) ในการ์ดค่า F1 */
+  .cm { width:calc(100% + 8px); margin:auto -4px 0; table-layout:fixed; border-collapse:separate; border-spacing:4px; font-size:.78rem; }
+  .cm thead td { width:36%; }
+  .cm th { font-weight:600; color:inherit; padding:2px 4px; text-align:center; border:0; background:none; }
+  .cm tbody th { text-align:left; line-height:1.3; }
+  .cm td { padding:8px 6px; border-radius:10px; text-align:center; border:0; }
+  .cm td b { display:block; font-size:1.35rem; line-height:1.1; }
+  .cm-ok { background:#1d4ed8; color:#fff; }
+  .cm-zero { background:color-mix(in srgb, currentColor 9%, transparent); color:inherit; }
+
   /* ---------- ทรานซิชันตอนเปลี่ยนหน้า ----------
    * เบราว์เซอร์ที่รองรับ View Transitions: ภาพทั้งจอจางข้ามกัน แถบเมนู (topbar) และแถบขั้นตอน (stepper) อยู่นิ่ง
    * วงขั้นปัจจุบัน (step-cur) เลื่อนจากขั้นเดิมไปขั้นใหม่ ส่วนเนื้อหาหน้าใหม่เลื่อนเข้าด้วยคลาส .view-enter
@@ -1331,7 +1433,7 @@
 
   /* ---------- การพิมพ์รายงาน ---------- */
   @media print {
-    .caps { display:none !important; }
+    .caps, .score-info { display:none !important; }
     .hero2-art, .hero2-cta, .hero2-checks, .quick, .feats, .how, .report2, .who-faq, .sec-h2, .board-split, .board-proof, .nav-cta { display:none !important; }
     .hero2 { width:auto; margin:0; padding:0; background:none; color:#000; } .hero2::after, .hero2::before { display:none; } .hero2 h1, .hero2-sub, .hero2-lead { color:#000; }
     footer.site { display:none !important; }
@@ -1520,10 +1622,48 @@
     <a class="btn-blue" href="#input-section">ไปที่ขั้นที่ 1 นำเข้าโค้ด</a>
   </div>
   <ol class="flow">
-    <li><a href="#input-section"><span class="flow-n">1</span><b>นำเข้าโค้ด</b><span>วางโค้ด HTML ระบุลิงก์ หรืออัปโหลดไฟล์</span></a></li>
-    <li><div><span class="flow-n">2</span><b>ระบบตรวจ 5 กฎ</b><span>อ่านโครงสร้าง HTML ทันทีที่กดตรวจสอบ</span></div></li>
-    <li><a href="#checklist-section"><span class="flow-n">3</span><b>ตอบแบบประเมิน</b><span>3 ข้อที่โปรแกรมตัดสินแทนไม่ได้</span></a></li>
-    <li><a href="#results-section"><span class="flow-n">4</span><b>ดูผลและออกรายงาน</b><span>คะแนน จุดที่ผิด วิธีแก้ และบันทึกผล</span></a></li>
+    <li><a href="#input-section"><span class="flow-n">1</span><span class="flow-vis"><svg viewBox="0 0 240 136" aria-hidden="true" focusable="false"><rect x="16" y="14" width="150" height="108" rx="10" fill="#fff" stroke="#c7d2fe" stroke-width="1.5"/>
+<path d="M16 24a10 10 0 0 1 10-10h130a10 10 0 0 1 10 10v6H16z" fill="#0b2463"/>
+<circle cx="27" cy="22" r="2.6" fill="#fbbf24"/><circle cx="35" cy="22" r="2.6" fill="#93c5fd"/><circle cx="43" cy="22" r="2.6" fill="#93c5fd"/>
+<text class="fv-code" x="26" y="50"><tspan fill="#1d4ed8">&lt;img</tspan> <tspan fill="#7c3aed">src</tspan>=<tspan fill="#047857">"a.png"</tspan><tspan fill="#1d4ed8">&gt;</tspan></text>
+<text class="fv-code" x="26" y="72"><tspan fill="#1d4ed8">&lt;h3&gt;</tspan><tspan fill="#334155">สินค้า</tspan><tspan fill="#1d4ed8">&lt;/h3&gt;</tspan></text>
+<text class="fv-code" x="26" y="94"><tspan fill="#1d4ed8">&lt;input</tspan> <tspan fill="#7c3aed">type</tspan>=<tspan fill="#047857">"text"</tspan><tspan fill="#1d4ed8">&gt;</tspan></text>
+<rect x="26" y="104" width="64" height="6" rx="3" fill="#e2e8f0"/>
+<g transform="translate(192 46)"><circle r="22" fill="#1d4ed8"/><path d="M-4 4l8-8M-2-8l3-3a5 5 0 0 1 7 7l-3 3M2 8l-3 3a5 5 0 0 1-7-7l3-3" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></g>
+<g transform="translate(200 98)"><circle r="22" fill="#fbbf24"/><path d="M0 7v-14M-6-1l6-6 6 6M-9 10h18" fill="none" stroke="#0b2463" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg></span><b>นำเข้าโค้ด</b><span>วางโค้ด HTML ระบุลิงก์ หรืออัปโหลดไฟล์</span></a></li>
+    <li><div><span class="flow-n">2</span><span class="flow-vis"><svg viewBox="0 0 240 136" aria-hidden="true" focusable="false"><rect x="16" y="14" width="150" height="108" rx="10" fill="#fff" stroke="#c7d2fe" stroke-width="1.5"/>
+<path d="M16 24a10 10 0 0 1 10-10h130a10 10 0 0 1 10 10v6H16z" fill="#0b2463"/>
+<circle cx="27" cy="22" r="2.6" fill="#fbbf24"/><circle cx="35" cy="22" r="2.6" fill="#93c5fd"/><circle cx="43" cy="22" r="2.6" fill="#93c5fd"/>
+<text class="fv-code" x="26" y="50"><tspan fill="#1d4ed8">&lt;img</tspan> <tspan fill="#7c3aed">src</tspan>=<tspan fill="#047857">"a.png"</tspan><tspan fill="#1d4ed8">&gt;</tspan></text>
+<text class="fv-code" x="26" y="72"><tspan fill="#1d4ed8">&lt;h3&gt;</tspan><tspan fill="#334155">สินค้า</tspan><tspan fill="#1d4ed8">&lt;/h3&gt;</tspan></text>
+<text class="fv-code" x="26" y="94"><tspan fill="#1d4ed8">&lt;input</tspan> <tspan fill="#7c3aed">type</tspan>=<tspan fill="#047857">"text"</tspan><tspan fill="#1d4ed8">&gt;</tspan></text>
+<rect x="26" y="104" width="64" height="6" rx="3" fill="#e2e8f0"/>
+<rect class="fv-scan" x="17" y="34" width="148" height="14" fill="#60a5fa" fill-opacity=".22"/>
+<path d="M150 46h20M150 68h20M150 90h20" stroke="#94a3b8" stroke-width="1.5"/>
+<g><rect x="170" y="37" width="62" height="18" rx="9" fill="#fee2e2"/><text class="fv-chip" x="201" y="50" fill="#b91c1c">ALT-01</text></g>
+<g><rect x="170" y="59" width="62" height="18" rx="9" fill="#fef3c7"/><text class="fv-chip" x="201" y="72" fill="#92400e">HEAD-01</text></g>
+<g><rect x="170" y="81" width="62" height="18" rx="9" fill="#fee2e2"/><text class="fv-chip" x="201" y="94" fill="#b91c1c">LABEL-01</text></g>
+<g transform="translate(118 112)"><circle r="11" fill="#fff" fill-opacity=".6" stroke="#0b2463" stroke-width="3.5"/><path d="M8 8l9 9" stroke="#0b2463" stroke-width="5" stroke-linecap="round"/></g>
+</svg></span><b>ระบบตรวจ 5 กฎ</b><span>อ่านโครงสร้าง HTML ทันทีที่กดตรวจสอบ</span></div></li>
+    <li><a href="#checklist-section"><span class="flow-n">3</span><span class="flow-vis"><svg viewBox="0 0 240 136" aria-hidden="true" focusable="false">
+<rect x="36" y="14" width="168" height="112" rx="12" fill="#fff" stroke="#c7d2fe" stroke-width="1.5"/>
+<rect x="50" y="22" width="40" height="10" rx="5" fill="#dbeafe"/><rect x="50" y="39" width="66" height="6" rx="3" fill="#cbd5e1"/><rect x="50" y="49" width="44" height="5" rx="2.5" fill="#e2e8f0"/><circle cx="136" cy="46" r="7" fill="#16a34a"/><path d="M132.8 46l2.2 2.2 4.2-4.4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="156" cy="46" r="6.2" fill="#fff" stroke="#94a3b8" stroke-width="1.6"/><circle cx="176" cy="46" r="6.2" fill="#fff" stroke="#94a3b8" stroke-width="1.6"/><rect x="50" y="67" width="66" height="6" rx="3" fill="#cbd5e1"/><rect x="50" y="77" width="44" height="5" rx="2.5" fill="#e2e8f0"/><circle cx="136" cy="74" r="6.2" fill="#fff" stroke="#94a3b8" stroke-width="1.6"/><circle cx="156" cy="74" r="7" fill="#f59e0b"/><path d="M156 70.5v4M156 77v.2" stroke="#fff" stroke-width="1.9" stroke-linecap="round"/><circle cx="176" cy="74" r="6.2" fill="#fff" stroke="#94a3b8" stroke-width="1.6"/><rect x="50" y="95" width="66" height="6" rx="3" fill="#cbd5e1"/><rect x="50" y="105" width="44" height="5" rx="2.5" fill="#e2e8f0"/><circle cx="136" cy="102" r="6.2" fill="#fff" stroke="#94a3b8" stroke-width="1.6"/><circle cx="156" cy="102" r="6.2" fill="#fff" stroke="#94a3b8" stroke-width="1.6"/><circle cx="176" cy="102" r="6.2" fill="#fff" stroke="#94a3b8" stroke-width="1.6"/>
+<path d="M184 96l14 6-6 2-2 6z" fill="#0b2463" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+</svg></span><b>ตอบแบบประเมิน</b><span>3 ข้อที่โปรแกรมตัดสินแทนไม่ได้</span></a></li>
+    <li><a href="#results-section"><span class="flow-n">4</span><span class="flow-vis"><svg viewBox="0 0 240 136" aria-hidden="true" focusable="false">
+<rect x="18" y="14" width="140" height="112" rx="12" fill="#fff" stroke="#c7d2fe" stroke-width="1.5"/>
+<circle cx="58" cy="58" r="24" fill="none" stroke="#fee2e2" stroke-width="8"/>
+<circle cx="58" cy="58" r="24" fill="none" stroke="#dc2626" stroke-width="8" stroke-linecap="round" stroke-dasharray="86.9 150.8" transform="rotate(-90 58 58)"/>
+<text class="fv-num" x="58" y="62">57.62</text>
+<rect x="94" y="40" width="50" height="6" rx="3" fill="#e2e8f0"/><rect x="94" y="40" width="25" height="6" rx="3" fill="#1d4ed8"/>
+<rect x="94" y="54" width="50" height="6" rx="3" fill="#e2e8f0"/><rect x="94" y="54" width="30" height="6" rx="3" fill="#1d4ed8"/>
+<rect x="94" y="68" width="50" height="6" rx="3" fill="#e2e8f0"/><rect x="94" y="68" width="33.5" height="6" rx="3" fill="#1d4ed8"/>
+<rect x="32" y="96" width="112" height="6" rx="3" fill="#e2e8f0"/><rect x="32" y="108" width="74" height="6" rx="3" fill="#e2e8f0"/>
+<g transform="translate(172 52)"><path d="M0 0h36l14 14v54H0z" fill="#fff" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round"/><path d="M36 0v14h14" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5" stroke-linejoin="round"/>
+<rect x="-6" y="26" width="38" height="18" rx="5" fill="#dc2626"/><text class="fv-chip" x="13" y="39" fill="#fff">PDF</text>
+<rect x="8" y="52" width="30" height="4" rx="2" fill="#e2e8f0"/></g>
+</svg></span><b>ดูผลและออกรายงาน</b><span>คะแนน จุดที่ผิด วิธีแก้ และบันทึกผล</span></a></li>
   </ol>
 </section>
 
@@ -1583,12 +1723,54 @@
   </div>
 </div>
 
+<section class="score-info" aria-labelledby="h-scoreinfo">
+  <h2 id="h-scoreinfo" class="sec-h2">คะแนนคำนวณอย่างไร</h2>
+  <p class="si-lead">ใช้วิธี Failure-Rate Metric (Vigo, Brajnik และ Harper, 2011) ตัวเลขด้านล่างมาจากตัวอย่างในบทที่ 3.7.2 ของรายงาน</p>
+  <ol class="si-steps">
+    <li class="si-step">
+      <p class="si-k"><span class="si-n" aria-hidden="true">1</span>นับคู่ที่ผ่านและไม่ผ่าน แยกตามหลักเกณฑ์</p>
+      <p class="si-legend" aria-hidden="true"><span><i class="f"></i>ไม่ผ่าน</span><span><i class="p"></i>ผ่าน</span><span><i class="r"></i>ต้องตรวจเพิ่ม</span></p>
+      <ul class="si-rows">
+        <li><span class="si-sc"><b>SC 1.1.1</b> ข้อความแทนภาพ</span><span class="si-dots" aria-hidden="true"><i class="f"></i><i class="f"></i><i class="p"></i><i class="p"></i><i class="r"></i></span><span class="si-fr">ไม่ผ่าน 2 จาก 4 = <b>0.50</b></span><span class="si-w">น้ำหนัก 3</span></li>
+        <li><span class="si-sc"><b>SC 1.3.1</b> โครงสร้าง</span><span class="si-dots" aria-hidden="true"><i class="f"></i><i class="f"></i><i class="p"></i><i class="p"></i><i class="p"></i></span><span class="si-fr">ไม่ผ่าน 2 จาก 5 = <b>0.40</b></span><span class="si-w">น้ำหนัก 2</span></li>
+        <li><span class="si-sc"><b>SC 1.4.3</b> ความคมชัดของสี</span><span class="si-dots" aria-hidden="true"><i class="f"></i><i class="p"></i><i class="p"></i></span><span class="si-fr">ไม่ผ่าน 1 จาก 3 = <b>0.33</b></span><span class="si-w">น้ำหนัก 2</span></li>
+      </ul>
+      <p class="si-note">คู่ที่ต้องตรวจเพิ่ม 1 คู่ยังไม่นับในตัวหาร จนกว่าผู้ประเมินจะตอบแบบประเมิน</p>
+    </li>
+    <li class="si-step">
+      <p class="si-k"><span class="si-n" aria-hidden="true">2</span>ถ่วงน้ำหนัก 3 : 2 : 2</p>
+      <div class="si-wbar" aria-hidden="true">
+        <span style="flex-grow:3"><i style="width:50%"></i></span><span style="flex-grow:2"><i style="width:40%"></i></span><span style="flex-grow:2"><i style="width:33.33%"></i></span>
+      </div>
+      <div class="si-wlab" aria-hidden="true"><span style="flex-grow:3">1.1.1 ×3</span><span style="flex-grow:2">1.3.1 ×2</span><span style="flex-grow:2">1.4.3 ×2</span></div>
+      <p class="si-cap">ความกว้างของแต่ละช่องตามน้ำหนัก ส่วนสีแดงคือสัดส่วนที่ไม่ผ่าน รวมแล้วเป็นอัตราไม่ผ่านถ่วงน้ำหนัก</p>
+      <p class="si-math">(3 × 2/4 + 2 × 2/5 + 2 × 1/3) ÷ 7 = <b>0.4238</b></p>
+    </li>
+    <li class="si-step">
+      <p class="si-k"><span class="si-n" aria-hidden="true">3</span>แปลงเป็นคะแนน 0–100</p>
+      <p class="si-math">100 × (1 − 0.4238) =</p>
+      <p class="si-score">57.62</p>
+      <div class="si-meter" aria-hidden="true"><i style="width:57.62%"></i><b style="left:60%"></b><b style="left:75%"></b><b style="left:90%"></b></div>
+      <div class="si-ticks" aria-hidden="true"><span style="left:0">0</span><span style="left:60%">60</span><span style="left:75%">75</span><span style="left:90%">90</span></div>
+      <p class="si-band"><span class="tag bad">ต้องปรับปรุง</span> คะแนนต่ำกว่า 60</p>
+      <p class="si-note">คะแนนเต็ม 100 ไม่ได้แปลว่าผ่าน WCAG ทั้งฉบับ เพราะนับเฉพาะกฎที่ระบบตรวจได้</p>
+    </li>
+  </ol>
+</section>
+
 <h2 class="sec-h2">ผลการทดสอบเครื่องมือ</h2>
 <div class="board board-proof">
   <div class="t t-mint t-fig">
     <p class="big">1.000</p>
     <p>ค่า F1 ของกฎตรวจทุกข้อ บนชุดทดสอบ F–I ที่สร้างหลังกฎนิ่ง 38 คู่ตรวจ ไม่มีแจ้งผิดและไม่มีตกหล่น</p>
-    <p class="f1-row"><span>TP 14</span><span>FP 0</span><span>FN 0</span><span>TN 24</span></p>
+    <table class="cm">
+      <caption class="sr-only">ผลของระบบเทียบกับเฉลย 38 คู่ตรวจ</caption>
+      <thead><tr><td></td><th scope="col">เฉลยว่าผิด</th><th scope="col">เฉลยว่าไม่ผิด</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">ระบบว่าผิด</th><td class="cm-ok"><b>14</b> TP</td><td class="cm-zero"><b>0</b> FP</td></tr>
+        <tr><th scope="row">ระบบว่าไม่ผิด</th><td class="cm-zero"><b>0</b> FN</td><td class="cm-ok"><b>24</b> TN</td></tr>
+      </tbody>
+    </table>
   </div>
   <div class="t t-surface t-contrast" data-ui>
     <p class="big">4.5 : 1</p>
@@ -1696,6 +1878,15 @@
         </tbody>
       </table>
     </div>
+
+    <h2 class="pour-h">เครื่องมือนี้ครอบคลุมแค่ไหน</h2>
+    <figure class="sc-map">
+      <p class="sc-legend" aria-hidden="true"><span><i class="is-on"></i>ตรวจ</span><span><i class="is-part"></i>ตรวจบางส่วน</span><span><i></i>ยังไม่ได้ตรวจ</span></p>
+      <div class="sc-grid" aria-hidden="true"><span></span><p class="sc-ch">ระดับ A <span>30 ข้อ</span></p><p class="sc-ch">ระดับ AA <span>20 ข้อ</span></p><p class="sc-rh">หลักการที่ 1 รับรู้ได้</p><ul class="sc-tiles"><li class="sc-lv">A</li><li class="is-on">1.1.1</li><li>1.2.1</li><li>1.2.2</li><li>1.2.3</li><li class="is-part">1.3.1</li><li>1.3.2</li><li>1.3.3</li><li>1.4.1</li><li>1.4.2</li></ul><ul class="sc-tiles"><li class="sc-lv">AA</li><li>1.2.4</li><li>1.2.5</li><li>1.3.4</li><li>1.3.5</li><li class="is-on">1.4.3</li><li>1.4.4</li><li>1.4.5</li><li>1.4.10</li><li>1.4.11</li><li>1.4.12</li><li>1.4.13</li></ul><p class="sc-rh">หลักการที่ 2 ใช้งานได้</p><ul class="sc-tiles"><li class="sc-lv">A</li><li>2.1.1</li><li>2.1.2</li><li>2.1.4</li><li>2.2.1</li><li>2.2.2</li><li>2.3.1</li><li>2.4.1</li><li>2.4.2</li><li>2.4.3</li><li>2.4.4</li><li>2.5.1</li><li>2.5.2</li><li>2.5.3</li><li>2.5.4</li></ul><ul class="sc-tiles"><li class="sc-lv">AA</li><li>2.4.5</li><li>2.4.6</li><li>2.4.7</li></ul><p class="sc-rh">หลักการที่ 3 เข้าใจได้</p><ul class="sc-tiles"><li class="sc-lv">A</li><li>3.1.1</li><li>3.2.1</li><li>3.2.2</li><li>3.3.1</li><li>3.3.2</li></ul><ul class="sc-tiles"><li class="sc-lv">AA</li><li>3.1.2</li><li>3.2.3</li><li>3.2.4</li><li>3.3.3</li><li>3.3.4</li></ul><p class="sc-rh">หลักการที่ 4 รองรับได้</p><ul class="sc-tiles"><li class="sc-lv">A</li><li>4.1.1</li><li>4.1.2</li></ul><ul class="sc-tiles"><li class="sc-lv">AA</li><li>4.1.3</li></ul></div>
+      <figcaption>WCAG 2.1 ระดับ A และ AA มีหลักเกณฑ์รวม 50 ข้อ (ระดับ A 30 ข้อ ระดับ AA 20 ข้อ)
+        เครื่องมือนี้ตรวจ 3 ข้อ ได้แก่ SC 1.1.1, SC 1.4.3 และ SC 1.3.1 เฉพาะลำดับหัวข้อกับป้ายกำกับช่องกรอก
+        หลักเกณฑ์ที่เหลือต้องตรวจด้วยเครื่องมืออื่นหรือโดยผู้เชี่ยวชาญ</figcaption>
+    </figure>
     <div id="standards-cards" class="std-cards"></div>
   </section>
 
