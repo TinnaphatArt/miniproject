@@ -207,15 +207,118 @@
       '<a href="' + esc(c.url) + '" target="_blank" rel="noopener">คำอธิบายจาก W3C (ภาษาอังกฤษ)</a></dd></dl>';
   }
 
-  function renderIssue(p) {
+  /* ================================================================ *
+   * ตัวอย่างโค้ดหลังแก้ (Code Fix Preview)
+   * สร้างจากองค์ประกอบที่ผิดจริงในโค้ดของผู้ใช้ ไม่ได้แก้ตรรกะการตรวจ เป็นเพียงการแสดงผล
+   * ข้อความในวงเล็บ เช่น alt หรือชื่อป้ายกำกับ เป็นตัวอย่างที่ผู้ใช้ต้องแก้ให้ตรงกับเนื้อหาจริง
+   * ================================================================ */
+  var FIX_TEXT = [];      /* โค้ดหลังแก้สำหรับปุ่มคัดลอก ล้างทุกครั้งที่วาดผลใหม่ */
+
+  function openTagOf(el) {
+    var m = (el.outerHTML || '').match(/^<[^>]*>/);
+    return m ? m[0] : '';
+  }
+  function toHex(c) {
+    return '#' + [c.r, c.g, c.b].map(function (v) { return ('0' + Math.round(v).toString(16)).slice(-2); }).join('');
+  }
+  /* หาสีตัวอักษรที่ใกล้สีเดิมที่สุดซึ่งผ่าน 4.5 ต่อ 1 โดยเลื่อนเข้าหาดำ (พื้นสว่าง) หรือขาว (พื้นมืด) */
+  function suggestTextColor(fg, bg) {
+    var lightBg = A.relativeLuminance(bg) > 0.18;
+    var targets = lightBg ? [{ r: 0, g: 0, b: 0 }, { r: 255, g: 255, b: 255 }] : [{ r: 255, g: 255, b: 255 }, { r: 0, g: 0, b: 0 }];
+    for (var k = 0; k < targets.length; k++) {
+      var t = targets[k];
+      for (var i = 1; i <= 100; i++) {
+        var f = i / 100;
+        var c = { r: Math.round(fg.r + (t.r - fg.r) * f), g: Math.round(fg.g + (t.g - fg.g) * f), b: Math.round(fg.b + (t.b - fg.b) * f) };
+        if (A.contrastRatio(c, bg) >= 4.5) return c;
+      }
+    }
+    return null;
+  }
+
+  function buildFix(p, n) {
+    var el = p.el;
+    if (!el || p.status !== S.FAIL || p.tag === 'checklist' || !el.ownerDocument) return null;
+    try {
+      var doc = el.ownerDocument;
+      if (p.ruleId === 'R-ALT-01' || p.ruleId === 'R-ALT-02') {
+        var img = el.cloneNode(false);
+        img.setAttribute('alt', 'อธิบายสิ่งที่ภาพนี้สื่อ');
+        return { before: [openTagOf(el)], after: [openTagOf(img)],
+          note: 'แทนข้อความใน alt ด้วยคำอธิบายจริงของภาพ ถ้าเป็นภาพตกแต่งที่ไม่สื่อความหมาย ให้ใช้ alt="" แทน' };
+      }
+      if (p.ruleId === 'R-HEAD-01') {
+        var m = /เป็น h(\d)/.exec(p.suggestion || '');
+        if (!m) return null;
+        var text = A.truncate(el.textContent, 40);
+        var oldH = el.cloneNode(false); oldH.textContent = text;
+        var newH = doc.createElement('h' + m[1]);
+        Array.prototype.forEach.call(el.attributes, function (a) { newH.setAttribute(a.name, a.value); });
+        newH.textContent = text;
+        return { before: [oldH.outerHTML], after: [newH.outerHTML],
+          note: 'ถ้าต้องการให้ตัวอักษรเล็กหรือใหญ่ ให้ปรับด้วย CSS ไม่ต้องเปลี่ยนระดับหัวข้อ' };
+      }
+      if (p.ruleId === 'R-LABEL-01') {
+        var id = el.getAttribute('id') || ('field-' + n);
+        var labelText = el.getAttribute('placeholder') || el.getAttribute('name') || 'ชื่อของช่องนี้';
+        var input = el.cloneNode(false); input.setAttribute('id', id);
+        var label = doc.createElement('label'); label.setAttribute('for', id); label.textContent = labelText;
+        return { before: [openTagOf(el)], after: [label.outerHTML, openTagOf(input)],
+          note: 'ข้อความในป้ายกำกับควรบอกให้ชัดว่าช่องนี้ให้กรอกอะไร placeholder ยังใช้ได้แต่ไม่นับเป็นป้ายกำกับ' };
+      }
+      if (p.ruleId === 'R-CONTRAST-01') {
+        var style = el.getAttribute('style') || '';
+        var decls = A.parseStyleAttribute(style);
+        var fg = A.parseColor(decls['color']), bg = A.parseColor(decls['background-color']);
+        if (!fg || !bg) return null;
+        var c = suggestTextColor(fg, bg);
+        if (!c) return null;
+        var hex = toHex(c);
+        var newStyle = style.replace(/(^|;)(\s*)color\s*:[^;]*/i, '$1$2color:' + hex);
+        if (newStyle === style) return null;
+        var fixed = el.cloneNode(false); fixed.setAttribute('style', newStyle);
+        return { before: [openTagOf(el)], after: [openTagOf(fixed)],
+          note: 'สีตัวอักษรใหม่ ' + hex + ' ใกล้สีเดิมที่สุดที่ผ่านเกณฑ์ อัตราส่วนจาก ' + A.contrastRatio(fg, bg).toFixed(2) +
+            ' เป็น ' + A.contrastRatio(c, bg).toFixed(2) + ' ต่อ 1 หรือจะปรับสีพื้นหลังแทนก็ได้' };
+      }
+    } catch (e) { return null; }
+    return null;
+  }
+
+  function renderFix(fix) {
+    var i = FIX_TEXT.push(fix.after.join('\n')) - 1;
+    var line = function (cls, sign, label, code) {
+      return '<span class="' + cls + '"><span class="sr-only">' + label + '</span><span class="d-sign" aria-hidden="true">' + sign + '</span>' + esc(code) + '</span>';
+    };
+    return '<div class="fixprev">' +
+      '<div class="fp-head"><p class="code-cap">ตัวอย่างโค้ดหลังแก้</p>' +
+      '<button type="button" class="secondary small copy-fix" data-i="' + i + '">คัดลอกโค้ดที่แก้แล้ว</button>' +
+      '<span class="copy-status" role="status" aria-live="polite"></span></div>' +
+      '<pre class="diff"><code>' +
+      fix.before.map(function (c) { return line('d-del', '−', 'โค้ดเดิม: ', c); }).join('') +
+      fix.after.map(function (c) { return line('d-add', '+', 'แก้เป็น: ', c); }).join('') +
+      '</code></pre>' +
+      '<p class="fp-note">' + esc(fix.note) + '</p></div>';
+  }
+
+  function renderIssue(p, anchor, n) {
     var sev = p.severity || 'should_fix';
     var part = PART_LABEL[A.RULE_PART[p.ruleId]];
     var isChecklist = p.tag === 'checklist';
-    return '<div class="issue ' + esc(sev) + '">' +
+    var fix = buildFix(p, n || 1);
+    var head = '<div class="issue ' + esc(sev) + '"' + (anchor ? ' id="' + anchor + '"' : '') + '>' +
       '<p class="issue-meta"><span class="sev ' + esc(sev) + '">' + esc(SEVERITY_LABEL[sev] || sev) + '</span>' +
       '<span class="rule-id">' + esc(p.ruleId) + '</span>' +
       '<span>' + (part ? esc(part) + ' · ' : '') + esc(isChecklist ? 'คำตอบจากแบบประเมิน' : '<' + p.tag + '>') + '</span></p>' +
-      '<h4 class="issue-msg">' + esc(p.message) + '</h4>' +
+      '<h4 class="issue-msg">' + esc(p.message) + '</h4>';
+    if (fix) {
+      return head +
+        (p.suggestion ? '<p class="fix-how"><b>แนวทางแก้ไข</b> ' + esc(p.suggestion) + '</p>' : '') +
+        renderFix(fix) +
+        (p.path ? '<p class="where">ตำแหน่ง: ' + esc(p.path) + '</p>' : '') +
+        standardBlock(p) + '</div>';
+    }
+    return head +
       '<div class="codes' + (p.suggestion ? '' : ' single') + '">' +
       '<div class="code-col found"><p class="code-cap">' + (isChecklist ? 'ที่มา' : 'โค้ดที่พบ') + '</p>' +
       '<code class="snippet">' + esc(p.snippet) + '</code>' +
@@ -225,6 +328,45 @@
       '</div>' +
       standardBlock(p) +
       '</div>';
+  }
+
+  /* ================================================================ *
+   * รายการปัญหา (Issue List) พร้อมตัวกรองตามความรุนแรง
+   * แต่ละแถวลิงก์ไปยังการ์ดรายละเอียดด้านล่าง
+   * ================================================================ */
+  var RULE_TITLE = { 'R-ALT-01': 'ภาพไม่มี alt', 'R-ALT-02': 'ภาพ alt ว่าง', 'R-HEAD-01': 'หัวข้อข้ามระดับ',
+    'R-LABEL-01': 'ช่องกรอกไม่มีป้ายกำกับ', 'R-CONTRAST-01': 'สีตัวอักษรกับพื้นหลังต่ำกว่าเกณฑ์' };
+
+  function renderIssueList(result) {
+    var rows = [];
+    result.issues.forEach(function (p, i) { rows.push({ p: p, f: p.severity || 'should_fix', href: '#issue-' + (i + 1) }); });
+    result.needsReview.forEach(function (p, i) { rows.push({ p: p, f: 'review', href: '#review-' + (i + 1) }); });
+    if (!rows.length) return '';
+    var count = function (f) { return rows.filter(function (r) { return r.f === f; }).length; };
+    var chips = [['all', 'ทั้งหมด', rows.length], ['critical', 'วิกฤต', count('critical')], ['should_fix', 'ควรแก้', count('should_fix')],
+      ['advisory', 'แนะนำ', count('advisory')], ['review', 'ต้องตรวจเพิ่ม', count('review')]]
+      .filter(function (c) { return c[0] === 'all' || c[2] > 0; });
+    return '<section class="issue-list" aria-labelledby="h-issue-list">' +
+      '<div class="il-head"><h2 id="h-issue-list">รายการปัญหา</h2>' +
+      '<div class="il-filter" role="group" aria-label="กรองรายการตามความรุนแรง">' + chips.map(function (c) {
+        return '<button type="button" class="il-chip' + (c[0] !== 'all' ? ' f-' + c[0] : '') + '" data-f="' + c[0] + '" aria-pressed="' + (c[0] === 'all') + '">' +
+          esc(c[1]) + ' <b>' + c[2] + '</b></button>';
+      }).join('') + '</div></div>' +
+      '<p class="il-count" role="status" aria-live="polite">แสดงทั้งหมด ' + rows.length + ' รายการ</p>' +
+      '<div class="table-scroll" tabindex="0" role="region" aria-label="ตารางรายการปัญหา"><table class="il-table">' +
+      '<thead><tr><th scope="col">ความรุนแรง</th><th scope="col">ปัญหา</th><th scope="col">โค้ดที่พบ</th>' +
+      '<th scope="col">หลักเกณฑ์</th><th scope="col"><span class="sr-only">รายละเอียด</span></th></tr></thead><tbody>' +
+      rows.map(function (r) {
+        var p = r.p, c = A.CRITERIA[p.sc] || {};
+        var sevCell = r.f === 'review' ? '<span class="sev review">ต้องตรวจเพิ่ม</span>'
+          : '<span class="sev ' + esc(r.f) + '">' + esc(SEVERITY_LABEL[r.f] || r.f) + '</span>';
+        var title = p.tag === 'checklist' ? A.truncate(p.message, 60) : (RULE_TITLE[p.ruleId] || p.ruleId);
+        return '<tr data-f="' + r.f + '"><td>' + sevCell + '</td>' +
+          '<td><span class="rule-id">' + esc(p.ruleId) + '</span> ' + esc(title) + '</td>' +
+          '<td><code>' + esc(A.truncate(p.snippet, 48)) + '</code></td>' +
+          '<td>' + esc(p.sc) + (c.level ? ' · ' + esc(c.level) : '') + '</td>' +
+          '<td><a class="il-go" href="' + r.href + '">วิธีแก้<span class="sr-only"> ' + esc(title) + '</span> ›</a></td></tr>';
+      }).join('') + '</tbody></table></div></section>';
   }
 
   /* แดชบอร์ดสรุปว่าหน้าเว็บผิดที่ส่วนไหน (รูปภาพ หัวข้อ ช่องกรอกข้อมูล สีข้อความ)
@@ -332,6 +474,7 @@
 
   function renderResults(result, highlighted) {
     var h = [];
+    FIX_TEXT = [];
     var interp = result.interpretation;
 
     /* ---- คะแนน: ตัวเลขเป็นข้อมูลหลัก แถบด้านข้างแสดงว่าคะแนนตกช่วงใดตามเกณฑ์ในบทที่ 3.7.3 ---- */
@@ -340,6 +483,7 @@
       return '<span class="seg ' + b.tone + (b.tone === interp.tone ? ' on' : '') + '" style="width:' + (b.to - b.from) + '%"></span>';
     }).join('') + (hasScore ? '<span class="marker" style="left:' + Math.max(0, Math.min(100, result.score)).toFixed(2) + '%"></span>' : '');
     h.push('<div class="score" id="r-score">' +
+      '<div class="score-card">' +
       '<div class="score-main">' +
       '<p class="score-label">คะแนนผลการตรวจเบื้องต้นตามรายการที่กำหนด</p>' +
       '<p class="score-num">' + (hasScore ? '<b>' + result.score.toFixed(2) + '</b><span>จาก 100</span>' : '<b>—</b><span>ไม่มีคะแนน</span>') + '</p>' +
@@ -352,7 +496,7 @@
         return '<span style="left:' + b.from + '%">' + b.from + '</span>'; }).join('') + '<span style="left:100%">100</span></div>' +
       '<div class="scale-names">' + SCORE_BANDS.map(function (b) {
         return '<span' + (b.tone === interp.tone ? ' class="on"' : '') + ' style="width:' + (b.to - b.from) + '%">' + esc(b.name) + '</span>'; }).join('') +
-      '</div></div>' +
+      '</div></div></div>' +
       renderKpis(result) +
       renderSeverityStrip(result) + renderCriteriaBars(result) +
       '<p class="score-src">แหล่งข้อมูล: ' + esc(state.sourceLabel || 'วางโค้ดเอง') +
@@ -360,6 +504,7 @@
       (state.fetchMs !== null ? ' · ดึงข้อมูลผ่านบริการตัวกลาง ' + state.fetchMs + ' มิลลิวินาที' : '') +
       '</p></div>');
 
+    h.push(renderIssueList(result));
     h.push(renderPartsDashboard(result));
 
     h.push('<div class="note info" role="note"><p>' +
@@ -466,8 +611,11 @@
         if (!group.length) return;
         var c = A.CRITERIA[part.sc];
         h.push('<h3 id="part-' + part.key + '" class="part-h">' + esc(part.label) + ' — ' + group.length + ' จุด ' +
-          '<span class="muted">ละเมิด ' + esc(part.sc) + ' ' + esc(c.nameTh) + ' ระดับ ' + esc(c.level) + '</span></h4>');
-        group.forEach(function (p) { h.push(renderIssue(p)); });
+          '<span class="muted">ละเมิด ' + esc(part.sc) + ' ' + esc(c.nameTh) + ' ระดับ ' + esc(c.level) + '</span></h3>');
+        group.forEach(function (p) {
+          var n = result.issues.indexOf(p) + 1;
+          h.push(renderIssue(p, 'issue-' + n, n));
+        });
       });
     }
 
@@ -480,7 +628,7 @@
         var group = result.needsReview.filter(function (p) { return A.RULE_PART[p.ruleId] === part.key; });
         if (!group.length) return;
         h.push('<h3 id="review-' + part.key + '" class="part-h">' + esc(part.label) + ' — ' + group.length + ' จุด</h3>');
-        group.forEach(function (p) { h.push(renderIssue(p)); });
+        group.forEach(function (p) { h.push(renderIssue(p, 'review-' + (result.needsReview.indexOf(p) + 1))); });
       });
     }
 
@@ -1044,6 +1192,29 @@
     $('file-input').addEventListener('change', function () { readHtmlFile($('file-input'), $('input-status')); });
 
     $('btn-analyze').addEventListener('click', onAnalyzeClick);
+
+    /* หน้าผล: ตัวกรองรายการปัญหา และปุ่มคัดลอกโค้ดหลังแก้ (ผลถูกวาดใหม่ทุกครั้ง จึงฟังเหตุการณ์ที่กล่องแม่) */
+    $('results-body').addEventListener('click', function (e) {
+      var chip = e.target.closest('.il-filter button');
+      if (chip) {
+        var f = chip.getAttribute('data-f'), box = chip.closest('.issue-list');
+        box.querySelectorAll('.il-filter button').forEach(function (b) { b.setAttribute('aria-pressed', String(b === chip)); });
+        var shown = 0, rows = box.querySelectorAll('tbody tr');
+        rows.forEach(function (tr) { tr.hidden = !(f === 'all' || tr.getAttribute('data-f') === f); if (!tr.hidden) shown++; });
+        box.querySelector('.il-count').textContent = f === 'all' ? 'แสดงทั้งหมด ' + shown + ' รายการ'
+          : 'แสดง ' + shown + ' จาก ' + rows.length + ' รายการ (' + chip.firstChild.textContent.trim() + ')';
+        return;
+      }
+      var copy = e.target.closest('.copy-fix');
+      if (copy) {
+        var text = FIX_TEXT[+copy.getAttribute('data-i')] || '';
+        var done = copy.parentNode.querySelector('.copy-status');
+        var ok = function () { done.textContent = 'คัดลอกแล้ว'; setTimeout(function () { done.textContent = ''; }, 2500); };
+        var fail = function () { done.textContent = 'คัดลอกไม่สำเร็จ ให้เลือกโค้ดแล้วคัดลอกเอง'; };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, fail);
+        else fail();
+      }
+    });
 
     /* กล่องตรวจด่วนในหน้าแรก: ใส่ลิงก์ หรืออัปโหลดไฟล์ .html แล้วตรวจด้วยขั้นตอนเดิมทุกอย่าง */
     function useMode(mode) {

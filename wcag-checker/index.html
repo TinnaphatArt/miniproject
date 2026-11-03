@@ -1311,6 +1311,152 @@
   }
   @media (prefers-reduced-motion: reduce) { .who-card:hover { transform:none; } }
 
+  /* ---------- Design System: โทเค็นกลาง (ใช้กับส่วนที่เพิ่มหลังจากนี้ และชั้นปรับให้เป็นชุดเดียวกันท้ายไฟล์) ----------
+   * มุมโค้ง: การ์ดหลัก 24 · แผงในการ์ด 16 · รายการย่อยและช่องกรอก 12 · ป้ายเล็ก 8 · ปุ่มและชิป 999
+   * เงา: ระดับ 1 การ์ดทั่วไป · ระดับ 2 การ์ดลอยเหนือพื้นสี
+   * ระยะห่าง: 4 8 12 16 24 32 48 96 */
+  :root {
+    --r-xs:8px; --r-sm:12px; --r-md:16px; --r-lg:24px; --r-pill:999px;
+    --sh-1:0 1px 2px rgba(11,36,99,.05), 0 10px 28px -14px rgba(11,36,99,.22);
+    --sh-2:0 28px 56px -26px rgba(11,36,99,.5);
+    --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:24px; --s-6:32px; --s-7:48px; --s-8:96px;
+    --btn-h:44px; --btn-h-sm:36px; --btn-h-lg:52px;
+  }
+
+  /* ---------- หน้าแรกแบบ Premium: ช่องตรวจอยู่ในส่วนหัว + ภาพจำลองแดชบอร์ดหลายชั้น ----------
+   * ภาพจำลองเป็นภาพตกแต่ง (aria-hidden) ใช้สีตายตัวเหมือนภาพหน้าจอจริง ตัวเลขมาจากตัวอย่างบทที่ 3.7.2 */
+  .hero2-in { grid-template-columns:minmax(0, 1.05fr) minmax(0, 1fr); gap:56px; }
+  .hero-check { margin:26px 0 0; max-width:620px; padding:16px; border-radius:var(--r-lg); background:var(--page); color:var(--ink); box-shadow:var(--sh-2); }
+  .hero-check .quick-form { padding:6px 6px 6px 16px; border-radius:var(--r-pill); background:var(--paper-2); box-shadow:inset 0 0 0 1px var(--control); }
+  .hero-check .quick-form:focus-within { box-shadow:inset 0 0 0 2px var(--blue); }
+  .hero-check .quick-form .btn-y { flex:none; min-height:var(--btn-h); padding:0 22px; box-shadow:none; }
+  .hc-alt { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:12px 4px 0; }
+  .hc-or { margin-right:2px; font-size:.86rem; color:var(--ink-2); }
+  .hc-opt { display:inline-flex; align-items:center; gap:8px; min-height:var(--btn-h-sm); padding:0 14px; border-radius:var(--r-pill); background:var(--p1); color:var(--link); font-size:.92rem; font-weight:600; text-decoration:none; cursor:pointer; }
+  .hc-opt:hover { filter:brightness(.97); text-decoration:underline; }
+  .hc-opt svg { width:18px; height:18px; flex:none; }
+  .hc-opt:focus-within { outline:3px solid var(--ink); outline-offset:2px; }
+  .hc-note { margin:10px 4px 0; font-size:.82rem; color:var(--ink-2); }
+  .hero-check .quick-status { margin:6px 4px 0; }
+  .hero-check .quick-status:empty { display:none; }
+  .hero2-checks { margin-top:22px; }
+  .view > ul.feats { position:relative; z-index:2; margin-top:-64px; }
+
+  .hero2 .hero2-art { height:auto; max-width:none; padding:24px 0 40px; }
+  .mk-win { position:relative; z-index:1; margin-left:6%; border-radius:18px; overflow:hidden; background:#fff; color:#0b2463; box-shadow:0 40px 80px -30px rgba(0,0,0,.6); transform:perspective(1300px) rotateY(-7deg) rotateX(2deg); }
+  .mk-bar { display:flex; align-items:center; gap:6px; padding:10px 14px; background:#eef2fb; border-bottom:1px solid #dbe3f4; }
+  .mk-bar i { width:9px; height:9px; border-radius:50%; background:#cbd5e1; }
+  .mk-bar i:first-child { background:#fbbf24; }
+  .mk-bar span { margin-left:auto; font-size:.72rem; color:#475569; }
+  .mk-body { display:grid; gap:14px; padding:18px; }
+  .mk-top { display:flex; align-items:center; gap:16px; }
+  .mk-gauge { position:relative; flex:none; width:96px; height:96px; border-radius:50%; display:grid; place-content:center; text-align:center; background:conic-gradient(#dc2626 calc(var(--score) * 1%), #fee2e2 0); }
+  .mk-gauge::before { content:""; position:absolute; inset:10px; border-radius:50%; background:#fff; }
+  .mk-gauge b, .mk-gauge span { position:relative; line-height:1.15; }
+  .mk-gauge b { font-size:1.3rem; }
+  .mk-gauge span { font-size:.64rem; color:#475569; }
+  .mk-sum { flex:1; display:grid; gap:8px; }
+  .mk-tag { justify-self:start; padding:2px 10px; border-radius:999px; background:#fee2e2; color:#b91c1c; font-size:.72rem; font-weight:700; }
+  .mk-kpis { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:6px; }
+  .mk-k { display:flex; flex-direction:column; align-items:center; padding:6px 4px; border-radius:10px; font-size:.7rem; font-weight:600; }
+  .mk-k b { font-size:1.15rem; line-height:1.2; }
+  .mk-k.bad { background:#fee2e2; color:#b91c1c; } .mk-k.warn { background:#fef3c7; color:#92400e; } .mk-k.good { background:#dcfce7; color:#166534; }
+  .mk-bars p { margin:0; display:grid; grid-template-columns:4.4em minmax(0, 1fr) 2.6em; gap:8px; align-items:center; font-size:.7rem; line-height:1.9; color:#334155; }
+  .mk-bars i { display:block; height:6px; border-radius:3px; background:#e2e8f0; overflow:hidden; }
+  .mk-bars em { display:block; height:100%; border-radius:3px; background:#1d4ed8; }
+  .mk-bars b { text-align:right; color:#0b2463; }
+  .mk-rows { display:grid; gap:6px; padding-top:12px; border-top:1px solid #e2e8f0; }
+  .mk-rows p { margin:0; display:flex; align-items:center; gap:8px; font-size:.74rem; font-weight:600; color:#0b2463; }
+  .mk-rows code { margin-left:auto; padding:1px 6px; border-radius:6px; background:#f1f5f9; color:#334155; font-size:.66rem; }
+  .mk-sev { padding:1px 8px; border-radius:999px; font-size:.64rem; font-weight:700; }
+  .mk-sev.bad { background:#fee2e2; color:#b91c1c; } .mk-sev.warn { background:#fef3c7; color:#92400e; }
+  .mk-float { position:absolute; z-index:2; border-radius:14px; box-shadow:0 24px 48px -20px rgba(0,0,0,.6); }
+  .mk-fix { right:-4%; bottom:-6px; width:min(280px, 64%); padding:12px 14px; background:#0b1020; color:#e2e8f0; font-family:var(--f-mono); font-size:.7rem; }
+  .mk-fix p { margin:0; padding:2px 8px; border-radius:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .mk-fix .mk-fix-h { padding:0 0 6px; font-family:var(--f-body); font-weight:700; color:#c7d2fe; }
+  .mk-del { background:rgba(248,113,113,.18); color:#fecaca; }
+  .mk-fix .mk-add { margin-top:3px; background:rgba(74,222,128,.16); color:#dcfce7; }
+  .mk-chip { left:-2%; top:4px; display:flex; align-items:center; gap:10px; padding:10px 14px; background:#fff; color:#0b2463; font-size:.78rem; }
+  .mk-chip small { display:block; font-size:.66rem; font-weight:600; color:#166534; }
+  .mk-aa { width:34px; height:34px; border-radius:10px; display:grid; place-items:center; background:#0b2463; color:#fbbf24; font-weight:700; }
+  @media (prefers-reduced-motion: no-preference) {
+    .mk-float { animation:float 6s ease-in-out infinite; }
+    .mk-chip { animation-delay:-3s; }
+  }
+  @media (max-width:1100px) {
+    .hero2-in { grid-template-columns:minmax(0, 1fr); gap:28px; }
+    .hero2 .hero2-art { max-width:600px; }
+    .mk-win { margin-left:0; transform:none; }
+  }
+  @media (max-width:560px) {
+    .hero-check { padding:12px; }
+    .hero-check .quick-form { flex-wrap:wrap; border-radius:var(--r-md); padding:8px; }
+    .hero-check .quick-form .btn-y { width:100%; justify-content:center; }
+    .mk-chip { display:none; }
+    .mk-fix { right:2%; bottom:0; width:78%; }
+    .mk-body { padding:14px; }
+    .mk-gauge { width:80px; height:80px; }
+  }
+
+  /* ---------- หน้าผลแบบระบบจริง: การ์ดคะแนน รายการปัญหา ตัวอย่างโค้ดหลังแก้ ---------- */
+  #results-body .score { grid-template-columns:minmax(0, 1.1fr) minmax(0, 1fr); grid-template-areas:"card kpis" "sev crit" "src src"; gap:16px; align-items:stretch; }
+  .score-card { grid-area:card; display:flex; flex-direction:column; justify-content:center; gap:16px; padding:22px; border-radius:var(--r-md); background:var(--paper-2); }
+  #results-body .score > .kpis { grid-area:kpis; grid-template-columns:repeat(2, minmax(0, 1fr)) !important; margin:0; align-content:stretch; }
+  #results-body .score > .kpis .kpi { height:100%; }
+  .score-card .scale-wrap { align-self:stretch; width:100%; }
+  #results-body .score > .sev-strip { grid-area:sev; grid-column:auto; margin:0; display:flex; flex-direction:column; justify-content:center; }
+  #results-body .score > .crit-bars { grid-area:crit; grid-column:auto; margin:0; }
+  #results-body .score > .score-src { grid-area:src; margin:0; }
+  #results-body .crit-bars li { grid-template-columns:minmax(0, 1fr) auto; }
+  #results-body .crit-bars .cb-bar { grid-column:1 / -1; grid-row:2; }
+  @media (max-width:900px) {
+    #results-body .score { grid-template-columns:minmax(0, 1fr); grid-template-areas:"card" "kpis" "sev" "crit" "src"; }
+  }
+
+  .issue-list { margin:28px 0 8px; }
+  .il-head { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px 16px; }
+  .il-head h2 { margin:0; }
+  .il-filter { display:flex; flex-wrap:wrap; gap:6px; }
+  .il-chip { display:inline-flex; align-items:center; gap:6px; min-height:36px; padding:0 14px; border-radius:var(--r-pill); border:0; background:var(--paper-3); color:var(--ink); font:inherit; font-size:.88rem; font-weight:600; cursor:pointer; }
+  .il-chip b { font-variant-numeric:tabular-nums; }
+  .il-chip:hover { background:var(--p1); }
+  .il-chip[aria-pressed="true"] { background:var(--navy); color:#fff; }
+  .il-chip::before { content:""; width:8px; height:8px; border-radius:50%; background:currentColor; opacity:.35; }
+  .il-chip.f-critical::before { background:var(--bad); opacity:1; }
+  .il-chip.f-should_fix::before { background:var(--warn); opacity:1; }
+  .il-chip.f-advisory::before { background:var(--ok); opacity:1; }
+  .il-chip.f-review::before { background:transparent; box-shadow:inset 0 0 0 2px var(--warn); opacity:1; }
+  .il-count { margin:10px 0 8px; font-size:.86rem; color:var(--ink-2); }
+  .il-table { width:100%; border-collapse:separate; border-spacing:0; }
+  .il-table th { font-size:.82rem; color:var(--ink-2); font-weight:600; text-align:left; padding:8px 12px; border-bottom:1px solid var(--rule); }
+  .il-table td { padding:12px; border-bottom:1px solid var(--rule); vertical-align:middle; font-size:.92rem; }
+  .il-table tbody tr:hover td { background:var(--paper-2); }
+  .il-table code { font-size:.8rem; padding:2px 6px; border-radius:6px; background:var(--paper-2); word-break:break-all; }
+  .il-go { font-weight:700; white-space:nowrap; }
+  .sev.review { background:transparent; color:var(--warn); box-shadow:inset 0 0 0 1.5px var(--warn); }
+  @media (max-width:640px) {
+    .il-table thead { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+    .il-table, .il-table tbody, .il-table tr, .il-table td { display:block; }
+    .il-table tr { padding:12px 4px; border-bottom:1px solid var(--rule); }
+    .il-table td { border:0; padding:3px 0; }
+  }
+
+  .fix-how { margin:0 0 12px; font-size:.95rem; }
+  .fix-how b { color:var(--good); margin-right:6px; }
+  .fixprev { margin:0 0 12px; border-radius:var(--r-md); background:#0b1020; color:#e2e8f0; overflow:hidden; }
+  .fp-head { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; padding:10px 12px 10px 16px; background:#141b33; }
+  .fp-head .code-cap { margin:0 auto 0 0; color:#c7d2fe; font-weight:700; font-size:.88rem; }
+  .fp-head .copy-fix { background:#24305a; color:#fff; }
+  .fp-head .copy-fix:hover { background:#2f3d70; }
+  .copy-status { font-size:.82rem; color:#86efac; min-height:1em; }
+  pre.diff { margin:0; padding:12px 0; font-family:var(--f-mono); font-size:.84rem; line-height:1.75; white-space:pre-wrap; word-break:break-all; overflow-x:auto; }
+  pre.diff code { background:none; padding:0; color:inherit; font:inherit; }
+  .d-del, .d-add { display:block; padding:0 16px 0 12px; border-left:3px solid transparent; }
+  .d-del { background:rgba(248,113,113,.14); border-left-color:#f87171; color:#fecaca; }
+  .d-add { background:rgba(74,222,128,.13); border-left-color:#4ade80; color:#dcfce7; }
+  .d-sign { display:inline-block; width:1.4em; font-weight:700; }
+  .fp-note { margin:0; padding:10px 16px 12px; font-size:.84rem; color:#cbd5e1; border-top:1px solid rgba(255,255,255,.08); }
+
   /* ---------- อินโฟกราฟิกเวกเตอร์ (วาดเองด้วย SVG/CSS จากข้อมูลจริงของโครงงาน) ----------
    * ภาพและแถบทั้งหมดเป็นภาพตกแต่ง (aria-hidden) ตัวเลขทุกตัวอยู่ในข้อความข้าง ๆ ให้โปรแกรมอ่านหน้าจออ่านได้ครบ */
 
@@ -1431,6 +1577,47 @@
   @keyframes view-in-fwd { from { opacity:0; transform:translateX(28px); } }
   @keyframes view-in-back { from { opacity:0; transform:translateX(-28px); } }
 
+  /* ---------- Design System: ชั้นปรับให้เป็นชุดเดียวกัน (อยู่ท้ายสุด จึงมีผลเหนือชั้นก่อนหน้า) ----------
+   * ปุ่มมี 4 แบบ สูงเท่ากัน 44 px (ขนาดเล็ก 36 px) มุมเต็มวง ตัวหนา 700
+   *   หลัก       น้ำเงินทึบ #1d4ed8 ตัวขาว     ตรวจสอบโค้ด บันทึกผล ไปขั้นถัดไป
+   *   เน้น       เหลือง #fbbf24 ตัวน้ำเงินเข้ม  เริ่มตรวจ ตรวจสอบเว็บไซต์ ลองรายงานตัวอย่าง (ใช้เท่าที่จำเป็น)
+   *   รอง        พื้นฟ้าอ่อน ตัวน้ำเงิน          ส่งออก PDF ตรวจอีกครั้ง ทดสอบการเชื่อมต่อ ตัวอย่างโค้ด
+   *   บนพื้นเข้ม  เส้นขอบขาว
+   * มุมโค้ง: การ์ด 24 · แผงในการ์ด 16 · รายการย่อย ช่องกรอก กล่องโค้ด 12 · ปุ่มและชิป เต็มวง
+   * หัวข้อส่วนในหน้าแรกขนาดเดียวกันทุกส่วน */
+  button, .btn-link, .btn-ghost, .btn-blue, .btn-y, .btn-o, .nav-cta, .res-actions a {
+    display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:var(--btn-h); padding:0 22px;
+    border:0; border-radius:var(--r-pill); font-family:var(--f-head); font-size:1rem; font-weight:700; line-height:1.3;
+    text-decoration:none; cursor:pointer; transition:background-color .15s, box-shadow .15s, transform .15s; }
+  button, button.primary, .btn-link, .btn-blue { background:var(--blue); color:#fff; box-shadow:0 10px 22px -14px rgba(29,78,216,.9); }
+  button.primary, button.secondary { min-height:var(--btn-h); padding:0 22px; font-size:1rem; }
+  button.small { min-height:var(--btn-h-sm); padding:0 14px; font-size:.88rem; }
+  button:hover, button.primary:hover, .btn-link:hover, .btn-blue:hover { background:#1e40af; filter:none; }
+  button.secondary, .btn-ghost, .res-actions .btn-ghost { background:var(--p1); color:var(--link); box-shadow:none; }
+  button.secondary:hover, .btn-ghost:hover { background:var(--p1); box-shadow:inset 0 0 0 2px var(--link); }
+  .btn-y, .nav-cta { background:var(--yellow); color:#0b2463; box-shadow:0 10px 22px -12px rgba(245,158,11,.9); }
+  .btn-y:hover, .nav-cta:hover { background:#fcd34d; }
+  .btn-o { background:transparent; color:#fff; box-shadow:inset 0 0 0 2px rgba(255,255,255,.85); }
+  .btn-o:hover { background:rgba(255,255,255,.1); }
+  button.small, .hc-opt, .il-chip { min-height:var(--btn-h-sm); padding:0 14px; font-size:.88rem; }
+  .il-chip { font-weight:600; background:var(--paper-3); color:var(--ink); box-shadow:none; }
+  .il-chip:hover { background:var(--p1); }
+  .il-chip[aria-pressed="true"] { background:var(--navy); color:#fff; }
+  .fp-head .copy-fix { background:#24305a; color:#fff; box-shadow:none; }
+  .fp-head .copy-fix:hover { background:#2f3d70; }
+  .nav-cta { min-height:42px; }
+  @media (prefers-reduced-motion: no-preference) { .btn-y:hover, .btn-blue:hover, .btn-link:hover, button.primary:hover { transform:translateY(-1px); } }
+
+  .issue, #checklist-container .q, .chk-side, .part, .cap-vis, .kpi, .sev-strip, .crit-bars, .score-card, .flow-vis { border-radius:var(--r-md); }
+  .code-col, .si-rows li, .answers label, .fixprev, .tip, .rule-list li, .res-legend li, textarea, details, .faq details, .note,
+  input[type="url"]:not(#quick-url), input[type="text"] { border-radius:var(--r-sm); }
+  .lv-table, .view > section, .cap, .who-card, .faq, .sc-map, .si-step, .pour-card, .rp-card, .feats { border-radius:var(--r-lg); }
+  .view > section.how, .view > section.report2, .view > section.who-faq, .view > section.caps, .view > section.score-info { border-radius:0; }
+
+  .view > .sec-h2, .caps > h2, .how-text h2, .rp-text h2, .who-faq .who h2, .score-info > .sec-h2 {
+    font-size:clamp(1.5rem, 1.2rem + 1vw, 2rem); line-height:1.3; letter-spacing:-.01em; }
+  .view > .sec-h2 { margin:0 0 18px; }
+
   /* ---------- การพิมพ์รายงาน ---------- */
   @media print {
     .caps, .score-info { display:none !important; }
@@ -1511,69 +1698,64 @@
       <p class="hero2-sub">ให้หน้าเว็บของคุณใช้งานได้สำหรับทุกคน</p>
       <p class="hero2-lead">เครื่องมือประเมินและแนะนำการปรับปรุงเว็บไซต์เพื่อผู้พิการ แบบกึ่งอัตโนมัติ
         วางโค้ด HTML หรือระบุลิงก์ แล้วรู้ว่าหน้าเว็บผิดที่ส่วนไหน ผิดมาตรฐานข้อใด และควรแก้อย่างไร</p>
+      <div class="hero-check" id="h-quick">
+        <form class="quick-form" id="quick-form" novalidate aria-label="ตรวจสอบเว็บไซต์จากลิงก์">
+          <label class="sr-only" for="quick-url">ลิงก์เว็บไซต์ที่ต้องการตรวจ</label>
+          <span class="qi" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+          <input type="url" id="quick-url" placeholder="https://" autocomplete="url">
+          <button type="submit" class="btn-y"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>ตรวจสอบเว็บไซต์</button>
+        </form>
+        <div class="hc-alt">
+          <span class="hc-or">หรือ</span>
+          <label class="hc-opt" for="quick-file"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 18a4.5 4.5 0 0 1-.6-9A6 6 0 0 1 18 8.5a4 4 0 0 1-.5 9.5M12 12v8M8.8 14.8 12 11.6l3.2 3.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>อัปโหลดไฟล์ .html<input type="file" id="quick-file" class="sr-only" accept=".html,.htm,text/html"></label>
+          <a class="hc-opt" href="#input-section"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.5 7 3.5 12l5 5M15.5 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>วางโค้ด HTML</a>
+        </div>
+        <p class="hc-note">ไฟล์ .html หรือ .htm ไม่เกิน 2 MB อ่านในเบราว์เซอร์ของคุณ ไม่ส่งโค้ดไปเก็บที่ใด</p>
+        <p class="quick-status" id="quick-status" role="status" aria-live="polite"></p>
+      </div>
       <ul class="hero2-checks">
         <li><svg class="yc" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="10" fill="#fbbf24"/><path d="M5.8 10.2l2.7 2.7 5.7-5.8" fill="none" stroke="#0b2463" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>รู้ผลในไม่กี่วินาที</li>
         <li><svg class="yc" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="10" fill="#fbbf24"/><path d="M5.8 10.2l2.7 2.7 5.7-5.8" fill="none" stroke="#0b2463" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>อ้างอิงมาตรฐานสากล WCAG 2.1</li>
         <li><svg class="yc" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="10" fill="#fbbf24"/><path d="M5.8 10.2l2.7 2.7 5.7-5.8" fill="none" stroke="#0b2463" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>พร้อมตัวอย่างโค้ดที่ถูกต้อง</li>
       </ul>
-      <p class="hero2-cta">
-        <a class="btn-y" href="#input-section"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M6 4l10 6-10 6z" fill="currentColor"/></svg>เริ่มตรวจสอบเลย</a>
-        <a class="btn-o" href="#standards-section"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 5.5C6.5 4 9.5 4 12 6c2.5-2 5.5-2 8-.5v13c-2.5-1.5-5.5-1.5-8 .5-2.5-2-5.5-2-8-.5z M12 6v13.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>มาตรฐานที่ตรวจหมายถึงอะไร</a>
-      </p>
+
+
     </div>
     <div class="hero2-art" aria-hidden="true">
-      <div class="laptop">
-        <div class="lt-screen">
-          <div class="lt-bar"><i></i><i></i><i></i><span></span></div>
-          <div class="lt-body lt-dash">
-            <div class="ld-head"><b>ผลการประเมิน</b><span>ตัวอย่างบทที่ 3.7.2</span></div>
-            <div class="ld-row">
-              <div class="ld-gauge" style="--score:57.62"><b>57.62</b><span>/100</span></div>
-              <div class="ld-kpis">
-                <span class="ld-k k-bad"><b>5</b>ผิด</span>
-                <span class="ld-k k-warn"><b>1</b>รอตรวจ</span>
-                <span class="ld-k k-good"><b>7</b>ผ่าน</span>
-              </div>
-            </div>
-            <div class="ld-bars">
-              <p><span>SC 1.1.1</span><i><em style="width:50%"></em></i><b>50%</b></p>
-              <p><span>SC 1.3.1</span><i><em style="width:60%"></em></i><b>60%</b></p>
-              <p><span>SC 1.4.3</span><i><em style="width:66.7%"></em></i><b>67%</b></p>
+      <div class="mk-win">
+        <div class="mk-bar"><i></i><i></i><i></i><span>ผลการประเมิน · ตัวอย่างบทที่ 3.7.2</span></div>
+        <div class="mk-body">
+          <div class="mk-top">
+            <div class="mk-gauge" style="--score:57.62"><b>57.62</b><span>จาก 100</span></div>
+            <div class="mk-sum">
+              <span class="mk-tag">ต้องปรับปรุง</span>
+              <div class="mk-kpis"><span class="mk-k bad"><b>5</b>ผิด</span><span class="mk-k warn"><b>1</b>รอตรวจ</span><span class="mk-k good"><b>7</b>ผ่าน</span></div>
             </div>
           </div>
+          <div class="mk-bars">
+            <p><span>SC 1.1.1</span><i><em style="width:50%"></em></i><b>50%</b></p>
+            <p><span>SC 1.3.1</span><i><em style="width:60%"></em></i><b>60%</b></p>
+            <p><span>SC 1.4.3</span><i><em style="width:66.7%"></em></i><b>67%</b></p>
+          </div>
+          <div class="mk-rows">
+            <p><span class="mk-sev bad">วิกฤต</span>ภาพไม่มี alt<code>&lt;img&gt;</code></p>
+            <p><span class="mk-sev warn">ควรแก้</span>หัวข้อข้ามระดับ<code>&lt;h3&gt;</code></p>
+            <p><span class="mk-sev bad">วิกฤต</span>ช่องกรอกไม่มีป้ายกำกับ<code>&lt;input&gt;</code></p>
+          </div>
         </div>
-        <div class="lt-base"></div>
       </div>
-      <span class="ring"></span>
-      <span class="glass g1" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span>
-      <span class="glass g2" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" fill="currentColor"/></svg></span>
-      <span class="glass g3" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="2.5" y="6.5" width="19" height="11" rx="2"/><path d="M6 10h.01M9 10h.01M12 10h.01M15 10h.01M18 10h.01M7 14h10"/></svg></span>
-      <span class="glass g4" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M4 18l4.5-12h1L14 18M5.6 14h7.3"/><path d="M15.5 12.2c.8-.9 1.7-1.2 2.8-1.2 1.6 0 2.7.9 2.7 2.6V18M21 15.5c-1.3-.4-2.8-.4-3.9.1-1.3.6-1.4 2.3.1 2.5 1.2.2 2.8-.3 3.8-1.4"/></svg></span>
+      <div class="mk-float mk-fix">
+        <p class="mk-fix-h">R-ALT-01 · โค้ดหลังแก้</p>
+        <p class="mk-del">− &lt;img src="book1.jpg"&gt;</p>
+        <p class="mk-add">+ &lt;img src="book1.jpg" alt="…"&gt;</p>
+      </div>
+      <div class="mk-float mk-chip">
+        <span class="mk-aa">Aa</span>
+        <span><b>1.61 : 1</b> → <b>4.54 : 1</b><small>สีตัวอักษรผ่านเกณฑ์ 4.5 : 1</small></span>
+      </div>
     </div>
   </div>
 </header>
-
-<section class="quick" aria-labelledby="h-quick">
-  <div class="quick-head">
-    <h2 id="h-quick">ตรวจสอบเว็บไซต์ของคุณ</h2>
-    <p>ระบุลิงก์ของหน้าเว็บ หรืออัปโหลดไฟล์ HTML แล้วระบบจะวิเคราะห์ให้ทันที</p>
-  </div>
-  <div class="quick-body">
-    <form class="quick-form" id="quick-form" novalidate>
-      <label class="sr-only" for="quick-url">ลิงก์เว็บไซต์ที่ต้องการตรวจ</label>
-      <span class="qi" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
-      <input type="url" id="quick-url" placeholder="https://" autocomplete="url">
-      <button type="submit" class="btn-blue"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>ตรวจสอบเว็บไซต์</button>
-    </form>
-    <p class="quick-or"><span>หรือ</span></p>
-    <label class="quick-drop" for="quick-file">
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 18a4.5 4.5 0 0 1-.6-9A6 6 0 0 1 18 8.5a4 4 0 0 1-.5 9.5M12 12v8M8.8 14.8 12 11.6l3.2 3.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span><b>อัปโหลดไฟล์ HTML เพื่อตรวจสอบ</b><small>รองรับไฟล์ .html และ .htm ไม่เกิน 2 MB อ่านในเบราว์เซอร์ของคุณ ไม่ส่งไฟล์ไปที่ใด</small></span>
-      <input type="file" id="quick-file" class="sr-only" accept=".html,.htm,text/html">
-    </label>
-    <p class="quick-status" id="quick-status" role="status" aria-live="polite"></p>
-  </div>
-</section>
 
 <ul class="feats">
   <li><span class="fi fi-1" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 2.5l8 3.2v5.6c0 5-3.4 9.1-8 10.7-4.6-1.6-8-5.7-8-10.7V5.7z" fill="currentColor"/><path d="M8.4 12.2l2.5 2.5 4.8-5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>มาตรฐาน WCAG 2.1</b><small>ระดับ A และ AA</small></li>
