@@ -563,11 +563,11 @@
 
   /* หัวเรื่องหลักของแต่ละหน้าเป็น h1 หัวข้อย่อยในผลการประเมินเลื่อนลงหนึ่งระดับ */
   .view .sec-head h1, #results-empty h1 { font-size:1.3rem; line-height:1.4; margin:0; font-weight:700; }
-  #results-body h2, .std-card h2 { font-size:1.08rem; line-height:1.45; margin:32px 0 10px; font-weight:700; scroll-margin-top:16px; }
+  #results-body h2, .std-card h3 { font-size:1.08rem; line-height:1.45; margin:32px 0 10px; font-weight:700; scroll-margin-top:16px; }
   #results-body h3 { font-size:1rem; line-height:1.45; margin:24px 0 8px; font-weight:600; scroll-margin-top:16px; }
   .dash h2 { margin-top:32px; }
-  .std-card h2 { margin:0; font-size:1.15rem; line-height:1.4; }
-  .std-card h2 .en { display:block; font-size:.88rem; font-weight:400; color:var(--ink-2); }
+  .std-card h3 { margin:0; font-size:1.15rem; line-height:1.4; }
+  .std-card h3 .en { display:block; font-size:.88rem; font-weight:400; color:var(--ink-2); }
   h4.issue-msg { margin:0 0 14px; font-size:1.02rem; line-height:1.6; font-weight:600; }
 
 
@@ -1618,6 +1618,249 @@
     font-size:clamp(1.5rem, 1.2rem + 1vw, 2rem); line-height:1.3; letter-spacing:-.01em; }
   .view > .sec-h2 { margin:0 0 18px; }
 
+  /* ================= รอบข้อเสนอแนะผู้ประเมิน (4 พ.ย. 2569) =================
+     สถานะเป็นกล่องสีทึบ · แถบเกณฑ์คะแนนด้านบน · ความครอบคลุมของคะแนน · ตรวจซ้ำหลังแก้ · เลขบรรทัดของจุดที่ผิด */
+  :root { --st-good:#15803d; --st-bad:#b91c1c; --st-warn:#b45309; --st-none:#5b6474; --st-ink:#ffffff; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --st-good:#6fd39a; --st-bad:#ff8a80; --st-warn:#f0bf66; --st-none:#a3adbd; --st-ink:#0a1226; } }
+  :root[data-theme="dark"] { --st-good:#6fd39a; --st-bad:#ff8a80; --st-warn:#f0bf66; --st-none:#a3adbd; --st-ink:#0a1226; }
+
+  .badge.good, .badge.bad, .badge.warn, .part .badge.none, .cp-list .badge.none {
+    display:inline-flex; align-items:center; gap:5px; padding:2px 10px 2px 7px; border-radius:6px;
+    color:var(--st-ink); font-weight:700; font-size:.82rem; line-height:1.45; }
+  .badge.good { background:var(--st-good); }
+  .badge.bad  { background:var(--st-bad); }
+  .badge.warn { background:var(--st-warn); }
+  .part .badge.none, .cp-list .badge.none { background:var(--st-none); }
+  .badge.good::before, .badge.bad::before, .badge.warn::before, .part .badge.none::before, .cp-list .badge.none::before {
+    content:""; width:13px; height:13px; flex:none; background:currentColor;
+    -webkit-mask:var(--st-ico) center/contain no-repeat; mask:var(--st-ico) center/contain no-repeat; }
+  .badge.good { --st-ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 12.5l5 5L20 6.5' fill='none' stroke='%23000' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+  .badge.bad  { --st-ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6 6 18' fill='none' stroke='%23000' stroke-width='3.4' stroke-linecap='round'/%3E%3C/svg%3E"); }
+  .badge.warn { --st-ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 4v10' fill='none' stroke='%23000' stroke-width='3.4' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='19.5' r='2.2'/%3E%3C/svg%3E"); }
+  .part .badge.none, .cp-list .badge.none { --st-ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12h14' fill='none' stroke='%23000' stroke-width='3.4' stroke-linecap='round'/%3E%3C/svg%3E"); }
+
+  /* แถบเกณฑ์แปลผลคะแนน */
+  .bands { margin:0 0 var(--s-5); }
+  .bands-cap { margin:0 0 var(--s-2); font-size:.86rem; font-weight:700; color:var(--ink-2); }
+  .bands-row { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:6px; }
+  .bd { position:relative; display:flex; flex-direction:column; gap:2px; padding:12px 14px; border-radius:var(--r-sm); border:2px solid transparent; }
+  .bd b { font-size:1rem; line-height:1.3; }
+  .bd span { font-size:.82rem; }
+  .bd-bad  { background:var(--bad-bg);  color:var(--bad); }
+  .bd-warn { background:var(--warn-bg); color:var(--warn); }
+  .bd-ok   { background:var(--ok-bg);   color:var(--ok); }
+  .bd-good { background:var(--good-bg); color:var(--good); }
+  .bd.on { color:var(--st-ink); box-shadow:var(--sh-1); }
+  .bd-bad.on  { background:var(--st-bad); }
+  .bd-warn.on { background:var(--st-warn); }
+  .bd-ok.on   { background:var(--blue, #1d4ed8); }
+  .bd-good.on { background:var(--st-good); }
+  .bd em { margin-top:4px; font-style:normal; font-weight:700; font-size:.86rem; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .bd-ok.on { background:#8db9ff; } }
+  :root[data-theme="dark"] .bd-ok.on { background:#8db9ff; }
+  @media (max-width:640px) { .bands-row { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+
+  .score-cov { justify-self:start; margin:10px 0 0; padding:3px 10px; border-radius:6px; font-size:.86rem; font-weight:700; }
+  .score-cov.part { color:var(--warn); background:var(--warn-bg); border:1px solid var(--warn-line); }
+  .score-cov.full { color:var(--good); background:var(--good-bg); border:1px solid var(--good-line); }
+  #results-body .covpanel h2, #results-body .recheck h2, #results-body .cmp h2 { margin-top:0; }
+
+  /* ความครอบคลุมของคะแนน */
+  .covpanel { margin:var(--s-5) 0; padding:var(--s-5); border-radius:var(--r-md); border:2px solid var(--warn-line); background:var(--warn-bg); }
+  .covpanel.cov-full { border-color:var(--good-line); background:var(--good-bg); }
+  .covpanel h2 { margin:0 0 6px; font-size:1.15rem; }
+  .cp-lead { margin:0 0 var(--s-4); }
+  .cp-list { list-style:none; margin:0; padding:0; display:grid; gap:8px; }
+  .cp-list li { display:grid; grid-template-columns:auto minmax(0, 1fr); column-gap:12px; row-gap:2px; align-items:center;
+    padding:10px 14px; border-radius:var(--r-sm); background:var(--page); }
+  .cp-list .badge { grid-row:1 / span 2; justify-self:start; min-width:96px; justify-content:center; }
+  .cp-name small { color:var(--ink-2); font-weight:400; }
+  .cp-text { font-size:.88rem; color:var(--ink-2); }
+  @media (max-width:560px) { .cp-list li { grid-template-columns:minmax(0, 1fr); } .cp-list .badge { grid-row:auto; } }
+
+  /* แก้แล้วตรวจซ้ำ */
+  .recheck { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--s-4); margin:var(--s-5) 0;
+    padding:var(--s-5); border-radius:var(--r-md); background:var(--p1); }
+  .recheck h2 { margin:0 0 4px; font-size:1.15rem; }
+  .recheck p { margin:0; }
+  .rc-text { flex:1 1 360px; }
+  .rc-act { display:flex; flex-wrap:wrap; gap:8px; }
+  .cmp { margin:0 0 var(--s-5); padding:var(--s-5); border-radius:var(--r-md); border:2px solid var(--good-line); background:var(--good-bg); }
+  .cmp h2 { margin:0 0 var(--s-3); font-size:1.15rem; }
+  .cmp-grid { display:flex; flex-wrap:wrap; align-items:center; gap:var(--s-5); }
+  .cmp-score { display:flex; align-items:baseline; gap:10px; margin:0; font-variant-numeric:tabular-nums; }
+  .cmp-cap { font-weight:700; color:var(--ink-2); }
+  .cmp-score b { font-size:1.6rem; }
+  .cmp-score b.new { font-size:2rem; }
+  .cmp-arrow { font-size:1.4rem; color:var(--ink-2); }
+  .cmp-score em { font-style:normal; font-weight:700; padding:0 8px; border-radius:6px; }
+  .cmp-score em.up { color:var(--st-ink); background:var(--st-good); }
+  .cmp-score em.down { color:var(--st-ink); background:var(--st-bad); }
+  .cmp-k { list-style:none; display:flex; flex-wrap:wrap; gap:8px; margin:0; padding:0; }
+  .cmp-k li { padding:6px 12px; border-radius:var(--r-sm); background:var(--page); }
+  .cmp-k b { font-size:1.15rem; }
+  .cmp-k .k-good b { color:var(--good); }
+  .cmp-k .k-bad b { color:var(--bad); }
+  .cmp-list { list-style:none; margin:var(--s-4) 0 0; padding:0; display:grid; gap:6px; }
+  .cmp-list li { display:flex; flex-wrap:wrap; align-items:center; gap:6px; font-size:.9rem; }
+  .cmp-list code { font-size:.8rem; word-break:break-all; }
+  .cmp-note { margin:var(--s-4) 0 0; font-size:.9rem; }
+  .cmp-note button { margin-left:6px; }
+
+  /* การ์ดจุดที่ผิด: ลำดับ เหตุผล ตำแหน่ง และผลหลังแก้ */
+  .iss-no { font-weight:700; color:var(--ink); }
+  .iss-why { display:grid; gap:4px; margin:4px 0 12px; }
+  .iss-why > div { display:grid; grid-template-columns:7.5em minmax(0, 1fr); gap:8px; }
+  .iss-why dt { font-weight:700; color:var(--ink-2); }
+  .iss-why dd { margin:0; }
+  @media (max-width:560px) { .iss-why > div { grid-template-columns:minmax(0, 1fr); gap:0; } }
+  .where-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin:0 0 12px; }
+  .where-line { display:inline-flex; align-items:center; gap:6px; margin:0; font-weight:600; }
+  .where-line b { margin:0 4px; padding:0 8px; border-radius:6px; background:var(--p1); color:var(--link); }
+  .where-line svg { width:18px; height:18px; fill:none; stroke:var(--link); stroke-width:2; }
+  .where-row .where { flex-basis:100%; font-size:.78rem; }
+  .where-row .where span { font-family:var(--f-body, inherit); }
+  .ctx { flex-basis:100%; }
+  .ctx-code { margin:0; padding:10px 0; border-radius:var(--r-sm); background:#0b1020; color:#e2e8f0; overflow-x:auto; font-size:.82rem; line-height:1.6; }
+  .ctx-code code { display:block; min-width:max-content; }
+  .ctx-code .cl { display:block; padding:0 14px 0 0; white-space:pre; }
+  .ctx-code .cl-n { display:inline-block; width:4.5em; padding-right:12px; text-align:right; color:#94a3b8; user-select:none; }
+  .ctx-code .cl.hit { background:rgba(248,113,113,.22); box-shadow:inset 4px 0 0 #f87171; }
+  .ctx-code .cl.hit .cl-n { color:#fecaca; font-weight:700; }
+  .fp-verify { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px; margin:0; padding:10px 16px 12px; font-size:.88rem;
+    border-top:1px solid rgba(255,255,255,.08); color:#e2e8f0; }
+  .fp-verify b { flex:none; padding:0 8px; border-radius:6px; background:#334155; color:#fff; }
+  .fp-verify[data-state="pass"] b { background:#15803d; }
+  .fp-verify[data-state="partial"] b, .fp-verify[data-state="review"] b { background:#b45309; }
+  .fp-verify[data-state="fail"] b { background:#b91c1c; }
+  .fp-verify strong { color:#86efac; }
+  .issue > .fp-verify { margin:0 0 12px; border:0; border-radius:var(--r-sm); background:var(--warn-bg); color:var(--ink); }
+  .issue:target, .issue:focus { outline:3px solid var(--link); outline-offset:3px; }
+  @media (prefers-reduced-motion:no-preference) { .issue:target { animation:iss-flash 1.6s ease-out 1; } }
+  @keyframes iss-flash { 0% { box-shadow:0 0 0 10px color-mix(in srgb, var(--link) 35%, transparent); } 100% { box-shadow:0 0 0 0 transparent; } }
+
+  /* ลิงก์ไปยังจุดที่ผิด: ทำเป็นปุ่มทรงแคปซูลให้รู้ว่ากดได้และพาเลื่อนลงไป */
+  a.part .part-go { align-self:flex-start; display:inline-flex; align-items:center; gap:6px; margin-top:auto; padding:6px 14px;
+    border-radius:var(--r-pill); background:var(--blue, #1d4ed8); color:#fff; text-decoration:none; font-weight:700; }
+  a.part:hover .part-go, a.part:focus-visible .part-go { background:var(--link); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) a.part .part-go { background:#93b4ff; color:#0a1226; } }
+  :root[data-theme="dark"] a.part .part-go { background:#93b4ff; color:#0a1226; }
+  .il-st { white-space:nowrap; }
+  .il-st .sev { margin-left:4px; }
+
+  /* หน้าแรกแบ่งเป็นแถบเต็มความกว้างสลับสี มีเลขส่วนกำกับ ให้แยกได้ทันทีว่าส่วนไหนคือเรื่องอะไร
+     แถบ a = พื้นขาว การ์ดข้างในใช้พื้นเทาฟ้า · แถบ b = พื้นฟ้าอ่อน การ์ดข้างในใช้พื้นขาว */
+  .view[data-view="home"] > .band { --band:var(--page); position:relative; background:var(--band);
+    box-shadow:0 0 0 100vmax var(--band); clip-path:inset(0 -100vmax); border-radius:0; margin:0; padding:var(--s-8) 0; }
+  .view[data-view="home"] > .band-b { --band:var(--p1); }
+  .view[data-view="home"] > .band + .band { border-top:0; }
+  .view[data-view="home"] > ul.feats { margin-bottom:64px; }
+  .view[data-view="home"] > .band:last-child { margin-bottom:-48px; }
+  .eyebrow { display:inline-flex; align-items:center; gap:8px; margin:0 0 10px; font-size:.86rem; font-weight:700; color:var(--link); }
+  .eyebrow span { display:inline-grid; place-items:center; min-width:32px; height:24px; padding:0 8px; border-radius:var(--r-pill);
+    background:var(--blue, #1d4ed8); color:#fff; font-size:.78rem; letter-spacing:.04em; }
+  .band > .sec-h2, .why h2 { font-size:clamp(1.5rem, 1.2rem + 1vw, 2rem); line-height:1.3; letter-spacing:-.01em; margin:0 0 18px; }
+  .view > .how.band-a .flow a, .view > .how.band-a .flow li > div { background:var(--ground) !important; box-shadow:none; border:1px solid var(--rule); }
+  .view > .how.band-a .flow li:nth-child(2) > div { box-shadow:0 0 0 2px var(--blue) !important; border-color:transparent; }
+  .split-sec .t-split { background:var(--ground); }
+  .split-sec > .board-split { margin-bottom:0; }
+  .proof-sec > .board-proof { margin-bottom:16px; }
+  .proof-sec > .board-2 { background:none; border:0; padding:0; box-shadow:none; margin:0; }
+
+  /* ทำไมต้องตรวจ */
+  .why { display:grid; grid-template-columns:minmax(0, .85fr) minmax(0, 1.15fr); gap:var(--s-6); align-items:start; }
+  .why-lead { margin:0 0 var(--s-5); color:var(--ink-2); }
+  .why-stats { list-style:none; margin:0; padding:0; display:grid; gap:12px; }
+  .why-stats li { display:grid; gap:2px; padding:18px 22px; border-radius:var(--r-md); background:var(--navy, #0b2463); color:#fff; }
+  .why-stats b { font-size:clamp(1.8rem, 1.4rem + 1.4vw, 2.4rem); line-height:1.15; color:var(--yellow, #fbbf24); }
+  .why-stats span { color:#eef2ff; }
+  .why-stats small { margin-top:4px; color:#c7d2fe; font-size:.78rem; }
+  .why-table { padding:var(--s-5); border-radius:var(--r-lg); background:var(--ground); border:1px solid var(--rule); }
+  .why-table h3 { margin:0 0 12px; font-size:1.1rem; }
+  .hear { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+  .hear li { display:grid; grid-template-columns:6.5rem minmax(0, 1fr) minmax(0, 1fr); gap:10px; align-items:stretch; }
+  .hear-k { margin:0; display:flex; flex-direction:column; justify-content:center; gap:4px; font-weight:700; }
+  .hear-k .f-sc { margin:0; }
+  .hear-bad, .hear-good { display:flex; flex-direction:column; align-items:flex-start; gap:6px; padding:10px 12px; border-radius:var(--r-sm);
+    background:var(--page); border:1px solid var(--bad-line); }
+  .hear-good { border-color:var(--good-line); }
+  .hear code { font-size:.76rem; word-break:break-all; }
+  .hear q { quotes:none; font-size:.9rem; line-height:1.5; }
+  .hear-sw { width:132px; height:34px; }
+  .hear-note { margin:10px 0 0; font-size:.8rem; color:var(--ink-2); }
+  @media (max-width:1100px) { .why { grid-template-columns:minmax(0, 1fr); } }
+  @media (max-width:640px) {
+    .hear li { grid-template-columns:minmax(0, 1fr); }
+    .view[data-view="home"] > .band { padding:64px 0; }
+  }
+
+  .caps > .eyebrow, .who > .eyebrow { display:flex; width:max-content; margin-inline:auto; }
+
+  /* หน้ามาตรฐาน: สารบัญ + 7 ส่วนที่มีเลขกำกับ สลับพื้นให้แยกส่วนได้ชัด */
+  .std-toc { margin:0 0 var(--s-6); padding:var(--s-4) var(--s-5); border-radius:var(--r-md); background:var(--p1); }
+  .std-toc-h { margin:0 0 8px; font-weight:700; }
+  .std-toc ol { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:8px; }
+  .std-toc a { display:inline-flex; align-items:center; gap:8px; min-height:40px; padding:4px 14px 4px 6px; border-radius:var(--r-pill);
+    background:var(--page); color:var(--ink); font-weight:600; text-decoration:none; box-shadow:var(--sh-1); }
+  .std-toc a:hover { color:var(--link); }
+  .std-toc a span { display:inline-grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--blue, #1d4ed8); color:#fff; font-size:.82rem; }
+  .std-sec { margin:0 0 var(--s-5); padding:var(--s-6); border-radius:var(--r-lg); background:var(--page); border:1px solid var(--rule); scroll-margin-top:90px; }
+  .std-sec:nth-of-type(even) { background:var(--p1); border-color:transparent; }
+  .std-sec > h2 { margin:0 0 12px; font-size:clamp(1.35rem, 1.15rem + .8vw, 1.75rem); line-height:1.3; }
+  .std-sec > p { max-width:72ch; }
+  .std-2col { display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(0, 1fr); gap:var(--s-6); align-items:start; margin-bottom:var(--s-5); }
+  .std-2col p { margin:0 0 12px; }
+  .ver-line { list-style:none; display:flex; margin:16px 0 0; padding:0; gap:0; }
+  .ver-line li { flex:1; position:relative; padding:14px 8px 0; border-top:4px solid var(--rule); display:flex; flex-direction:column; gap:2px; }
+  .ver-line li::before { content:""; position:absolute; top:-10px; left:8px; width:16px; height:16px; border-radius:50%; background:var(--page); border:4px solid var(--control); }
+  .ver-line li.on { border-top-color:var(--blue, #1d4ed8); }
+  .ver-line li.on::before { border-color:var(--blue, #1d4ed8); background:var(--yellow, #fbbf24); }
+  .ver-line span { font-size:.84rem; color:var(--ink-2); }
+  .tree { margin:0; padding:var(--s-5); border-radius:var(--r-md); background:var(--navy, #0b2463); color:#fff; }
+  .tree figcaption { margin:0 0 12px; font-weight:700; color:#e0e7ff; }
+  .tree ol { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+  .tree li { position:relative; display:grid; grid-template-columns:9.5em minmax(0, 1fr); gap:10px; align-items:center; }
+  .tree li + li::before { content:""; position:absolute; left:1.1em; top:-12px; height:14px; border-left:2px dashed rgba(255,255,255,.45); }
+  .tree-k { font-weight:700; color:#fde68a; }
+  .tree-k small { display:block; font-weight:400; color:#c7d2fe; font-size:.78rem; }
+  .tree-v { padding:8px 12px; border-radius:var(--r-sm); background:rgba(255,255,255,.1); }
+  .rule4 { list-style:none; margin:var(--s-4) 0 0; padding:0; display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:var(--s-4); }
+  .r4 { display:flex; flex-direction:column; gap:10px; padding:var(--s-5); border-radius:var(--r-md); background:var(--page); box-shadow:var(--sh-1); }
+  .r4-top { display:flex; align-items:center; gap:12px; margin:0; }
+  .r4-n { flex:none; display:grid; place-items:center; width:44px; height:44px; border-radius:14px; background:var(--blue, #1d4ed8); color:#fff; font-size:1.3rem; font-weight:800; }
+  .r4-t { display:block; font-size:1.15rem; }
+  .r4-sc { display:block; font-size:.84rem; color:var(--ink-2); }
+  .r4-what, .r4-skip { margin:0; }
+  .r4-skip { font-size:.88rem; color:var(--ink-2); }
+  .r4-ex { display:grid; gap:6px; margin:0; }
+  .r4-ex > div { display:grid; grid-template-columns:9.5em minmax(0, 1fr); gap:8px; align-items:start; padding:8px 10px; border-radius:var(--r-sm); background:var(--paper-2); }
+  .r4-ex dt { font-size:.84rem; font-weight:700; color:var(--ink-2); }
+  .r4-ex dd { margin:0; font-size:.9rem; }
+  .r4-ex code { word-break:break-all; }
+  .std-bands { margin:var(--s-4) 0; }
+  .std-bands .bd small { margin-top:4px; font-size:.82rem; color:var(--ink); }
+  .score-rules, .lim-list { margin:var(--s-4) 0 0; padding-left:1.4em; display:grid; gap:8px; }
+  .lim-list li::marker { font-weight:700; color:var(--link); }
+  @media (max-width:900px) { .std-2col, .rule4 { grid-template-columns:minmax(0, 1fr); } }
+  @media (max-width:560px) {
+    .std-sec { padding:var(--s-5) var(--s-4); }
+    .r4-ex > div, .tree li { grid-template-columns:minmax(0, 1fr); gap:2px; }
+    .ver-line { flex-direction:column; gap:12px; }
+  }
+
+  /* ผลทดสอบ 100 กรณี และตรวจซ้ำหลังแก้ */
+  .board-bugs { margin:0 0 16px; }
+  .board-bugs .t-bugs { grid-column:span 7; display:flex; flex-direction:column; gap:8px; background:var(--page) !important; border:1px solid var(--rule); }
+  .board-bugs .t-loop { grid-column:span 5; display:flex; flex-direction:column; gap:8px; }
+  .board-bugs .t-h { margin:0; font-size:1.05rem; }
+  .board-bugs p { margin:0; }
+  .bug-mix { list-style:none; margin:4px 0 0; padding:0; display:flex; gap:4px; }
+  .bug-mix li { flex:var(--n) 1 0; min-width:0; padding:8px 8px 6px; border-radius:var(--r-xs, 8px); background:var(--p1); font-size:.74rem; line-height:1.3; overflow-wrap:anywhere; }
+  .bug-mix b { display:block; font-size:1.05rem; color:var(--link); }
+  .t-links { display:flex; flex-wrap:wrap; gap:6px 16px; font-weight:700; }
+  @media (max-width:900px) { .board-bugs .t-bugs, .board-bugs .t-loop { grid-column:1 / -1; } }
+  @media (max-width:560px) { .bug-mix { flex-wrap:wrap; } .bug-mix li { flex:1 1 30%; } }
+
   /* ---------- การพิมพ์รายงาน ---------- */
   @media print {
     .caps, .score-info { display:none !important; }
@@ -1676,6 +1919,7 @@
     <a class="nav-cta" href="#input-section"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M6 4l10 6-10 6z" fill="currentColor"/></svg>เริ่มตรวจ</a>
     <ul class="steps steps-foot">
       <li><a href="./tests/runner.html"><span class="t">ผลวัดความแม่นยำ</span></a></li>
+      <li><a href="./tests/bugcases.html"><span class="t">ชุดทดสอบ 100 กรณี</span></a></li>
     </ul>
   </nav>
 </aside>
@@ -1766,7 +2010,49 @@
 </ul>
 
 
-<section class="caps" aria-labelledby="h-caps">
+<section class="why band band-a" aria-labelledby="h-why">
+  <div class="why-head">
+    <p class="eyebrow"><span>01</span>ทำไมต้องตรวจ</p>
+    <h2 id="h-why">ทำไมต้องตรวจการเข้าถึงเว็บไซต์</h2>
+    <p class="why-lead">คนจำนวนมากใช้เว็บด้วยโปรแกรมอ่านหน้าจอ คีย์บอร์ด หรือขยายตัวอักษร ถ้าโค้ดผิดเพียงจุดเดียว
+      ข้อมูลส่วนนั้นอาจหายไปทั้งหมดสำหรับเขา ตารางด้านขวาแสดงว่าผู้ใช้ได้รับอะไร ก่อนและหลังแก้ตามกฎทั้ง 4 ข้อ</p>
+    <ul class="why-stats">
+      <li><b>1.3 พันล้านคน</b><span>หรือราว 16% ของประชากรโลก มีภาวะพิการที่มีนัยสำคัญ</span>
+        <small>ที่มา: องค์การอนามัยโลก (WHO), Disability fact sheet, 2023</small></li>
+      <li><b>ราว 2.2 ล้านคน</b><span>คนพิการในประเทศไทยที่มีบัตรประจำตัวคนพิการ</span>
+        <small>ที่มา: ทะเบียนกลางคนพิการ กรมส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ ข้อมูล ณ 1 ส.ค. 2567</small></li>
+    </ul>
+  </div>
+  <div class="why-table" role="region" aria-labelledby="h-why-table">
+    <h3 id="h-why-table">ผู้ใช้โปรแกรมอ่านหน้าจอได้รับอะไร</h3>
+    <ol class="hear">
+      <li>
+        <p class="hear-k"><span class="f-sc">SC 1.1.1</span> รูปภาพ</p>
+        <div class="hear-bad"><span class="badge bad">ก่อนแก้</span><code>&lt;img src="book1.jpg"&gt;</code><q>อาจได้ยินแค่ชื่อไฟล์ “book1.jpg”</q></div>
+        <div class="hear-good"><span class="badge good">หลังแก้</span><code>alt="ปกหนังสือนิทานภาพ"</code><q>“ภาพ ปกหนังสือนิทานภาพ”</q></div>
+      </li>
+      <li>
+        <p class="hear-k"><span class="f-sc">SC 1.3.1</span> หัวข้อ</p>
+        <div class="hear-bad"><span class="badge bad">ก่อนแก้</span><code>&lt;h1&gt; … &lt;h3&gt;</code><q>“หัวข้อระดับ 1 … หัวข้อระดับ 3” เหมือนระดับ 2 หายไป</q></div>
+        <div class="hear-good"><span class="badge good">หลังแก้</span><code>&lt;h1&gt; … &lt;h2&gt;</code><q>“หัวข้อระดับ 1 … หัวข้อระดับ 2” โครงเรื่องต่อเนื่อง</q></div>
+      </li>
+      <li>
+        <p class="hear-k"><span class="f-sc">SC 1.3.1</span> ช่องกรอก</p>
+        <div class="hear-bad"><span class="badge bad">ก่อนแก้</span><code>placeholder="อีเมล"</code><q>“ช่องแก้ไขข้อความ” ไม่รู้ว่าต้องกรอกอะไร</q></div>
+        <div class="hear-good"><span class="badge good">หลังแก้</span><code>&lt;label for="email"&gt;อีเมล&lt;/label&gt;</code><q>“อีเมล ช่องแก้ไขข้อความ”</q></div>
+      </li>
+      <li>
+        <p class="hear-k"><span class="f-sc">SC 1.4.3</span> สีข้อความ</p>
+        <div class="hear-bad"><span class="badge bad">ก่อนแก้</span><svg class="hear-sw" viewBox="0 0 132 34" aria-hidden="true" focusable="false"><rect width="132" height="34" rx="6" fill="#ffffff" stroke="#dfe3e8"/><text x="10" y="23" fill="#cccccc" font-size="15" font-weight="700" class="il-font">ลดราคา 20%</text></svg><q>สีเทาอ่อนบนพื้นขาว 1.61 : 1 ผู้มีสายตาเลือนรางอ่านไม่ออก</q></div>
+        <div class="hear-good"><span class="badge good">หลังแก้</span><svg class="hear-sw" viewBox="0 0 132 34" aria-hidden="true" focusable="false"><rect width="132" height="34" rx="6" fill="#ffffff" stroke="#dfe3e8"/><text x="10" y="23" fill="#595959" font-size="15" font-weight="700" class="il-font">ลดราคา 20%</text></svg><q>สีเทาเข้ม #595959 บนพื้นขาว 7.00 : 1 อ่านง่ายขึ้น</q></div>
+      </li>
+    </ol>
+    <p class="hear-note">คำที่ได้ยินเป็นตัวอย่างโดยประมาณ แต่ละโปรแกรมอ่านหน้าจออ่านต่างกันเล็กน้อย</p>
+  </div>
+</section>
+
+<section class="caps band band-b" aria-labelledby="h-caps">
+  <p class="eyebrow"><span>02</span>ความสามารถ</p>
   <h2 id="h-caps">เครื่องมือนี้ตรวจอะไรให้คุณ</h2>
   <p class="caps-lead">4 เรื่องที่พบบ่อยที่สุด ครอบคลุม 3 หลักเกณฑ์ของ WCAG 2.1</p>
   <div class="caps-grid">
@@ -1797,8 +2083,9 @@
   </div>
 </section>
 
-<section class="how" aria-labelledby="h-how">
+<section class="how band band-a" aria-labelledby="h-how">
   <div class="how-text">
+    <p class="eyebrow"><span>03</span>วิธีใช้งาน</p>
     <h2 id="h-how">ใช้งานง่าย <span class="nw">ใน 4 ขั้นตอน</span></h2>
     <p>ระบบตรวจส่วนที่โปรแกรมตัดสินได้ให้อัตโนมัติ ส่วนที่ต้องใช้ดุลยพินิจ ผู้ประเมินตอบแบบประเมินอีก 3 ข้อ</p>
     <a class="btn-blue" href="#input-section">ไปที่ขั้นที่ 1 นำเข้าโค้ด</a>
@@ -1849,7 +2136,7 @@
   </ol>
 </section>
 
-<section class="report2" aria-labelledby="h-report2">
+<section class="report2 band band-b" aria-labelledby="h-report2">
   <figure class="rp-card" data-ui>
     <figcaption class="rp-top"><b>ตัวอย่างรายงาน</b><span>จากตัวอย่างในบทที่ 3.7.2</span></figcaption>
     <div class="rp-main">
@@ -1869,6 +2156,7 @@
     </div>
   </figure>
   <div class="rp-text">
+    <p class="eyebrow"><span>04</span>รายงานผล</p>
     <h2 id="h-report2"><span class="nw">รายงานครบถ้วน</span> <span class="nw">เข้าใจง่าย</span> <span class="nw">พร้อมวิธีแก้</span></h2>
     <p>ผลการตรวจบอกว่าหน้าเว็บผิดที่ส่วนไหน ละเมิดหลักเกณฑ์ข้อใดของ WCAG 2.1 และควรแก้อย่างไร พร้อมตัวอย่างโค้ดที่ถูกต้อง</p>
     <ul class="rp-checks">
@@ -1881,7 +2169,9 @@
   </div>
 </section>
 
-<h2 class="sec-h2">ตรวจอัตโนมัติ ร่วมกับผู้ประเมิน</h2>
+<section class="split-sec band band-a" aria-labelledby="h-split">
+<p class="eyebrow"><span>05</span>กึ่งอัตโนมัติ</p>
+<h2 class="sec-h2" id="h-split">ตรวจอัตโนมัติ ร่วมกับผู้ประเมิน</h2>
 <div class="board board-split">
   <div class="t t-split t-auto">
     <p class="split-k">ระบบตรวจอัตโนมัติ</p>
@@ -1904,8 +2194,10 @@
     </ul>
   </div>
 </div>
+</section>
 
-<section class="score-info" aria-labelledby="h-scoreinfo">
+<section class="score-info band band-b" aria-labelledby="h-scoreinfo">
+  <p class="eyebrow"><span>06</span>วิธีคิดคะแนน</p>
   <h2 id="h-scoreinfo" class="sec-h2">คะแนนคำนวณอย่างไร</h2>
   <p class="si-lead">ใช้วิธี Failure-Rate Metric (Vigo, Brajnik และ Harper, 2011) ตัวเลขด้านล่างมาจากตัวอย่างในบทที่ 3.7.2 ของรายงาน</p>
   <ol class="si-steps">
@@ -1940,7 +2232,9 @@
   </ol>
 </section>
 
-<h2 class="sec-h2">ผลการทดสอบเครื่องมือ</h2>
+<section class="proof-sec band band-a" aria-labelledby="h-proof">
+<p class="eyebrow"><span>07</span>ผลการทดสอบ</p>
+<h2 class="sec-h2" id="h-proof">ผลการทดสอบเครื่องมือ</h2>
 <div class="board board-proof">
   <div class="t t-mint t-fig">
     <p class="big">1.000</p>
@@ -1975,12 +2269,34 @@
     <p class="t-note">ตรวจเมื่อ 25 ก.ย. 2569 · ทุกเว็บกำหนดสีไว้ในไฟล์ CSS แยก จึงยังตรวจ SC 1.4.3 ไม่ได้ คะแนน 100 จึงไม่ได้แปลว่าผ่าน WCAG ทั้งหมด</p>
   </div>
 </div>
+<div class="board board-bugs">
+  <div class="t t-surface t-bugs">
+    <h3 class="t-h">ชุดทดสอบ 100 กรณีข้อผิดพลาด</h3>
+    <p class="big">100 / 100</p>
+    <p>ตรวจพบตรงตามที่คาดทุกกรณี จากโค้ดผิด 100 รูปแบบที่ไม่ซ้ำกัน รอบแรกได้ 98 / 100 เพราะพบบั๊กจริง 2 จุด
+      คือ aria-labelledby ที่ชี้ไปยัง id ที่ไม่มีอยู่ และค่าสีที่มี !important แก้แล้วรันซ้ำผ่านครบ โดยค่า F1 เดิมไม่เปลี่ยน</p>
+    <ul class="bug-mix" aria-label="จำนวนกรณีแยกตามกฎตรวจ">
+      <li style="--n:25"><b>25</b> R-ALT-01</li><li style="--n:12"><b>12</b> R-ALT-02</li><li style="--n:20"><b>20</b> R-HEAD-01</li>
+      <li style="--n:23"><b>23</b> R-LABEL-01</li><li style="--n:20"><b>20</b> R-CONTRAST-01</li>
+    </ul>
+    <p class="t-links"><a href="./tests/bugcases.html">ดูผลรายกรณี</a> <a href="./tests/sites.html">ทดสอบกับเว็บไซต์ภายนอกด้วยตัวเอง</a></p>
+  </div>
+  <div class="t t-dark t-loop">
+    <h3 class="t-h">ตรวจซ้ำหลังแก้ (Feedback Loop)</h3>
+    <p class="big">100 / 100</p>
+    <p>แก้โค้ดตามคำแนะนำแล้วตรวจซ้ำ รายการที่ผิดหายไปและคะแนนเพิ่มขึ้นทุกกรณี
+      ส่วนการให้ระบบแก้ตามตัวอย่างโค้ดหลังแก้แล้วตรวจซ้ำ ผ่าน 88 / 88 กรณีที่ระบบตัดสินว่าไม่ผ่าน
+      อีก 12 กรณีเป็นภาพ alt ว่างที่ต้องให้คนตัดสิน</p>
+  </div>
+</div>
 <section class="board board-2" aria-labelledby="h-limits">
   <div class="t t-surface limits">
     <h2 id="h-limits">ข้อจำกัดที่ต้องทราบก่อนใช้งาน</h2>
     <ol>
       <li>ระบบตรวจได้เฉพาะ <strong>กฎย่อยสี่กฎ</strong> ภายใต้หลักเกณฑ์สามข้อ ไม่ครอบคลุมทุกเทคนิคที่ WCAG กำหนด คะแนนเต็มจึงไม่ได้แปลว่าเว็บไซต์ผ่านหลักเกณฑ์เหล่านั้นอย่างสมบูรณ์</li>
       <li>ระบบวิเคราะห์เฉพาะโครงสร้าง HTML ที่รับเข้ามา <strong>ไม่ได้รันสคริปต์และไม่อ่านไฟล์ CSS ภายนอก</strong> เนื้อหาที่ JavaScript สร้างขึ้นภายหลังและสีที่กำหนดในไฟล์ CSS แยกจึงไม่ถูกตรวจ</li>
+      <li>หลักเกณฑ์ที่ไม่มีจุดให้ตรวจ <strong>ไม่ถูกนำมาคิดคะแนน</strong> หน้าที่ไม่มีรูปภาพหรือไม่กำหนดสีใน style จึงอาจได้ 100 จากหลักเกณฑ์เดียว
+        หน้าผลบอกเสมอว่าคะแนนคิดจากกี่หลักเกณฑ์ <a href="#std-limits">ดูข้อจำกัดทั้งหมด</a></li>
       <li>ผลการประเมินนี้ <strong>ไม่ใช่ใบรับรองความสอดคล้องกับมาตรฐาน WCAG 2.1</strong> และไม่ทดแทนการตรวจสอบโดยผู้เชี่ยวชาญด้านการเข้าถึงเว็บไซต์</li>
     </ol>
   </div>
@@ -1989,9 +2305,11 @@
     <p>กรณีทดสอบความปลอดภัยผ่านทั้งหมด ระบบส่งไปบันทึกเฉพาะค่าสรุปเชิงตัวเลข ไม่ส่งและไม่เก็บโค้ด HTML ที่นำมาตรวจ</p>
   </div>
 </section>
+</section>
 
-<section class="who-faq" aria-label="เพื่อใคร และคำถามที่พบบ่อย">
+<section class="who-faq band band-b" aria-label="เพื่อใคร และคำถามที่พบบ่อย">
   <div class="who">
+    <p class="eyebrow"><span>08</span>เพื่อทุกคน</p>
     <h2>เว็บไซต์ที่ดี ต้องเข้าถึงได้สำหรับทุกคน</h2>
     <p>ทั้งสามหลักเกณฑ์ที่ระบบตรวจ ช่วยคนกลุ่มนี้ได้โดยตรง</p>
     <ul class="who-cards">
@@ -2022,7 +2340,10 @@
     </div>
     <details><summary>WCAG คืออะไร</summary><p>Web Content Accessibility Guidelines แนวทางของ W3C ที่บอกว่าเว็บไซต์ต้องทำอย่างไรให้ทุกคนเข้าถึงได้ รวมถึงผู้พิการ เครื่องมือนี้อ้างอิง WCAG 2.1 ระดับ A และ AA</p></details>
     <details><summary>เครื่องมือนี้ตรวจอะไรได้บ้าง</summary><p>ตรวจ 3 หลักเกณฑ์ คือ SC 1.1.1 ข้อความแทนภาพ, SC 1.3.1 โครงสร้างหัวข้อและป้ายกำกับ และ SC 1.4.3 ความคมชัดของสี ด้วยกฎตรวจ 5 รหัส ร่วมกับแบบประเมิน 3 ข้อ</p></details>
-    <details><summary>คะแนน 100 แปลว่าผ่าน WCAG หรือไม่</summary><p>ไม่ คะแนนสะท้อนเฉพาะกฎที่ระบบตรวจได้ ไม่ใช่ใบรับรองความสอดคล้อง และไม่ทดแทนการตรวจโดยผู้เชี่ยวชาญ</p></details>
+    <details><summary>คะแนน 100 แปลว่าผ่าน WCAG หรือไม่</summary><p>ไม่ คะแนนสะท้อนเฉพาะกฎที่ระบบตรวจได้ และคิดเฉพาะหลักเกณฑ์ที่มีจุดให้ตรวจ
+      ถ้าหน้าเว็บไม่มีรูปภาพเลย SC 1.1.1 จะไม่ถูกนำมาคิด ให้ดูกล่อง “คะแนนนี้คิดจาก … หลักเกณฑ์” ในหน้าผลทุกครั้ง คะแนนนี้ไม่ใช่ใบรับรองความสอดคล้อง</p></details>
+    <details><summary>แก้โค้ดแล้ว ผลจะเปลี่ยนเป็นผ่านไหม</summary><p>แต่ละจุดในหน้าผลมี “ผลหลังแก้” ที่ระบบตรวจซ้ำโค้ดหลังแก้ให้แล้ว
+      และเมื่อแก้โค้ดจริงแล้วกดตรวจอีกครั้ง ระบบจะเทียบกับผลครั้งก่อนว่าแก้ได้กี่จุด เหลือกี่จุด และคะแนนเปลี่ยนเท่าไร</p></details>
     <details><summary>โค้ดที่นำมาตรวจถูกเก็บไว้หรือไม่</summary><p>ไม่ การวิเคราะห์ทำในเบราว์เซอร์ของคุณ ถ้าเลือกบันทึกผล ระบบส่งเฉพาะค่าสรุปเชิงตัวเลขไป Google Sheets ไม่ส่งโค้ด HTML</p></details>
     <details><summary>ทำไมบางเว็บตรวจสีไม่ได้</summary><p>ระบบอ่านสีจาก style ที่เขียนไว้ในองค์ประกอบเท่านั้น ไม่อ่านไฟล์ CSS แยก ถ้าเว็บกำหนดสีใน CSS ระบบจะบอกว่าตรวจไม่ได้ แทนที่จะให้ผ่าน</p></details>
   </div>
@@ -2041,15 +2362,60 @@
       <img class="std-art" src="./img/checker-person.webp" alt="" width="760" height="570" loading="lazy" decoding="async">
     </header>
 
-    <h2 class="pour-h">หลักการ 4 ข้อของ WCAG และส่วนที่เครื่องมือนี้ตรวจ</h2>
+    <nav class="std-toc" aria-labelledby="std-toc-h">
+      <p id="std-toc-h" class="std-toc-h">ในหน้านี้</p>
+      <ol>
+        <li><a href="#std-wcag"><span>1</span>WCAG 2.1 คืออะไร</a></li>
+        <li><a href="#std-levels"><span>2</span>ระดับ A และ AA</a></li>
+        <li><a href="#std-map"><span>3</span>เครื่องมือนี้ครอบคลุมแค่ไหน</a></li>
+        <li><a href="#std-sc"><span>4</span>หลักเกณฑ์ 3 ข้อที่ตรวจ</a></li>
+        <li><a href="#std-rules"><span>5</span>กฎย่อย 4 ข้อ</a></li>
+        <li><a href="#std-score"><span>6</span>คะแนน 0–100 หมายถึงอะไร</a></li>
+        <li><a href="#std-limits"><span>7</span>ข้อจำกัดของการประเมิน</a></li>
+      </ol>
+    </nav>
+
+    <section class="std-sec" id="std-wcag" aria-labelledby="h-std-wcag">
+      <p class="eyebrow"><span>1</span>พื้นฐาน</p>
+      <h2 id="h-std-wcag">WCAG 2.1 คืออะไร</h2>
+      <div class="std-2col">
+        <div>
+          <p>WCAG (Web Content Accessibility Guidelines) คือแนวทางการทำเนื้อหาเว็บให้ทุกคนเข้าถึงได้ รวมถึงผู้พิการทางการเห็น การได้ยิน
+            การเคลื่อนไหว และการเรียนรู้ จัดทำโดย W3C ผ่านโครงการ WAI และเป็นมาตรฐานที่หน่วยงานทั่วโลกใช้อ้างอิง</p>
+          <p>WCAG 2.1 ประกาศเมื่อเดือนมิถุนายน พ.ศ. 2561 (ค.ศ. 2018) ต่อยอดจาก WCAG 2.0 โดยเพิ่มหลักเกณฑ์สำหรับผู้มีสายตาเลือนราง
+            ผู้ใช้มือถือ และผู้ที่มีความบกพร่องทางการเรียนรู้ รวมเป็น<strong> 78 หลักเกณฑ์</strong> ใน 13 แนวทาง ภายใต้หลักการ 4 ข้อ
+            เครื่องมือนี้อ้างอิง WCAG 2.1 ตามขอบเขตของโครงงาน หลักเกณฑ์ 3 ข้อที่ตรวจมีข้อความเหมือนเดิมใน WCAG 2.2</p>
+          <ol class="ver-line" aria-label="ลำดับเวอร์ชันของ WCAG 2">
+            <li><b>WCAG 2.0</b><span>ธ.ค. 2551</span></li>
+            <li class="on"><b>WCAG 2.1</b><span>มิ.ย. 2561 · ที่เครื่องมือนี้ใช้</span></li>
+            <li><b>WCAG 2.2</b><span>ต.ค. 2566</span></li>
+          </ol>
+        </div>
+        <figure class="tree">
+          <figcaption>WCAG แบ่งเป็น 4 ชั้น ตัวอย่างเส้นทางของ SC 1.1.1</figcaption>
+          <ol>
+            <li><span class="tree-k">หลักการ <small>4 ข้อ</small></span><span class="tree-v">1 การรับรู้ได้ (Perceivable)</span></li>
+            <li><span class="tree-k">แนวทาง <small>13 ข้อ</small></span><span class="tree-v">1.1 ทางเลือกที่เป็นข้อความ</span></li>
+            <li><span class="tree-k">หลักเกณฑ์ (SC) <small>78 ข้อ</small></span><span class="tree-v">SC 1.1.1 ข้อความแทนภาพ</span></li>
+            <li><span class="tree-k">ระดับ <small>A · AA · AAA</small></span><span class="tree-v">ระดับ A</span></li>
+          </ol>
+        </figure>
+      </div>
+      <h3 class="pour-h">หลักการ 4 ข้อ (POUR) และส่วนที่เครื่องมือนี้ตรวจ</h3>
     <div class="pour">
-      <div class="pour-card on"><span class="pour-ico" style="background:var(--p1)" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/></svg></span><h3>1. Perceivable รับรู้ได้</h3><p>ข้อมูลต้องนำเสนอในแบบที่ทุกคนรับรู้ได้ เช่น ข้อความแทนภาพ สีที่คมชัด</p><span class="pour-tag">เครื่องมือนี้ตรวจ 3 หลักเกณฑ์</span></div>
-      <div class="pour-card"><span class="pour-ico" style="background:var(--p3)" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="2.5" y="6.5" width="19" height="11" rx="2"/><path d="M6 10h.01M9 10h.01M12 10h.01M15 10h.01M18 10h.01M7 14h10"/></svg></span><h3>2. Operable ใช้งานได้</h3><p>ใช้งานได้ด้วยคีย์บอร์ด มีเส้นโฟกัส มีเวลาพอ</p><span class="pour-tag">ยังไม่ได้ตรวจ</span></div>
-      <div class="pour-card"><span class="pour-ico" style="background:var(--p4)" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M9 4.5a3 3 0 0 0-3 3 3 3 0 0 0-1.5 5.5A3 3 0 0 0 9 19.5h0V4.5zM15 4.5a3 3 0 0 1 3 3 3 3 0 0 1 1.5 5.5A3 3 0 0 1 15 19.5h0V4.5z"/></svg></span><h3>3. Understandable เข้าใจได้</h3><p>ภาษาและฟอร์มชัดเจน แจ้งข้อผิดพลาดให้เข้าใจ</p><span class="pour-tag">ยังไม่ได้ตรวจ</span></div>
-      <div class="pour-card"><span class="pour-ico" style="background:var(--p2)" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg></span><h3>4. Robust รองรับได้</h3><p>โค้ดถูกต้องตามมาตรฐาน ทำงานกับเทคโนโลยีช่วยเหลือได้</p><span class="pour-tag">ยังไม่ได้ตรวจ</span></div>
+      <div class="pour-card on"><span class="pour-ico" style="background:var(--p1)" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/></svg></span><h4>1. Perceivable รับรู้ได้</h4><p>ข้อมูลต้องนำเสนอในแบบที่ทุกคนรับรู้ได้ เช่น ข้อความแทนภาพ สีที่คมชัด</p><span class="pour-tag">เครื่องมือนี้ตรวจ 3 หลักเกณฑ์</span></div>
+      <div class="pour-card"><span class="pour-ico" style="background:var(--p3)" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="2.5" y="6.5" width="19" height="11" rx="2"/><path d="M6 10h.01M9 10h.01M12 10h.01M15 10h.01M18 10h.01M7 14h10"/></svg></span><h4>2. Operable ใช้งานได้</h4><p>ใช้งานได้ด้วยคีย์บอร์ด มีเส้นโฟกัส มีเวลาพอ</p><span class="pour-tag">ยังไม่ได้ตรวจ</span></div>
+      <div class="pour-card"><span class="pour-ico" style="background:var(--p4)" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M9 4.5a3 3 0 0 0-3 3 3 3 0 0 0-1.5 5.5A3 3 0 0 0 9 19.5h0V4.5zM15 4.5a3 3 0 0 1 3 3 3 3 0 0 1 1.5 5.5A3 3 0 0 1 15 19.5h0V4.5z"/></svg></span><h4>3. Understandable เข้าใจได้</h4><p>ภาษาและฟอร์มชัดเจน แจ้งข้อผิดพลาดให้เข้าใจ</p><span class="pour-tag">ยังไม่ได้ตรวจ</span></div>
+      <div class="pour-card"><span class="pour-ico" style="background:var(--p2)" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg></span><h4>4. Robust รองรับได้</h4><p>โค้ดถูกต้องตามมาตรฐาน ทำงานกับเทคโนโลยีช่วยเหลือได้</p><span class="pour-tag">ยังไม่ได้ตรวจ</span></div>
     </div>
 
-    <h2 class="pour-h">ระดับความสอดคล้องของ WCAG</h2>
+    </section>
+
+    <section class="std-sec" id="std-levels" aria-labelledby="h-std-levels">
+      <p class="eyebrow"><span>2</span>ระดับความสอดคล้อง</p>
+      <h2 id="h-std-levels">ระดับ A และ AA คืออะไร</h2>
+      <p>ทุกหลักเกณฑ์มีระดับกำกับ เว็บที่อ้างว่าผ่านระดับ AA ต้องผ่าน<strong>ทุกหลักเกณฑ์ระดับ A และ AA</strong> รวม 50 ข้อ
+        ระดับ A 30 ข้อ ระดับ AA 20 ข้อ ส่วนระดับ AAA อีก 28 ข้อเป็นระดับสูงสุดที่ไม่บังคับใช้กับทั้งเว็บไซต์</p>
     <div class="table-scroll lv-table" tabindex="0" role="region" aria-label="ตารางระดับความสอดคล้องของ WCAG">
       <table>
         <thead><tr><th scope="col">ระดับ</th><th scope="col">ความหมาย</th><th scope="col">เครื่องมือนี้ตรวจ</th></tr></thead>
@@ -2061,7 +2427,11 @@
       </table>
     </div>
 
-    <h2 class="pour-h">เครื่องมือนี้ครอบคลุมแค่ไหน</h2>
+    </section>
+
+    <section class="std-sec" id="std-map" aria-labelledby="h-std-map">
+      <p class="eyebrow"><span>3</span>ขอบเขต</p>
+      <h2 id="h-std-map">เครื่องมือนี้ครอบคลุมแค่ไหน</h2>
     <figure class="sc-map">
       <p class="sc-legend" aria-hidden="true"><span><i class="is-on"></i>ตรวจ</span><span><i class="is-part"></i>ตรวจบางส่วน</span><span><i></i>ยังไม่ได้ตรวจ</span></p>
       <div class="sc-grid" aria-hidden="true"><span></span><p class="sc-ch">ระดับ A <span>30 ข้อ</span></p><p class="sc-ch">ระดับ AA <span>20 ข้อ</span></p><p class="sc-rh">หลักการที่ 1 รับรู้ได้</p><ul class="sc-tiles"><li class="sc-lv">A</li><li class="is-on">1.1.1</li><li>1.2.1</li><li>1.2.2</li><li>1.2.3</li><li class="is-part">1.3.1</li><li>1.3.2</li><li>1.3.3</li><li>1.4.1</li><li>1.4.2</li></ul><ul class="sc-tiles"><li class="sc-lv">AA</li><li>1.2.4</li><li>1.2.5</li><li>1.3.4</li><li>1.3.5</li><li class="is-on">1.4.3</li><li>1.4.4</li><li>1.4.5</li><li>1.4.10</li><li>1.4.11</li><li>1.4.12</li><li>1.4.13</li></ul><p class="sc-rh">หลักการที่ 2 ใช้งานได้</p><ul class="sc-tiles"><li class="sc-lv">A</li><li>2.1.1</li><li>2.1.2</li><li>2.1.4</li><li>2.2.1</li><li>2.2.2</li><li>2.3.1</li><li>2.4.1</li><li>2.4.2</li><li>2.4.3</li><li>2.4.4</li><li>2.5.1</li><li>2.5.2</li><li>2.5.3</li><li>2.5.4</li></ul><ul class="sc-tiles"><li class="sc-lv">AA</li><li>2.4.5</li><li>2.4.6</li><li>2.4.7</li></ul><p class="sc-rh">หลักการที่ 3 เข้าใจได้</p><ul class="sc-tiles"><li class="sc-lv">A</li><li>3.1.1</li><li>3.2.1</li><li>3.2.2</li><li>3.3.1</li><li>3.3.2</li></ul><ul class="sc-tiles"><li class="sc-lv">AA</li><li>3.1.2</li><li>3.2.3</li><li>3.2.4</li><li>3.3.3</li><li>3.3.4</li></ul><p class="sc-rh">หลักการที่ 4 รองรับได้</p><ul class="sc-tiles"><li class="sc-lv">A</li><li>4.1.1</li><li>4.1.2</li></ul><ul class="sc-tiles"><li class="sc-lv">AA</li><li>4.1.3</li></ul></div>
@@ -2069,7 +2439,99 @@
         เครื่องมือนี้ตรวจ 3 ข้อ ได้แก่ SC 1.1.1, SC 1.4.3 และ SC 1.3.1 เฉพาะลำดับหัวข้อกับป้ายกำกับช่องกรอก
         หลักเกณฑ์ที่เหลือต้องตรวจด้วยเครื่องมืออื่นหรือโดยผู้เชี่ยวชาญ</figcaption>
     </figure>
-    <div id="standards-cards" class="std-cards"></div>
+    </section>
+
+    <section class="std-sec" id="std-sc" aria-labelledby="h-std-sc">
+      <p class="eyebrow"><span>4</span>หัวข้อการประเมิน</p>
+      <h2 id="h-std-sc">หลักเกณฑ์ 3 ข้อที่เครื่องมือนี้ตรวจ</h2>
+      <p>การประเมินแบ่งเป็น 3 หัวข้อตามหลักเกณฑ์ของ WCAG 2.1 แต่ละหัวข้อมีน้ำหนักในคะแนนต่างกัน
+        SC 1.1.1 น้ำหนัก 3 เพราะภาพที่ไม่มีข้อความแทนทำให้ข้อมูลหายไปทั้งหมด ส่วน SC 1.3.1 และ SC 1.4.3 น้ำหนัก 2</p>
+      <div id="standards-cards" class="std-cards"></div>
+    </section>
+
+    <section class="std-sec" id="std-rules" aria-labelledby="h-std-rules">
+      <p class="eyebrow"><span>5</span>กฎย่อย</p>
+      <h2 id="h-std-rules">กฎย่อย 4 ข้อที่ระบบใช้ตรวจ</h2>
+      <p>ภายใต้ 3 หลักเกณฑ์ ระบบตรวจด้วยกฎย่อย 4 ข้อ (5 รหัสกฎ) แต่ละข้อตัดสินได้ 3 แบบ
+        <span class="badge bad">ไม่ผ่าน</span> <span class="badge warn">ต้องตรวจเพิ่ม</span> <span class="badge good">ผ่าน</span>
+        และองค์ประกอบที่เข้าข้อยกเว้นจะไม่ถูกนับ</p>
+      <ol class="rule4">
+        <li class="r4">
+          <p class="r4-top"><span class="r4-n" aria-hidden="true">1</span><span><b class="r4-t">ข้อความแทนภาพ</b><span class="r4-sc">SC 1.1.1 ระดับ A · R-ALT-01, R-ALT-02</span></span></p>
+          <p class="r4-what"><b>ตรวจอะไร</b> แท็ก <code>&lt;img&gt;</code> ทุกตัวว่ามีแอตทริบิวต์ alt หรือไม่</p>
+          <dl class="r4-ex">
+            <div class="ex-bad"><dt><span class="badge bad">ไม่ผ่าน</span> วิกฤต</dt><dd><code>&lt;img src="book.jpg"&gt;</code></dd></div>
+            <div class="ex-warn"><dt><span class="badge warn">ต้องตรวจเพิ่ม</span></dt><dd><code>&lt;img src="line.png" alt=""&gt;</code> ระบบไม่รู้ว่าเป็นภาพตกแต่งหรือไม่ ผู้ประเมินตอบข้อ CL-1.1.1</dd></div>
+            <div class="ex-good"><dt><span class="badge good">ผ่าน</span></dt><dd><code>&lt;img src="book.jpg" alt="ปกหนังสือนิทานภาพ"&gt;</code></dd></div>
+          </dl>
+          <p class="r4-skip"><b>ไม่นับ</b> ภาพที่มี <code>role="presentation"</code> หรือ <code>aria-hidden="true"</code></p>
+        </li>
+        <li class="r4">
+          <p class="r4-top"><span class="r4-n" aria-hidden="true">2</span><span><b class="r4-t">ลำดับหัวข้อ</b><span class="r4-sc">SC 1.3.1 ระดับ A · R-HEAD-01</span></span></p>
+          <p class="r4-what"><b>ตรวจอะไร</b> หัวข้อ <code>&lt;h1&gt;</code>–<code>&lt;h6&gt;</code> แต่ละตัวเทียบกับหัวข้อก่อนหน้า ว่าลงลึกทีละระดับหรือไม่</p>
+          <dl class="r4-ex">
+            <div class="ex-bad"><dt><span class="badge bad">ไม่ผ่าน</span> ควรแก้</dt><dd><code>&lt;h1&gt;…&lt;/h1&gt; &lt;h3&gt;…&lt;/h3&gt;</code> ข้ามระดับ 2</dd></div>
+            <div class="ex-good"><dt><span class="badge good">ผ่าน</span></dt><dd><code>&lt;h1&gt;…&lt;/h1&gt; &lt;h2&gt;…&lt;/h2&gt;</code> และย้อนกลับขึ้นระดับบนได้ เช่น h3 ไป h2</dd></div>
+          </dl>
+          <p class="r4-skip"><b>ไม่นับ</b> หัวข้อแรกของหน้า เพราะไม่มีหัวข้อก่อนหน้าให้เทียบ</p>
+        </li>
+        <li class="r4">
+          <p class="r4-top"><span class="r4-n" aria-hidden="true">3</span><span><b class="r4-t">ป้ายกำกับช่องกรอก</b><span class="r4-sc">SC 1.3.1 ระดับ A · R-LABEL-01</span></span></p>
+          <p class="r4-what"><b>ตรวจอะไร</b> ช่อง <code>&lt;input&gt;</code> <code>&lt;select&gt;</code> <code>&lt;textarea&gt;</code> ว่ามีป้ายกำกับผูกไว้หรือไม่
+            ผ่านได้ 4 วิธี คือ <code>label for</code> ที่ตรงกับ id, <code>label</code> ครอบช่อง, <code>aria-label</code> หรือ <code>aria-labelledby</code></p>
+          <dl class="r4-ex">
+            <div class="ex-bad"><dt><span class="badge bad">ไม่ผ่าน</span> วิกฤต</dt><dd><code>&lt;input type="email" placeholder="อีเมล"&gt;</code> placeholder ไม่นับเป็นป้ายกำกับ</dd></div>
+            <div class="ex-good"><dt><span class="badge good">ผ่าน</span></dt><dd><code>&lt;label for="email"&gt;อีเมล&lt;/label&gt; &lt;input id="email" type="email"&gt;</code></dd></div>
+          </dl>
+          <p class="r4-skip"><b>ไม่นับ</b> ช่องชนิด hidden, submit, button, reset, image และช่องที่มีแอตทริบิวต์ hidden</p>
+        </li>
+        <li class="r4">
+          <p class="r4-top"><span class="r4-n" aria-hidden="true">4</span><span><b class="r4-t">ความคมชัดของสี</b><span class="r4-sc">SC 1.4.3 ระดับ AA · R-CONTRAST-01</span></span></p>
+          <p class="r4-what"><b>ตรวจอะไร</b> องค์ประกอบที่กำหนดทั้ง <code>color</code> และ <code>background-color</code> ไว้ใน style
+            คำนวณอัตราส่วนความคมชัดเทียบเกณฑ์ 4.5 : 1</p>
+          <dl class="r4-ex">
+            <div class="ex-bad"><dt><span class="badge bad">ไม่ผ่าน</span> ควรแก้</dt><dd><code>style="color:#cccccc;background-color:#ffffff"</code> 1.61 : 1</dd></div>
+            <div class="ex-warn"><dt><span class="badge warn">ต้องตรวจเพิ่ม</span></dt><dd>ค่าสีที่อ่านไม่ได้ เช่น <code>transparent</code> หรือสีไล่ระดับ</dd></div>
+            <div class="ex-good"><dt><span class="badge good">ผ่าน</span></dt><dd><code>style="color:#595959;background-color:#ffffff"</code> 7.00 : 1</dd></div>
+          </dl>
+          <p class="r4-skip"><b>ไม่นับ</b> องค์ประกอบที่กำหนดสีไว้ด้านเดียว พื้นหลังที่เขียนแบบย่อ <code>background:</code> และสีที่อยู่ในไฟล์ CSS หรือแท็ก &lt;style&gt;</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="std-sec" id="std-score" aria-labelledby="h-std-score">
+      <p class="eyebrow"><span>6</span>การแปลผล</p>
+      <h2 id="h-std-score">คะแนน 0–100 หมายถึงอะไร</h2>
+      <p>คะแนนบอกว่าในจุดที่ระบบตัดสินได้ มีสัดส่วนที่ไม่ผ่านมากน้อยเพียงใด คิดอัตราไม่ผ่านแยกตามหลักเกณฑ์
+        แล้วถ่วงน้ำหนัก 3 : 2 : 2 ตามวิธี Failure-Rate Metric <a href="#h-scoreinfo">ดูตัวอย่างการคำนวณทีละขั้น</a></p>
+      <ol class="bands-row std-bands">
+        <li class="bd bd-bad"><b>ต้องปรับปรุง</b><span>0–59.99 คะแนน</span><small>พบข้อบกพร่องที่กระทบผู้ใช้อย่างชัดเจน</small></li>
+        <li class="bd bd-warn"><b>พอใช้</b><span>60–74.99 คะแนน</span><small>พบข้อบกพร่องพอสมควร ควรแก้ก่อนเผยแพร่</small></li>
+        <li class="bd bd-ok"><b>ดี</b><span>75–89.99 คะแนน</span><small>พบข้อบกพร่องบางส่วน ควรปรับเพิ่ม</small></li>
+        <li class="bd bd-good"><b>ดีมาก</b><span>90–100 คะแนน</span><small>พบข้อบกพร่องน้อยมากในกฎที่ตรวจได้</small></li>
+      </ol>
+      <ul class="score-rules">
+        <li><b>จุดที่ต้องตรวจเพิ่มยังไม่ถูกนับ</b> จนกว่าผู้ประเมินจะตอบแบบประเมิน ระบบไม่เดาว่าผ่าน</li>
+        <li><b>หลักเกณฑ์ที่ไม่มีจุดให้ตรวจจะไม่ถูกนำมาคิดคะแนน</b> เช่น หน้าที่ไม่มีรูปภาพเลย
+          จึงต้องดูกล่อง “คะแนนนี้คิดจาก … หลักเกณฑ์” ในหน้าผลทุกครั้ง คะแนนสูงจากหลักเกณฑ์เดียวไม่ได้แปลว่าผ่านทั้งหมด</li>
+        <li><b>100 คะแนนไม่ได้แปลว่าผ่าน WCAG 2.1</b> คะแนนสะท้อนเฉพาะกฎย่อย 4 ข้อที่ระบบตรวจ</li>
+      </ul>
+    </section>
+
+    <section class="std-sec" id="std-limits" aria-labelledby="h-std-limits">
+      <p class="eyebrow"><span>7</span>ข้อจำกัด</p>
+      <h2 id="h-std-limits">ข้อจำกัดของการประเมิน</h2>
+      <ol class="lim-list">
+        <li><b>ตรวจ 3 จาก 50 หลักเกณฑ์</b> ของระดับ A และ AA ด้วยกฎย่อย 4 ข้อ หลักเกณฑ์ที่เหลือต้องตรวจด้วยเครื่องมืออื่นหรือโดยผู้เชี่ยวชาญ</li>
+        <li><b>ไม่อ่าน CSS และไม่รันสคริปต์</b> สีที่กำหนดในไฟล์ CSS หรือในแท็ก &lt;style&gt; และเนื้อหาที่ JavaScript สร้างภายหลังจะไม่ถูกตรวจ</li>
+        <li><b>ตรวจว่ามี alt แต่ไม่ตัดสินความหมาย</b> เช่น <code>alt="image.jpg"</code> ระบบให้ผ่าน คุณภาพของข้อความต้องให้คนตรวจ</li>
+        <li><b>ใช้เกณฑ์ 4.5 : 1 กับข้อความทุกขนาด</b> (WCAG ยอมให้ข้อความขนาดใหญ่ใช้ 3 : 1) และไม่คิดค่าความโปร่งใสหรือสีพื้นที่สืบทอดจากองค์ประกอบแม่</li>
+        <li><b>หน้าเว็บที่มีองค์ประกอบน้อยได้คะแนนจากหลักเกณฑ์ไม่ครบ</b> ตัวอย่าง เมื่อตรวจโค้ดของเว็บนี้เองได้ 100.00
+          แต่คิดจาก SC 1.3.1 อย่างเดียว เพราะภาพทั้ง 4 ภาพเป็นภาพตกแต่ง (alt ว่าง รอผู้ประเมินยืนยัน) และสีทั้งหมดอยู่ในแท็ก &lt;style&gt;
+          หน้าผลจึงบอกเสมอว่าคะแนนคิดจากกี่หลักเกณฑ์</li>
+        <li><b>ไม่ใช่ใบรับรอง</b> ผลนี้ไม่ทดแทนการตรวจโดยผู้เชี่ยวชาญหรือการทดสอบกับผู้ใช้จริง</li>
+      </ol>
+    </section>
   </section>
 
 
@@ -2247,7 +2709,7 @@
   <div class="ft-top">
     <p class="ft-brand"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="15" fill="none" stroke="#fff" stroke-width="2"/><circle cx="16" cy="8.6" r="2.3" fill="#fff"/><path d="M8.8 12.3c2.4.8 4.8 1.2 7.2 1.2s4.8-.4 7.2-1.2M16 13.6v4.9l-3.1 6.3M16 18.5l3.1 6.3" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>ตรวจการเข้าถึงเว็บไซต์<small>สร้างเว็บที่ทุกคนใช้งานได้</small></span></p>
     <nav aria-label="ลิงก์ท้ายหน้า"><ul class="ft-links">
-      <li><a href="#home">หน้าแรก</a></li><li><a href="#standards-section">มาตรฐานที่ตรวจ</a></li><li><a href="#input-section">ตรวจโค้ด</a></li><li><a href="#results-section">ผลการประเมิน</a></li><li><a href="./tests/runner.html">ผลวัดความแม่นยำ</a></li>
+      <li><a href="#home">หน้าแรก</a></li><li><a href="#standards-section">มาตรฐานที่ตรวจ</a></li><li><a href="#input-section">ตรวจโค้ด</a></li><li><a href="#results-section">ผลการประเมิน</a></li><li><a href="./tests/runner.html">ผลวัดความแม่นยำ</a></li><li><a href="./tests/bugcases.html">ชุดทดสอบ 100 กรณี</a></li>
     </ul></nav>
   </div>
   <div class="ft-note">
@@ -2269,6 +2731,7 @@
 
 
 <script src="./analyzer.js"></script>
+<script src="./fixer.js"></script>
 <script src="./app.js"></script>
 </body>
 </html>

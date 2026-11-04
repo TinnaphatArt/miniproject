@@ -176,7 +176,7 @@
       return '<article class="std-card" id="' + stdAnchor(sc) + '" aria-labelledby="' + stdAnchor(sc) + '-h">' +
         '<div class="std-ill"><svg viewBox="0 0 320 160" aria-hidden="true" focusable="false">' + STD_ILLUSTRATION[sc] + '</svg></div>' +
         '<p class="std-tagline"><span class="rule-id">' + esc(sc) + '</span> ระดับ ' + esc(c.level) + ' · แนวทาง ' + esc(c.guideline) + '</p>' +
-        '<h2 id="' + stdAnchor(sc) + '-h">' + esc(c.nameTh) + ' <span class="en">' + esc(c.nameEn) + '</span></h2>' +
+        '<h3 id="' + stdAnchor(sc) + '-h">' + esc(c.nameTh) + ' <span class="en">' + esc(c.nameEn) + '</span></h3>' +
         '<dl class="std-def"><dt>หมายถึง</dt><dd>' + esc(c.meaningTh) + '</dd>' +
         '<dt>ผู้ได้รับผลกระทบ</dt><dd>' + esc(c.whoTh) + '</dd>' +
         '<dt>เครื่องมือนี้ตรวจ</dt><dd><ul>' + c.checksTh.map(function (k) {
@@ -208,84 +208,33 @@
   }
 
   /* ================================================================ *
-   * ตัวอย่างโค้ดหลังแก้ (Code Fix Preview)
-   * สร้างจากองค์ประกอบที่ผิดจริงในโค้ดของผู้ใช้ ไม่ได้แก้ตรรกะการตรวจ เป็นเพียงการแสดงผล
-   * ข้อความในวงเล็บ เช่น alt หรือชื่อป้ายกำกับ เป็นตัวอย่างที่ผู้ใช้ต้องแก้ให้ตรงกับเนื้อหาจริง
+   * ตัวอย่างโค้ดหลังแก้ (Code Fix Preview) และการตรวจซ้ำหลังแก้ (Feedback Loop)
+   * วิธีแก้อยู่ใน fixer.js ใช้ชุดเดียวกันทั้งตอนแสดงและตอนตรวจซ้ำ ไม่ได้แก้ตรรกะการตรวจ
+   * ข้อความใน alt หรือชื่อป้ายกำกับเป็นตัวอย่างที่ผู้ใช้ต้องแก้ให้ตรงกับเนื้อหาจริง
    * ================================================================ */
+  var F = window.WcagFixer;
   var FIX_TEXT = [];      /* โค้ดหลังแก้สำหรับปุ่มคัดลอก ล้างทุกครั้งที่วาดผลใหม่ */
+  var LOC = null;         /* ตัวหาบรรทัดของโค้ดชุดล่าสุด */
+  var VERIFY_JOBS = [];   /* จุดที่รอตรวจซ้ำทีละจุดหลังวาดผล */
+  var verifyGen = 0;
 
-  function openTagOf(el) {
-    var m = (el.outerHTML || '').match(/^<[^>]*>/);
-    return m ? m[0] : '';
-  }
-  function toHex(c) {
-    return '#' + [c.r, c.g, c.b].map(function (v) { return ('0' + Math.round(v).toString(16)).slice(-2); }).join('');
-  }
-  /* หาสีตัวอักษรที่ใกล้สีเดิมที่สุดซึ่งผ่าน 4.5 ต่อ 1 โดยเลื่อนเข้าหาดำ (พื้นสว่าง) หรือขาว (พื้นมืด) */
-  function suggestTextColor(fg, bg) {
-    var lightBg = A.relativeLuminance(bg) > 0.18;
-    var targets = lightBg ? [{ r: 0, g: 0, b: 0 }, { r: 255, g: 255, b: 255 }] : [{ r: 255, g: 255, b: 255 }, { r: 0, g: 0, b: 0 }];
-    for (var k = 0; k < targets.length; k++) {
-      var t = targets[k];
-      for (var i = 1; i <= 100; i++) {
-        var f = i / 100;
-        var c = { r: Math.round(fg.r + (t.r - fg.r) * f), g: Math.round(fg.g + (t.g - fg.g) * f), b: Math.round(fg.b + (t.b - fg.b) * f) };
-        if (A.contrastRatio(c, bg) >= 4.5) return c;
-      }
-    }
-    return null;
-  }
+  function buildFix(p, n) { return F ? F.preview(p, n) : null; }
 
-  function buildFix(p, n) {
-    var el = p.el;
-    if (!el || p.status !== S.FAIL || p.tag === 'checklist' || !el.ownerDocument) return null;
-    try {
-      var doc = el.ownerDocument;
-      if (p.ruleId === 'R-ALT-01' || p.ruleId === 'R-ALT-02') {
-        var img = el.cloneNode(false);
-        img.setAttribute('alt', 'อธิบายสิ่งที่ภาพนี้สื่อ');
-        return { before: [openTagOf(el)], after: [openTagOf(img)],
-          note: 'แทนข้อความใน alt ด้วยคำอธิบายจริงของภาพ ถ้าเป็นภาพตกแต่งที่ไม่สื่อความหมาย ให้ใช้ alt="" แทน' };
-      }
-      if (p.ruleId === 'R-HEAD-01') {
-        var m = /เป็น h(\d)/.exec(p.suggestion || '');
-        if (!m) return null;
-        var text = A.truncate(el.textContent, 40);
-        var oldH = el.cloneNode(false); oldH.textContent = text;
-        var newH = doc.createElement('h' + m[1]);
-        Array.prototype.forEach.call(el.attributes, function (a) { newH.setAttribute(a.name, a.value); });
-        newH.textContent = text;
-        return { before: [oldH.outerHTML], after: [newH.outerHTML],
-          note: 'ถ้าต้องการให้ตัวอักษรเล็กหรือใหญ่ ให้ปรับด้วย CSS ไม่ต้องเปลี่ยนระดับหัวข้อ' };
-      }
-      if (p.ruleId === 'R-LABEL-01') {
-        var id = el.getAttribute('id') || ('field-' + n);
-        var labelText = el.getAttribute('placeholder') || el.getAttribute('name') || 'ชื่อของช่องนี้';
-        var input = el.cloneNode(false); input.setAttribute('id', id);
-        var label = doc.createElement('label'); label.setAttribute('for', id); label.textContent = labelText;
-        return { before: [openTagOf(el)], after: [label.outerHTML, openTagOf(input)],
-          note: 'ข้อความในป้ายกำกับควรบอกให้ชัดว่าช่องนี้ให้กรอกอะไร placeholder ยังใช้ได้แต่ไม่นับเป็นป้ายกำกับ' };
-      }
-      if (p.ruleId === 'R-CONTRAST-01') {
-        var style = el.getAttribute('style') || '';
-        var decls = A.parseStyleAttribute(style);
-        var fg = A.parseColor(decls['color']), bg = A.parseColor(decls['background-color']);
-        if (!fg || !bg) return null;
-        var c = suggestTextColor(fg, bg);
-        if (!c) return null;
-        var hex = toHex(c);
-        var newStyle = style.replace(/(^|;)(\s*)color\s*:[^;]*/i, '$1$2color:' + hex);
-        if (newStyle === style) return null;
-        var fixed = el.cloneNode(false); fixed.setAttribute('style', newStyle);
-        return { before: [openTagOf(el)], after: [openTagOf(fixed)],
-          note: 'สีตัวอักษรใหม่ ' + hex + ' ใกล้สีเดิมที่สุดที่ผ่านเกณฑ์ อัตราส่วนจาก ' + A.contrastRatio(fg, bg).toFixed(2) +
-            ' เป็น ' + A.contrastRatio(c, bg).toFixed(2) + ' ต่อ 1 หรือจะปรับสีพื้นหลังแทนก็ได้' };
-      }
-    } catch (e) { return null; }
-    return null;
-  }
+  /* คำอธิบายภาษาง่ายของแต่ละกฎ: ผิดอะไร และกระทบผู้ใช้อย่างไร */
+  var RULE_PLAIN = {
+    'R-ALT-01': { what: 'รูปภาพนี้ไม่มีข้อความแทนภาพ (alt)',
+      why: 'โปรแกรมอ่านหน้าจออ่านรูปภาพเองไม่ได้ ถ้าไม่มี alt ผู้ใช้จะได้ยินแค่ชื่อไฟล์ หรือไม่ได้ยินอะไรเลย จึงไม่รู้ว่าภาพนี้สื่ออะไร' },
+    'R-ALT-02': { what: 'รูปภาพนี้มี alt ว่าง ต้องให้คนยืนยันว่าเป็นภาพตกแต่งจริงหรือไม่',
+      why: 'alt ว่างเป็นการบอกโปรแกรมอ่านหน้าจอให้ข้ามภาพนี้ ถูกต้องเฉพาะภาพตกแต่ง ถ้าภาพนี้มีข้อมูล ผู้ใช้จะพลาดข้อมูลนั้น ระบบตัดสินแทนไม่ได้จึงยังไม่นำมาคิดคะแนน' },
+    'R-HEAD-01': { what: 'หัวข้อนี้ข้ามระดับ',
+      why: 'ผู้ใช้โปรแกรมอ่านหน้าจอมักกระโดดอ่านทีละหัวข้อเพื่อดูโครงของหน้า เมื่อระดับหัวข้อข้ามไป จะเข้าใจว่ามีหัวข้อหายไปหรือโครงเรื่องผิด' },
+    'R-LABEL-01': { what: 'ช่องกรอกนี้ไม่มีป้ายกำกับ',
+      why: 'เมื่อกดไปที่ช่องนี้ โปรแกรมอ่านหน้าจอจะอ่านได้แค่ว่าเป็นช่องกรอก โดยไม่บอกว่าต้องกรอกอะไร ส่วน placeholder จะหายไปเมื่อเริ่มพิมพ์' },
+    'R-CONTRAST-01': { what: 'สีตัวอักษรกับสีพื้นหลังต่างกันไม่พอ',
+      why: 'ตัวอักษรที่สีใกล้กับพื้นหลังอ่านยาก โดยเฉพาะผู้มีสายตาเลือนราง ผู้สูงอายุ ผู้ที่บกพร่องในการเห็นสี และคนที่ดูจอกลางแดด' }
+  };
 
-  function renderFix(fix) {
+  function renderFix(fix, verifyId) {
     var i = FIX_TEXT.push(fix.after.join('\n')) - 1;
     var line = function (cls, sign, label, code) {
       return '<span class="' + cls + '"><span class="sr-only">' + label + '</span><span class="d-sign" aria-hidden="true">' + sign + '</span>' + esc(code) + '</span>';
@@ -298,36 +247,115 @@
       fix.before.map(function (c) { return line('d-del', '−', 'โค้ดเดิม: ', c); }).join('') +
       fix.after.map(function (c) { return line('d-add', '+', 'แก้เป็น: ', c); }).join('') +
       '</code></pre>' +
-      '<p class="fp-note">' + esc(fix.note) + '</p></div>';
+      '<p class="fp-note">' + esc(fix.note) + '</p>' +
+      (verifyId ? '<p class="fp-verify" id="' + verifyId + '" data-state="wait"><b>ผลหลังแก้</b> <span class="fv-text">กำลังตรวจซ้ำโค้ดหลังแก้…</span></p>' : '') +
+      '</div>';
   }
 
-  function renderIssue(p, anchor, n) {
+  /* บรรทัดในโค้ดที่นำเข้า พร้อมปุ่มแสดงโค้ดรอบบรรทัดนั้น (ถ้ายืนยันตำแหน่งไม่ได้ จะแสดงเฉพาะเส้นทางในโครงสร้าง) */
+  function whereBlock(p, anchor) {
+    var line = LOC && p.el ? LOC.line(p.el) : null;
+    var path = p.path ? '<p class="where"><span>เส้นทางในโครงสร้าง HTML:</span> <code>' + esc(p.path) + '</code></p>' : '';
+    if (!line) return '<div class="where-row">' + path + '</div>';
+    var from = Math.max(1, line - 3), to = Math.min(LOC.lineCount, line + 3);
+    return '<div class="where-row">' +
+      '<p class="where-line"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>' +
+      'อยู่ที่<b>บรรทัด ' + line + '</b>ในโค้ดที่นำเข้า</p>' +
+      '<button type="button" class="secondary small js-ctx" data-line="' + line + '" aria-expanded="false" aria-controls="ctx-' + anchor + '">' +
+      'แสดงโค้ดบรรทัด ' + from + '–' + to + '</button>' +
+      '<div class="ctx" id="ctx-' + anchor + '" hidden></div>' + path + '</div>';
+  }
+
+  function renderContext(line) {
+    if (!LOC) return '';
+    return '<pre class="ctx-code" tabindex="0" aria-label="โค้ดรอบบรรทัด ' + line + '"><code>' + LOC.context(line, 3).map(function (r) {
+      return '<span class="cl' + (r.hit ? ' hit' : '') + '"><span class="cl-n" aria-hidden="true">' + r.n + '</span>' +
+        (r.hit ? '<span class="sr-only">บรรทัด ' + r.n + ' จุดที่ผิด: </span>' : '') + esc(r.text) + '</span>';
+    }).join('') + '</code></pre>';
+  }
+
+  function renderIssue(p, anchor, n, total) {
     var sev = p.severity || 'should_fix';
     var part = PART_LABEL[A.RULE_PART[p.ruleId]];
     var isChecklist = p.tag === 'checklist';
+    var isFail = p.status === S.FAIL;
     var fix = buildFix(p, n || 1);
-    var head = '<div class="issue ' + esc(sev) + '"' + (anchor ? ' id="' + anchor + '"' : '') + '>' +
-      '<p class="issue-meta"><span class="sev ' + esc(sev) + '">' + esc(SEVERITY_LABEL[sev] || sev) + '</span>' +
+    var plain = RULE_PLAIN[p.ruleId] || {};
+    var c = A.CRITERIA[p.sc] || {};
+    var idx = state.result ? state.result.pairs.indexOf(p) : -1;
+    var verifyId = fix && idx >= 0 ? 'fv-' + anchor : null;
+    if (verifyId) VERIFY_JOBS.push({ id: verifyId, idx: idx });
+    var head = '<article class="issue ' + esc(sev) + '"' + (anchor ? ' id="' + anchor + '"' : '') + ' tabindex="-1">' +
+      '<p class="issue-meta">' + (total ? '<span class="iss-no">จุดที่ ' + n + ' จาก ' + total + '</span>' : '') +
+      '<span class="badge ' + (isFail ? 'bad' : 'warn') + '">' + (isFail ? 'ไม่ผ่าน' : 'ต้องตรวจเพิ่ม') + '</span>' +
+      '<span class="sev ' + esc(sev) + '">' + esc(SEVERITY_LABEL[sev] || sev) + '</span>' +
       '<span class="rule-id">' + esc(p.ruleId) + '</span>' +
       '<span>' + (part ? esc(part) + ' · ' : '') + esc(isChecklist ? 'คำตอบจากแบบประเมิน' : '<' + p.tag + '>') + '</span></p>' +
-      '<h4 class="issue-msg">' + esc(p.message) + '</h4>';
+      '<h4 class="issue-msg">' + esc(isChecklist ? p.message : (plain.what || p.message)) + '</h4>' +
+      '<dl class="iss-why">' +
+      '<div><dt>' + (isFail ? 'ผิดข้อ' : 'ตรวจตามข้อ') + '</dt><dd><a href="#' + stdAnchor(p.sc) + '">WCAG 2.1 ' + esc(p.sc) + ' ' + esc(c.nameTh || '') + '</a> ระดับ ' + esc(c.level || '') +
+        ' · กฎตรวจ ' + esc(p.ruleId) + '</dd></div>' +
+      (isChecklist ? '' : '<div><dt>ระบบพบว่า</dt><dd>' + esc(p.message) + '</dd></div>') +
+      (plain.why ? '<div><dt>ผลกระทบ</dt><dd>' + esc(plain.why) + '</dd></div>' : '') +
+      '</dl>' + (isChecklist ? '' : whereBlock(p, anchor));
     if (fix) {
       return head +
         (p.suggestion ? '<p class="fix-how"><b>แนวทางแก้ไข</b> ' + esc(p.suggestion) + '</p>' : '') +
-        renderFix(fix) +
-        (p.path ? '<p class="where">ตำแหน่ง: ' + esc(p.path) + '</p>' : '') +
-        standardBlock(p) + '</div>';
+        renderFix(fix, verifyId) +
+        standardBlock(p) + '</article>';
     }
     return head +
       '<div class="codes' + (p.suggestion ? '' : ' single') + '">' +
       '<div class="code-col found"><p class="code-cap">' + (isChecklist ? 'ที่มา' : 'โค้ดที่พบ') + '</p>' +
-      '<code class="snippet">' + esc(p.snippet) + '</code>' +
-      (p.path && !isChecklist ? '<p class="where">ตำแหน่ง: ' + esc(p.path) + '</p>' : '') + '</div>' +
+      '<code class="snippet">' + esc(p.snippet) + '</code></div>' +
       (p.suggestion ? '<div class="code-col fix"><p class="code-cap">แนวทางแก้ไข</p><p>' + esc(p.suggestion) + '</p>' +
         (p.example ? '<p class="code-cap sub">ตัวอย่างโค้ดที่ถูกต้อง</p><code class="snippet">' + esc(p.example) + '</code>' : '') + '</div>' : '') +
       '</div>' +
+      (p.status === S.NEEDS_REVIEW ? '<p class="fp-verify" data-state="review"><b>ผลหลังแก้</b> <span class="fv-text">จุดนี้ระบบตัดสินแทนไม่ได้ ' +
+        'ให้ตอบแบบประเมินในขั้นที่ 2 ถ้าตอบว่าเป็นภาพตกแต่งจริง จุดนี้จะนับเป็นผ่าน ถ้าไม่ใช่ ให้ใส่ข้อความใน alt แล้วตรวจซ้ำ</span></p>' : '') +
       standardBlock(p) +
-      '</div>';
+      '</article>';
+  }
+
+  /* ตรวจซ้ำทีละจุดหลังวาดผล ทำเป็นช่วง ๆ เพื่อไม่ให้หน้าค้าง ผลเดิมจะถูกยกเลิกเมื่อมีการตรวจใหม่ */
+  var VERIFY_LIMIT = 150;
+  function runVerifyJobs() {
+    var gen = ++verifyGen;
+    var jobs = VERIFY_JOBS.slice(0, VERIFY_LIMIT), html = state.sourceHtml, checklist = state.checklist;
+    VERIFY_JOBS.slice(VERIFY_LIMIT).forEach(function (j) {
+      var el = $(j.id); if (!el) return;
+      el.setAttribute('data-state', 'skip');
+      el.querySelector('.fv-text').textContent = 'หน้านี้มีจุดที่ต้องแก้มาก ระบบตรวจซ้ำให้อัตโนมัติเฉพาะ ' + VERIFY_LIMIT + ' จุดแรก ใช้ปุ่ม “ทดลองแก้ทุกจุดแล้วตรวจซ้ำ” ด้านบนแทน';
+    });
+    var i = 0;
+    (function step() {
+      if (gen !== verifyGen) return;
+      var stop = Math.min(jobs.length, i + 6);
+      for (; i < stop; i++) {
+        var j = jobs[i], el = $(j.id);
+        if (!el) continue;
+        var r = null;
+        try { r = F.verifyOne(html, j.idx, checklist); } catch (e) { r = null; }
+        var t = el.querySelector('.fv-text');
+        if (!r) { el.setAttribute('data-state', 'skip'); t.textContent = 'ตรวจซ้ำอัตโนมัติไม่ได้สำหรับจุดนี้'; continue; }
+        var scoreTxt = (r.scoreBefore !== null && r.score !== null)
+          ? ' · คะแนนรวม ' + r.scoreBefore.toFixed(2) + ' → ' + r.score.toFixed(2) : '';
+        if (r.status === S.PASS && !r.newFails) {
+          el.setAttribute('data-state', 'pass');
+          t.innerHTML = 'ตรวจซ้ำด้วยระบบเดิมแล้ว ถ้าแก้ตามนี้ จุดนี้จะ<strong>ผ่าน</strong>' + esc(scoreTxt);
+        } else if (r.status === S.PASS) {
+          el.setAttribute('data-state', 'partial');
+          t.innerHTML = 'จุดนี้จะ<strong>ผ่าน</strong> แต่ทำให้เกิดจุดผิดใหม่ ' + r.newFails + ' จุด เช่น หัวข้อถัดไปข้ามระดับ ต้องแก้ต่อ' + esc(scoreTxt);
+        } else if (r.status === S.FAIL) {
+          el.setAttribute('data-state', 'fail');
+          t.textContent = 'ตรวจซ้ำแล้วยังไม่ผ่าน ต้องแก้เพิ่มจากตัวอย่างนี้' + scoreTxt;
+        } else {
+          el.setAttribute('data-state', 'review');
+          t.textContent = 'หลังแก้ จุดนี้ต้องให้ผู้ประเมินตรวจเพิ่ม' + scoreTxt;
+        }
+      }
+      if (i < jobs.length) setTimeout(step, 0);
+    })();
   }
 
   /* ================================================================ *
@@ -339,8 +367,8 @@
 
   function renderIssueList(result) {
     var rows = [];
-    result.issues.forEach(function (p, i) { rows.push({ p: p, f: p.severity || 'should_fix', href: '#issue-' + (i + 1) }); });
-    result.needsReview.forEach(function (p, i) { rows.push({ p: p, f: 'review', href: '#review-' + (i + 1) }); });
+    result.issues.forEach(function (p, i) { rows.push({ p: p, f: p.severity || 'should_fix', href: '#issue-' + (i + 1), n: i + 1 }); });
+    result.needsReview.forEach(function (p, i) { rows.push({ p: p, f: 'review', href: '#review-' + (i + 1), n: i + 1 }); });
     if (!rows.length) return '';
     var count = function (f) { return rows.filter(function (r) { return r.f === f; }).length; };
     var chips = [['all', 'ทั้งหมด', rows.length], ['critical', 'วิกฤต', count('critical')], ['should_fix', 'ควรแก้', count('should_fix')],
@@ -352,20 +380,23 @@
         return '<button type="button" class="il-chip' + (c[0] !== 'all' ? ' f-' + c[0] : '') + '" data-f="' + c[0] + '" aria-pressed="' + (c[0] === 'all') + '">' +
           esc(c[1]) + ' <b>' + c[2] + '</b></button>';
       }).join('') + '</div></div>' +
-      '<p class="il-count" role="status" aria-live="polite">แสดงทั้งหมด ' + rows.length + ' รายการ</p>' +
+      '<p class="il-count" role="status" aria-live="polite">แสดงทั้งหมด ' + rows.length + ' รายการ กด “ดูวิธีแก้” เพื่อเลื่อนลงไปที่การ์ดรายละเอียดของจุดนั้น</p>' +
       '<div class="table-scroll" tabindex="0" role="region" aria-label="ตารางรายการปัญหา"><table class="il-table">' +
-      '<thead><tr><th scope="col">ความรุนแรง</th><th scope="col">ปัญหา</th><th scope="col">โค้ดที่พบ</th>' +
+      '<thead><tr><th scope="col">สถานะ</th><th scope="col">ปัญหา</th><th scope="col">โค้ดที่พบ</th><th scope="col" class="num">บรรทัด</th>' +
       '<th scope="col">หลักเกณฑ์</th><th scope="col"><span class="sr-only">รายละเอียด</span></th></tr></thead><tbody>' +
       rows.map(function (r) {
         var p = r.p, c = A.CRITERIA[p.sc] || {};
-        var sevCell = r.f === 'review' ? '<span class="sev review">ต้องตรวจเพิ่ม</span>'
-          : '<span class="sev ' + esc(r.f) + '">' + esc(SEVERITY_LABEL[r.f] || r.f) + '</span>';
+        var sevCell = r.f === 'review' ? '<span class="badge warn">ต้องตรวจเพิ่ม</span>'
+          : '<span class="badge bad">ไม่ผ่าน</span> <span class="sev ' + esc(r.f) + '">' + esc(SEVERITY_LABEL[r.f] || r.f) + '</span>';
         var title = p.tag === 'checklist' ? A.truncate(p.message, 60) : (RULE_TITLE[p.ruleId] || p.ruleId);
-        return '<tr data-f="' + r.f + '"><td>' + sevCell + '</td>' +
+        var ln = LOC && p.el ? LOC.line(p.el) : null;
+        return '<tr data-f="' + r.f + '"><td class="il-st">' + sevCell + '</td>' +
           '<td><span class="rule-id">' + esc(p.ruleId) + '</span> ' + esc(title) + '</td>' +
           '<td><code>' + esc(A.truncate(p.snippet, 48)) + '</code></td>' +
+          '<td class="num">' + (ln ? ln : '—') + '</td>' +
           '<td>' + esc(p.sc) + (c.level ? ' · ' + esc(c.level) : '') + '</td>' +
-          '<td><a class="il-go" href="' + r.href + '">วิธีแก้<span class="sr-only"> ' + esc(title) + '</span> ›</a></td></tr>';
+          '<td><a class="il-go" href="' + r.href + '">' + (r.f === 'review' ? 'ดูวิธีตรวจ' : 'ดูวิธีแก้') +
+          '<span class="sr-only"> ' + esc(title) + ' จุดที่ ' + r.n + '</span> <span aria-hidden="true">↓</span></a></td></tr>';
       }).join('') + '</tbody></table></div></section>';
   }
 
@@ -404,18 +435,18 @@
     list.forEach(function (c) {
       var crit = A.CRITERIA[c.sc];
       var state, text;
-      if (c.total === 0) { state = 'none'; text = c.key === 'color' ? 'ตรวจไม่ได้' : 'ไม่มีในหน้านี้'; }
-      else if (c.fail > 0) { state = 'bad'; text = 'ต้องแก้'; }
-      else if (c.needsReview > 0) { state = 'warn'; text = 'รอตรวจเพิ่ม'; }
+      if (c.total === 0) { state = 'none'; text = 'ไม่มีให้ตรวจ'; }
+      else if (c.fail > 0) { state = 'bad'; text = 'ไม่ผ่าน'; }
+      else if (c.needsReview > 0) { state = 'warn'; text = 'ต้องตรวจเพิ่ม'; }
       else if (c.counted > 0) { state = 'good'; text = 'ผ่าน'; }
-      else { state = 'none'; text = 'ไม่มีจุดให้ตรวจ'; }
+      else { state = 'none'; text = 'ไม่มีให้ตรวจ'; }
       var target = c.fail > 0 ? '#part-' + c.key : c.needsReview > 0 ? '#review-' + c.key : null;
       var seg = function (n, cls) {
         return n ? '<span class="' + cls + '" style="width:' + (n / c.total * 100).toFixed(2) + '%"></span>' : '';
       };
       var note = c.total === 0
-        ? (c.key === 'color' ? 'ไม่มีองค์ประกอบที่กำหนดทั้งสีตัวอักษรและสีพื้นหลังไว้ใน style ระบบจึงตรวจไม่ได้'
-                             : 'ไม่พบ' + esc(c.what) + 'ในโค้ดชุดนี้')
+        ? (c.key === 'color' ? 'ไม่มีองค์ประกอบที่กำหนดทั้งสีตัวอักษรและสีพื้นหลังไว้ใน style ระบบจึงไม่มีจุดให้ตรวจ ไม่ได้แปลว่าผ่าน'
+                             : 'ไม่พบ' + esc(c.what) + 'ในโค้ดชุดนี้ จึงไม่มีจุดให้ตรวจ ไม่ได้แปลว่าผ่าน')
         : 'ตรวจได้&nbsp;' + c.counted + '&nbsp;จุด · ผ่าน&nbsp;' + c.pass + (c.needsReview ? ' · รอตรวจ&nbsp;' + c.needsReview : '') +
           (c.notApplicable ? ' · ไม่เกี่ยวข้อง&nbsp;' + c.notApplicable : '');
       var tag = target ? 'a' : 'div';
@@ -427,7 +458,7 @@
           seg(c.needsReview, 'b-rev') + seg(c.notApplicable, 'b-na') + '</span>' : '') +
         '<span class="part-meta">' + note + '</span>' +
         '<span class="part-std">' + esc(c.sc).replace(' ', '&nbsp;') + ' ' + esc(crit.nameTh) + ' · ระดับ&nbsp;' + esc(crit.level) + '</span>' +
-        (target ? '<span class="part-go">ดูจุดที่' + (c.fail ? 'ผิด' : 'ต้องตรวจเพิ่ม') + ' ›</span>' : '') +
+        (target ? '<span class="part-go">ไปที่ ' + (c.fail || c.needsReview) + ' จุดที่' + (c.fail ? 'ผิด' : 'ต้องตรวจเพิ่ม') + ' <span aria-hidden="true">↓</span></span>' : '') +
         '</' + tag + '>');
     });
     out.push('</div>');
@@ -472,31 +503,143 @@
     return out.join('');
   }
 
+  /* ความครอบคลุมของคะแนน: หลักเกณฑ์ใดถูกนำมาคิดคะแนนจริง หลักเกณฑ์ใดรอผู้ประเมิน และหลักเกณฑ์ใดไม่มีจุดให้ตรวจ
+     แก้ปัญหาที่ผู้ประเมินพบว่าเว็บที่ไม่มีรูปภาพหรือสีใน style ได้ 100 เต็มโดยไม่บอกว่าคิดจากหลักเกณฑ์เดียว
+     สูตรคะแนนไม่เปลี่ยน (บทที่ 3.7.2) เปลี่ยนเฉพาะการแสดงผลให้เห็นว่าคะแนนมาจากอะไร */
+  function coverageOf(result) {
+    var out = { scored: [], review: [], none: [], rows: [] };
+    A.CRITERIA_ORDER.forEach(function (sc) {
+      var c = result.byCriterion[sc], crit = A.CRITERIA[sc];
+      var row = { sc: sc, c: c, crit: crit };
+      if (c.counted > 0) {
+        row.state = c.fail ? 'bad' : 'good'; row.label = c.fail ? 'ไม่ผ่าน ' + c.fail + ' จุด' : 'ผ่าน';
+        row.text = 'นำมาคิดคะแนนแล้ว ตรวจได้ ' + c.counted + ' จุด · ผ่าน ' + c.pass + ' · ไม่ผ่าน ' + c.fail +
+          (c.needsReview ? ' · รอผู้ประเมิน ' + c.needsReview : '');
+        out.scored.push(sc);
+      } else if (c.needsReview > 0) {
+        row.state = 'warn'; row.label = 'รอผู้ประเมิน';
+        row.text = 'ยังไม่นำมาคิดคะแนน มี ' + c.needsReview + ' จุดที่ระบบตัดสินแทนไม่ได้ ตอบแบบประเมินในขั้นที่ 2 แล้วระบบจะนำมาคิดคะแนน';
+        out.review.push(sc);
+      } else {
+        row.state = 'none'; row.label = 'ไม่มีให้ตรวจ';
+        row.text = 'ไม่นำมาคิดคะแนน ' + (sc === 'SC 1.1.1'
+          ? (c.related ? 'ภาพทั้งหมดประกาศเป็นภาพตกแต่ง (role="presentation" หรือ aria-hidden) จึงไม่มีจุดให้ตรวจ' : 'เพราะไม่พบแท็ก <img> ในโค้ดชุดนี้')
+          : sc === 'SC 1.3.1' ? 'เพราะไม่พบหัวข้อที่เทียบลำดับได้ (ต้องมีอย่างน้อย 2 หัวข้อ) และไม่พบช่องกรอกที่ต้องมีป้ายกำกับ'
+          : 'เพราะไม่มีองค์ประกอบที่กำหนดทั้งสีตัวอักษรและสีพื้นหลังไว้ใน style ถ้าเว็บกำหนดสีในไฟล์ CSS ระบบไม่ได้อ่าน');
+        out.none.push(sc);
+      }
+      out.rows.push(row);
+    });
+    return out;
+  }
+
+  function renderCoverage(result, cov) {
+    var n = cov.scored.length, total = A.CRITERIA_ORDER.length;
+    var hasScore = result.score !== null && result.score !== undefined;
+    var missing = cov.review.concat(cov.none);
+    var title = n === total ? 'คะแนนนี้คิดจากครบทั้ง ' + total + ' หลักเกณฑ์'
+      : n === 0 ? 'ยังคิดคะแนนไม่ได้ เพราะไม่มีหลักเกณฑ์ใดมีจุดที่ตัดสินได้'
+      : 'คะแนนนี้คิดจาก ' + n + ' ใน ' + total + ' หลักเกณฑ์เท่านั้น';
+    var lead = n === total
+      ? 'ทั้งสามหลักเกณฑ์มีจุดที่ระบบตัดสินได้ คะแนนจึงสะท้อนกฎย่อยที่ระบบตรวจครบ แต่ยังไม่ใช่การรับรองว่าผ่าน WCAG 2.1 ทั้งฉบับ'
+      : n === 0 ? 'ตอบแบบประเมินในขั้นที่ 2 หรือตรวจโค้ดที่มีรูปภาพ หัวข้อ ช่องกรอก หรือสีที่กำหนดใน style'
+      : esc(missing.join(' และ ')) + ' ไม่ได้ถูกนำมาคิดคะแนน คะแนน ' + (hasScore ? result.score.toFixed(2) : '') +
+        ' จึงหมายถึงผลของ ' + esc(cov.scored.join(' และ ')) + ' เท่านั้น ไม่ได้หมายความว่าเว็บไซต์ผ่านทั้ง ' + total + ' หลักเกณฑ์';
+    return '<section class="covpanel cov-' + (n === total ? 'full' : 'part') + '" aria-labelledby="h-covpanel">' +
+      '<h2 id="h-covpanel">' + title + '</h2><p class="cp-lead">' + lead + '</p>' +
+      '<ul class="cp-list">' + cov.rows.map(function (r) {
+        return '<li class="cp-' + r.state + '"><span class="badge ' + r.state + '">' + esc(r.label) + '</span>' +
+          '<span class="cp-name"><b>' + esc(r.sc) + '</b> ' + esc(r.crit.nameTh) + ' <small>ระดับ ' + esc(r.crit.level) + ' · น้ำหนัก ' + r.crit.weight + '</small></span>' +
+          '<span class="cp-text">' + esc(r.text) + '</span></li>';
+      }).join('') + '</ul></section>';
+  }
+
+  /* แถบเกณฑ์แปลผลคะแนนด้านบนสุดของหน้าผล ช่วงคะแนนตรงกับ interpretScore ในบทที่ 3.7.3 */
+  function renderBands(result, hasScore) {
+    var tone = result.interpretation.tone;
+    return '<div class="bands"><p class="bands-cap" id="bands-cap">เกณฑ์แปลผลคะแนน 0–100</p>' +
+      '<ol class="bands-row" aria-labelledby="bands-cap">' + SCORE_BANDS.map(function (b) {
+        var on = hasScore && b.tone === tone;
+        return '<li class="bd bd-' + b.tone + (on ? ' on' : '') + '"' + (on ? ' aria-current="true"' : '') + '>' +
+          '<b>' + esc(b.name) + '</b><span>' + b.from + '–' + (b.to === 100 ? '100' : (b.to - 0.01).toFixed(2)) + ' คะแนน</span>' +
+          (on ? '<em><span aria-hidden="true">▲ </span>คะแนนของคุณ ' + result.score.toFixed(2) + '</em>' : '') + '</li>';
+      }).join('') + '</ol></div>';
+  }
+
+  /* เทียบผลกับการตรวจครั้งก่อน: จุดเดิมจับคู่ด้วยโค้ดที่พบ แล้วจึงด้วยตำแหน่งในโครงสร้าง ที่เหลือคือแก้แล้วหรือพบใหม่ */
+  function diffIssues(prevIssues, curIssues) {
+    var left = curIssues.slice(), fixed = [], kept = 0, unmatched = [];
+    var take = function (pred) {
+      for (var i = 0; i < left.length; i++) if (pred(left[i])) return left.splice(i, 1)[0];
+      return null;
+    };
+    prevIssues.forEach(function (p) {
+      if (take(function (q) { return q.ruleId === p.ruleId && q.snippet === p.snippet; })) kept++; else unmatched.push(p);
+    });
+    unmatched.forEach(function (p) {
+      if (take(function (q) { return q.ruleId === p.ruleId && q.path === p.path; })) kept++; else fixed.push(p);
+    });
+    return { fixed: fixed, kept: kept, added: left };
+  }
+
+  function renderCompare(cmp) {
+    var fmt = function (v) { return v === null || v === undefined ? '—' : v.toFixed(2); };
+    var delta = (cmp.before !== null && cmp.after !== null) ? cmp.after - cmp.before : null;
+    var list = cmp.fixed.slice(0, 8).map(function (p) {
+      return '<li><span class="badge good">แก้แล้ว</span> <span class="rule-id">' + esc(p.ruleId) + '</span> ' +
+        esc(RULE_TITLE[p.ruleId] || '') + ' <code>' + esc(A.truncate(p.snippet, 60)) + '</code></li>';
+    }).concat(cmp.added.slice(0, 5).map(function (p) {
+      return '<li><span class="badge bad">พบใหม่</span> <span class="rule-id">' + esc(p.ruleId) + '</span> ' +
+        esc(RULE_TITLE[p.ruleId] || '') + ' <code>' + esc(A.truncate(p.snippet, 60)) + '</code></li>';
+    }));
+    return '<section class="cmp" aria-labelledby="h-cmp">' +
+      '<h2 id="h-cmp" tabindex="-1">' + (cmp.auto ? 'ผลการทดลองแก้ตามคำแนะนำแล้วตรวจซ้ำ' : 'เทียบกับการตรวจครั้งก่อน') + '</h2>' +
+      '<div class="cmp-grid">' +
+      '<p class="cmp-score"><span class="cmp-cap">คะแนน</span><b>' + fmt(cmp.before) + '</b><span class="cmp-arrow" aria-hidden="true">→</span>' +
+      '<span class="sr-only">เป็น</span><b class="new">' + fmt(cmp.after) + '</b>' +
+      (delta !== null ? '<em class="' + (delta >= 0 ? 'up' : 'down') + '">' + (delta >= 0 ? '+' : '') + delta.toFixed(2) + '</em>' : '') + '</p>' +
+      '<ul class="cmp-k"><li class="k-good"><b>' + cmp.fixed.length + '</b> จุดที่แก้แล้ว</li>' +
+      '<li><b>' + cmp.kept + '</b> จุดที่ยังเหลือ</li><li class="k-bad"><b>' + cmp.added.length + '</b> จุดผิดใหม่</li></ul></div>' +
+      (list.length ? '<ul class="cmp-list">' + list.join('') + '</ul>' : '') +
+      (cmp.auto ? '<p class="cmp-note">ระบบแก้ ' + cmp.auto.fixedCount + ' จุดด้วยวิธีเดียวกับตัวอย่างโค้ดหลังแก้ แล้วตรวจโค้ดใหม่ทั้งหน้าด้วยกฎชุดเดิม ' +
+        'โค้ดหลังแก้อยู่ในช่องนำเข้าโค้ดแล้ว ข้อความใน alt และในป้ายกำกับเป็นตัวอย่าง ต้องแก้ให้ตรงกับเนื้อหาจริงก่อนใช้งาน ' +
+        '<button type="button" class="secondary small js-undo-fix">กลับไปใช้โค้ดเดิม</button></p>' : '') +
+      '</section>';
+  }
+
+  function renderRecheck(result) {
+    if (!result.issueCount && !result.needsReviewCount) return '';
+    var fixable = F ? result.pairs.filter(F.canFix).length : 0;
+    return '<section class="recheck no-print" aria-labelledby="h-recheck"><div class="rc-text"><h2 id="h-recheck">แก้แล้วตรวจซ้ำ</h2>' +
+      '<p>แก้โค้ดตามคำแนะนำ แล้วกดตรวจอีกครั้ง ระบบจะเทียบกับผลครั้งนี้ว่าแก้ได้กี่จุด เหลือกี่จุด และคะแนนเปลี่ยนเท่าไร ' +
+      'หรือกดทดลองให้ระบบแก้ตามตัวอย่างโค้ดหลังแก้ทุกจุดแล้วตรวจซ้ำให้ดู</p></div>' +
+      '<p class="rc-act"><a class="btn-ghost" href="#input-section">แก้โค้ดแล้วตรวจซ้ำ</a>' +
+      (fixable ? '<button type="button" class="js-autofix">ทดลองแก้ ' + fixable + ' จุดแล้วตรวจซ้ำ</button>' : '') + '</p></section>';
+  }
+
   function renderResults(result, highlighted) {
     var h = [];
     FIX_TEXT = [];
+    VERIFY_JOBS = [];
     var interp = result.interpretation;
-
-    /* ---- คะแนน: ตัวเลขเป็นข้อมูลหลัก แถบด้านข้างแสดงว่าคะแนนตกช่วงใดตามเกณฑ์ในบทที่ 3.7.3 ---- */
     var hasScore = result.score !== null && result.score !== undefined;
-    var scale = SCORE_BANDS.map(function (b) {
-      return '<span class="seg ' + b.tone + (b.tone === interp.tone ? ' on' : '') + '" style="width:' + (b.to - b.from) + '%"></span>';
-    }).join('') + (hasScore ? '<span class="marker" style="left:' + Math.max(0, Math.min(100, result.score)).toFixed(2) + '%"></span>' : '');
+    var cov = coverageOf(result);
+
+    if (state.compare) h.push(renderCompare(state.compare));
+    h.push(renderBands(result, hasScore));
+
+    /* ---- คะแนน: ตัวเลขเป็นข้อมูลหลัก บอกด้วยว่าคิดจากกี่หลักเกณฑ์ ---- */
     h.push('<div class="score" id="r-score">' +
       '<div class="score-card">' +
       '<div class="score-main">' +
       '<p class="score-label">คะแนนผลการตรวจเบื้องต้นตามรายการที่กำหนด</p>' +
       '<p class="score-num">' + (hasScore ? '<b>' + result.score.toFixed(2) + '</b><span>จาก 100</span>' : '<b>—</b><span>ไม่มีคะแนน</span>') + '</p>' +
       '<p class="score-band"><span class="tag ' + interp.tone + '">' + esc(interp.band) + '</span> ' + esc(interp.text) + '</p>' +
-      '</div>' +
-      '<div class="scale-wrap" aria-hidden="true">' +
-      '<p class="scale-cap">ช่วงคะแนน' + (hasScore ? '' : ' (ยังไม่มีคะแนนให้วาง)') + '</p>' +
-      '<div class="scale">' + scale + '</div>' +
-      '<div class="scale-ticks"><span style="left:0">0</span>' + SCORE_BANDS.slice(1).map(function (b) {
-        return '<span style="left:' + b.from + '%">' + b.from + '</span>'; }).join('') + '<span style="left:100%">100</span></div>' +
-      '<div class="scale-names">' + SCORE_BANDS.map(function (b) {
-        return '<span' + (b.tone === interp.tone ? ' class="on"' : '') + ' style="width:' + (b.to - b.from) + '%">' + esc(b.name) + '</span>'; }).join('') +
-      '</div></div></div>' +
+      (hasScore ? '<p class="score-cov ' + (cov.scored.length < A.CRITERIA_ORDER.length ? 'part' : 'full') + '">' +
+        (cov.scored.length < A.CRITERIA_ORDER.length
+          ? 'คิดจาก ' + cov.scored.length + ' ใน ' + A.CRITERIA_ORDER.length + ' หลักเกณฑ์ (' + esc(cov.scored.join(', ')) + ')'
+          : 'คิดจากครบ ' + A.CRITERIA_ORDER.length + ' หลักเกณฑ์') + '</p>' : '') +
+      '</div></div>' +
       renderKpis(result) +
       renderSeverityStrip(result) + renderCriteriaBars(result) +
       '<p class="score-src">แหล่งข้อมูล: ' + esc(state.sourceLabel || 'วางโค้ดเอง') +
@@ -504,13 +647,10 @@
       (state.fetchMs !== null ? ' · ดึงข้อมูลผ่านบริการตัวกลาง ' + state.fetchMs + ' มิลลิวินาที' : '') +
       '</p></div>');
 
+    h.push(renderCoverage(result, cov));
+    h.push(renderRecheck(result));
     h.push(renderIssueList(result));
     h.push(renderPartsDashboard(result));
-
-    h.push('<div class="note info" role="note"><p>' +
-      'คะแนนนี้สะท้อนเฉพาะกฎย่อยสี่กฎที่ระบบตรวจได้ ไม่ใช่คะแนนความสอดคล้องกับมาตรฐาน WCAG 2.1 ทั้งฉบับ ' +
-      'ให้อ่านควบคู่กับคอลัมน์ &ldquo;จำนวนจุดที่ตรวจได้&rdquo; ในตารางด้านล่างเสมอ เพราะคะแนนสูงในหลักเกณฑ์ที่ตรวจได้น้อยจุด ' +
-      'ไม่ได้แปลว่าเว็บไซต์ไม่มีปัญหาในหลักเกณฑ์นั้น</p></div>');
 
     /* ---- ตารางความครอบคลุมรายหลักเกณฑ์ ---- */
     h.push('<h2 id="h-coverage">ความครอบคลุมและอัตราไม่ผ่านรายหลักเกณฑ์</h2>');
@@ -582,9 +722,9 @@
 
     /* ---- ที่มาของคะแนน ---- */
     h.push('<details><summary>ที่มาของคะแนนทีละขั้น</summary>');
-    h.push('<div class="table-scroll" tabindex="0" role="region" aria-label="ตารางที่มาของคะแนน"><table><caption>PreliminaryScore = 100 × [ 1 − ( Σ w<sub>i</sub> × FailureRate(i) ) / Σ w<sub>i</sub> ]</caption>' +
+    h.push('<div class="table-scroll" tabindex="0" role="region" aria-label="ตารางที่มาของคะแนน"><table><caption>คะแนน = 100 × [ 1 − ( Σ น้ำหนัก × อัตราไม่ผ่าน ) ÷ Σ น้ำหนัก ] <span class="muted">(PreliminaryScore ตามบทที่ 3.7.2)</span></caption>' +
       '<thead><tr><th scope="col">หลักเกณฑ์</th><th scope="col" class="num">ตรวจได้ / ไม่ผ่าน</th>' +
-      '<th scope="col" class="num">FailureRate</th><th scope="col" class="num">น้ำหนัก × FailureRate</th></tr></thead><tbody>');
+      '<th scope="col" class="num">อัตราไม่ผ่าน</th><th scope="col" class="num">น้ำหนัก × อัตราไม่ผ่าน</th></tr></thead><tbody>');
     result.scoring.terms.forEach(function (t) {
       var c = result.byCriterion[t.sc];
       h.push('<tr><th scope="row">' + esc(t.sc) + '</th>' +
@@ -614,7 +754,7 @@
           '<span class="muted">ละเมิด ' + esc(part.sc) + ' ' + esc(c.nameTh) + ' ระดับ ' + esc(c.level) + '</span></h3>');
         group.forEach(function (p) {
           var n = result.issues.indexOf(p) + 1;
-          h.push(renderIssue(p, 'issue-' + n, n));
+          h.push(renderIssue(p, 'issue-' + n, n, result.issueCount));
         });
       });
     }
@@ -628,7 +768,7 @@
         var group = result.needsReview.filter(function (p) { return A.RULE_PART[p.ruleId] === part.key; });
         if (!group.length) return;
         h.push('<h3 id="review-' + part.key + '" class="part-h">' + esc(part.label) + ' — ' + group.length + ' จุด</h3>');
-        group.forEach(function (p) { h.push(renderIssue(p, 'review-' + (result.needsReview.indexOf(p) + 1))); });
+        group.forEach(function (p) { var k = result.needsReview.indexOf(p) + 1; h.push(renderIssue(p, 'review-' + k, k, result.needsReviewCount)); });
       });
     }
 
@@ -872,16 +1012,30 @@
       return;
     }
 
+    /* เทียบกับผลครั้งก่อนเมื่อเป็นแหล่งเดิมแต่โค้ดเปลี่ยน (ผู้ใช้แก้แล้วตรวจซ้ำ) หรือเมื่อทดลองแก้อัตโนมัติ
+       เก็บไว้ในหน่วยความจำของหน้าเว็บเท่านั้น ไม่ส่งและไม่บันทึกโค้ดไปที่ใด */
+    var prev = state.result;
+    var forced = state.compareNext; state.compareNext = null;
+    state.compare = null;
+    if (prev && state.sourceHtml !== html && (forced || (state.sourceLabel === label && state.mode === mode))) {
+      var d = diffIssues(prev.issues, result.issues);
+      state.compare = { before: prev.score, after: result.score, fixed: d.fixed, kept: d.kept, added: d.added,
+        auto: forced && forced.auto ? forced : null };
+    }
+
     state.result = result;
     state.sourceHtml = html;
     state.sourceLabel = label;
     state.mode = mode;
+    state.checklist = checklist;
+    try { LOC = F ? F.locator(html) : null; } catch (e) { LOC = null; }
 
     var highlighted = null;
     try { highlighted = buildHighlightedSource(html, checklist); }
     catch (e) { highlighted = null; }
 
     renderResults(result, highlighted);
+    if (F) runVerifyJobs();
     /* วงแหวนคะแนนรอบตัวเลข (ตกแต่ง ตัวเลขจริงอยู่ในข้อความ) */
     var scoreBox = document.querySelector('#results-body .score');
     if (scoreBox) {
@@ -897,6 +1051,40 @@
       if (location.hash === '#results-section') route(true);
       else location.hash = '#results-section';
     }
+  }
+
+  function useMode(mode) {
+    var r = $(mode === 'url' ? 'mode-url' : 'mode-snippet');
+    r.checked = true; r.dispatchEvent(new Event('change'));
+  }
+
+  /* ทดลองแก้ทุกจุดตามตัวอย่างโค้ดหลังแก้ แล้วตรวจโค้ดใหม่ทั้งหน้า (Feedback Loop) */
+  function onAutoFix() {
+    if (!F || !state.result) return;
+    var res = F.fixAll(state.sourceHtml, state.checklist);
+    state.undo = { html: state.sourceHtml, label: state.sourceLabel, mode: state.mode };
+    state.compareNext = { auto: true, fixedCount: res.fixedCount };
+    useMode('snippet');
+    $('html-input').value = res.html;
+    runAnalysis(res.html, 'โค้ดหลังแก้อัตโนมัติ', 'snippet', true);
+    focusTop('h-cmp');
+  }
+  function onUndoFix() {
+    var u = state.undo;
+    if (!u) return;
+    state.undo = null;
+    useMode('snippet');
+    $('html-input').value = u.html;
+    runAnalysis(u.html, u.label, u.mode, true);
+    focusTop('h-results');
+  }
+  function focusTop(id) {
+    var el = $(id);
+    if (!el) return;
+    if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
+    try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+    var y = el.getBoundingClientRect().top + window.pageYOffset - 96;
+    try { window.scrollTo({ top: y, behavior: 'instant' }); } catch (e) { window.scrollTo(0, y); }
   }
 
   /* ดึง HTML จากลิงก์ผ่านบริการตัวกลางตามลำดับที่กำหนด (บทที่ 3.3.1 และ 3.3.2) */
@@ -1205,6 +1393,17 @@
           : 'แสดง ' + shown + ' จาก ' + rows.length + ' รายการ (' + chip.firstChild.textContent.trim() + ')';
         return;
       }
+      if (e.target.closest('.js-autofix')) { onAutoFix(); return; }
+      if (e.target.closest('.js-undo-fix')) { onUndoFix(); return; }
+      var ctxBtn = e.target.closest('.js-ctx');
+      if (ctxBtn) {
+        var box = $(ctxBtn.getAttribute('aria-controls'));
+        var open = ctxBtn.getAttribute('aria-expanded') !== 'true';
+        if (open && !box.innerHTML) box.innerHTML = renderContext(+ctxBtn.getAttribute('data-line'));
+        box.hidden = !open;
+        ctxBtn.setAttribute('aria-expanded', String(open));
+        return;
+      }
       var copy = e.target.closest('.copy-fix');
       if (copy) {
         var text = FIX_TEXT[+copy.getAttribute('data-i')] || '';
@@ -1217,10 +1416,6 @@
     });
 
     /* กล่องตรวจด่วนในหน้าแรก: ใส่ลิงก์ หรืออัปโหลดไฟล์ .html แล้วตรวจด้วยขั้นตอนเดิมทุกอย่าง */
-    function useMode(mode) {
-      var r = $(mode === 'url' ? 'mode-url' : 'mode-snippet');
-      r.checked = true; r.dispatchEvent(new Event('change'));
-    }
     var quickForm = $('quick-form');
     if (quickForm) quickForm.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -1287,5 +1482,5 @@
   else init();
 
   /* เปิดให้การทดสอบอัตโนมัติเรียกใช้ได้ */
-  window.__APP__ = { runAnalysis: runAnalysis, buildPayload: buildPayload, state: state };
+  window.__APP__ = { runAnalysis: runAnalysis, buildPayload: buildPayload, state: state, autoFix: onAutoFix };
 })();

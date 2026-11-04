@@ -268,7 +268,9 @@
       var i = part.indexOf(':');
       if (i < 0) return;
       var prop = part.slice(0, i).trim().toLowerCase();
-      var val = part.slice(i + 1).trim();
+      /* ตัด !important ออกจากค่า เพราะเป็นตัวกำหนดลำดับความสำคัญ ไม่ใช่ส่วนหนึ่งของค่าสี
+         พบจากชุดทดสอบ 100 กรณี (BC-100) ซึ่งเดิมทำให้อ่านค่าสีไม่ได้และส่งเป็นต้องตรวจเพิ่ม */
+      var val = part.slice(i + 1).replace(/\s*!\s*important\s*$/i, '').trim();
       if (prop && val) decls[prop] = val;
     });
     return decls;
@@ -486,6 +488,14 @@
       var hasWrappingLabel = !!(el.closest && el.closest('label'));
       var ariaLabel = (el.getAttribute('aria-label') || '').trim();
       var ariaLabelledby = (el.getAttribute('aria-labelledby') || '').trim();
+      /* aria-labelledby นับเป็นป้ายกำกับเมื่อชี้ไปยัง id ที่มีอยู่จริงในหน้าอย่างน้อยหนึ่งตัว
+         ถ้าชี้ไปยัง id ที่ไม่มีอยู่ โปรแกรมอ่านหน้าจอจะไม่ได้ชื่อใดเลย พบจากชุดทดสอบ 100 กรณี (BC-080) */
+      var brokenLabelledby = null;
+      if (ariaLabelledby) {
+        var refs = ariaLabelledby.split(/\s+/);
+        var found = refs.some(function (ref) { return !!doc.getElementById(ref); });
+        if (!found) { brokenLabelledby = ariaLabelledby; ariaLabelledby = ''; }
+      }
 
       var how = hasLabelFor ? '<label for="' + id + '">'
         : hasWrappingLabel ? '<label> ครอบช่องกรอกไว้'
@@ -504,7 +514,9 @@
           status: STATUS.FAIL,
           severity: SEVERITY.CRITICAL,
           context: { placeholder: hasPlaceholder },
-          message: 'ไม่มีป้ายกำกับที่ผูกกับช่องกรอกนี้' + (hasPlaceholder ? ' (มีเพียง placeholder ซึ่งไม่นับเป็นป้ายกำกับที่ถูกต้อง เพราะหายไปเมื่อผู้ใช้เริ่มพิมพ์)' : ''),
+          message: 'ไม่มีป้ายกำกับที่ผูกกับช่องกรอกนี้' +
+            (brokenLabelledby ? ' (aria-labelledby ชี้ไปยัง id "' + truncate(brokenLabelledby, 40) + '" ซึ่งไม่มีอยู่ในหน้า จึงไม่ได้ชื่อใดเลย)' : '') +
+            (hasPlaceholder ? ' (มีเพียง placeholder ซึ่งไม่นับเป็นป้ายกำกับที่ถูกต้อง เพราะหายไปเมื่อผู้ใช้เริ่มพิมพ์)' : ''),
           suggestion: 'เพิ่ม <label for="…"> ที่ตรงกับ id ของช่องกรอก หรือครอบช่องกรอกไว้ใน <label> หรือใช้ aria-label เมื่อไม่ต้องการแสดงป้ายกำกับบนหน้าจอ',
           example: '<label for="email">อีเมล</label><input id="email" type="text">'
         })));
