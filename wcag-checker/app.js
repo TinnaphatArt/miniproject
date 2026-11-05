@@ -1053,6 +1053,50 @@
     }
   }
 
+  /* ================================================================ *
+   * ข้อความและการ์ดในหน้าแรกและหน้ามาตรฐานค่อย ๆ ปรากฏเมื่อเลื่อนมาถึง
+   * CSS ซ่อนเฉพาะเมื่อมี JavaScript และไม่ได้ตั้งลดการเคลื่อนไหว ถ้าเบราว์เซอร์ไม่มี IntersectionObserver ให้แสดงทันที
+   * หน้าเครื่องมือ (นำเข้าโค้ด แบบประเมิน ผล รายงาน) ไม่ใส่ เพื่อให้ผลการตรวจปรากฏทันที
+   * ================================================================ */
+  var REVEAL_SEL = [
+    /* หน้าแรก */
+    '.why-head > .eyebrow', '.why-head > h2', '.why-lead', '.why-stats > li', '.why-table',
+    '.caps > .eyebrow', '.caps > h2', '.caps-lead', '.caps-grid > .cap',
+    '.how-text > *', '.how .flow > li',
+    '.rp-text > *', '.report2 .rp-card',
+    '.split-sec > .eyebrow', '.split-sec > .sec-h2', '.board-split > .t',
+    '.score-info > .eyebrow', '.score-info > .sec-h2', '.si-lead', '.si-steps > .si-step',
+    '.proof-sec > .eyebrow', '.proof-sec > .sec-h2', '.board-proof > .t', '.board-bugs > .t', '.board-2 > .t',
+    '.who > .eyebrow', '.who > h2', '.who > p', '.who-cards > li', '.faq-head', '.faq > details',
+    /* หน้ามาตรฐาน */
+    '.std-toc', '.std-sec > .eyebrow', '.std-sec > h2', '.std-sec > h3', '.std-sec > p', '.std-2col > *',
+    '.pour > .pour-card', '.std-sec > .lv-table', '.std-sec > .sc-map', '.std-cards > .std-card',
+    '.rule4 > li', '.std-bands > li', '.score-rules > li', '.lim-list > li'
+  ].join(',');
+  var REVEAL_STEP_MS = 80, REVEAL_MAX_STEPS = 6;
+
+  function initReveal() {
+    var items = Array.prototype.slice.call(document.querySelectorAll(REVEAL_SEL));
+    if (!items.length) return;
+    var show = function (el) { el.classList.add('rv-in'); };
+    items.forEach(function (el) {
+      el.classList.add('rv');
+      /* ขึ้นทีละชิ้นตามลำดับในกลุ่มเดียวกัน หน่วงสูงสุด 6 ขั้น เพื่อไม่ให้รอนานในรายการยาว */
+      var group = Array.prototype.filter.call(el.parentElement.children, function (c) { return c.matches(REVEAL_SEL); });
+      var i = group.indexOf(el);
+      if (i > 0) el.style.setProperty('--rv-d', Math.min(i, REVEAL_MAX_STEPS) * REVEAL_STEP_MS + 'ms');
+    });
+    if (reducedMotion() || typeof IntersectionObserver === 'undefined') { items.forEach(show); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        show(en.target);
+        io.unobserve(en.target);
+      });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
+    items.forEach(function (el) { io.observe(el); });
+  }
+
   function useMode(mode) {
     var r = $(mode === 'url' ? 'mode-url' : 'mode-snippet');
     r.checked = true; r.dispatchEvent(new Event('change'));
@@ -1343,6 +1387,7 @@
   function init() {
     renderStandards();
     renderChecklist();
+    initReveal();
 
     window.addEventListener('hashchange', function () { route(true); });
     route(false);

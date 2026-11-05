@@ -1861,8 +1861,21 @@
   @media (max-width:900px) { .board-bugs .t-bugs, .board-bugs .t-loop { grid-column:1 / -1; } }
   @media (max-width:560px) { .bug-mix { flex-wrap:wrap; } .bug-mix li { flex:1 1 30%; } }
 
+  /* ข้อความและการ์ดค่อย ๆ ปรากฏเมื่อเลื่อนมาถึง (หน้าแรกและหน้ามาตรฐาน) — app.js ติดคลาส .rv แล้วเติม .rv-in เมื่อเข้าจอ
+     ซ่อนเฉพาะเมื่อมี JavaScript (html.js) และผู้ใช้ไม่ได้ตั้งลดการเคลื่อนไหว ใช้คุณสมบัติ translate แยกจาก transform
+     จึงไม่ทับการหมุนหรือการยกตัวตอนชี้ที่การ์ดมีอยู่เดิม เนื้อหายังอยู่ในโครงสร้างให้โปรแกรมอ่านหน้าจออ่านได้ตลอด */
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .rv { opacity:0; translate:0 28px;
+      transition:opacity .75s cubic-bezier(.2,.7,.2,1) var(--rv-d, 0ms), translate .75s cubic-bezier(.2,.7,.2,1) var(--rv-d, 0ms),
+        transform .15s, border-color .15s, box-shadow .2s; }
+    html.js .rv.rv-in, html.js .rv:focus-within { opacity:1; translate:none; }
+    html.js .board > .t.rv { animation:none; }
+    html.js .rv:not(.rv-in) .fx-fill { animation-play-state:paused; }
+  }
+
   /* ---------- การพิมพ์รายงาน ---------- */
   @media print {
+    .rv { opacity:1 !important; translate:none !important; transition:none !important; }
     .caps, .score-info { display:none !important; }
     .hero2-art, .hero2-cta, .hero2-checks, .quick, .feats, .how, .report2, .who-faq, .sec-h2, .board-split, .board-proof, .nav-cta { display:none !important; }
     .hero2 { width:auto; margin:0; padding:0; background:none; color:#000; } .hero2::after, .hero2::before { display:none; } .hero2 h1, .hero2-sub, .hero2-lead { color:#000; }
