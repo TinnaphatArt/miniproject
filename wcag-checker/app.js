@@ -1073,12 +1073,11 @@
     '.pour > .pour-card', '.std-sec > .lv-table', '.std-sec > .sc-map', '.std-cards > .std-card',
     '.rule4 > li', '.std-bands > li', '.score-rules > li', '.lim-list > li'
   ].join(',');
-  var REVEAL_STEP_MS = 80, REVEAL_MAX_STEPS = 6;
+  var REVEAL_STEP_MS = 110, REVEAL_MAX_STEPS = 6;
 
   function initReveal() {
     var items = Array.prototype.slice.call(document.querySelectorAll(REVEAL_SEL));
     if (!items.length) return;
-    var show = function (el) { el.classList.add('rv-in'); };
     items.forEach(function (el) {
       el.classList.add('rv');
       /* ขึ้นทีละชิ้นตามลำดับในกลุ่มเดียวกัน หน่วงสูงสุด 6 ขั้น เพื่อไม่ให้รอนานในรายการยาว */
@@ -1086,15 +1085,22 @@
       var i = group.indexOf(el);
       if (i > 0) el.style.setProperty('--rv-d', Math.min(i, REVEAL_MAX_STEPS) * REVEAL_STEP_MS + 'ms');
     });
-    if (reducedMotion() || typeof IntersectionObserver === 'undefined') { items.forEach(show); return; }
-    var io = new IntersectionObserver(function (entries) {
+    if (reducedMotion() || typeof IntersectionObserver === 'undefined') {
+      items.forEach(function (el) { el.classList.add('rv-in'); });
+      return;
+    }
+    /* ปรากฏเมื่อชิ้นนั้นเลื่อนเข้ามาพ้นขอบล่างของจอราว 15% ผู้ใช้จึงเห็นจังหวะที่ค่อย ๆ ขึ้น ไม่ใช่ขึ้นเสร็จตั้งแต่ยังอยู่ขอบจอ */
+    var ioIn = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) en.target.classList.add('rv-in'); });
+    }, { rootMargin: '0px 0px -15% 0px', threshold: 0.15 });
+    /* เมื่อเลื่อนกลับขึ้นจนชิ้นนั้นหลุดลงไปใต้จอทั้งชิ้น ให้ซ่อนรอไว้ เลื่อนลงมาอีกครั้งจะค่อย ๆ ปรากฏใหม่
+       ชิ้นที่หลุดออกทางด้านบนยังแสดงค้างไว้ เลื่อนขึ้นจึงไม่เห็นข้อความกะพริบ */
+    var ioOut = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
-        if (!en.isIntersecting) return;
-        show(en.target);
-        io.unobserve(en.target);
+        if (!en.isIntersecting && en.boundingClientRect.top > 0 && !en.target.contains(document.activeElement)) en.target.classList.remove('rv-in');
       });
-    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
-    items.forEach(function (el) { io.observe(el); });
+    }, { threshold: 0 });
+    items.forEach(function (el) { ioIn.observe(el); ioOut.observe(el); });
   }
 
   function useMode(mode) {

@@ -1865,8 +1865,8 @@
      ซ่อนเฉพาะเมื่อมี JavaScript (html.js) และผู้ใช้ไม่ได้ตั้งลดการเคลื่อนไหว ใช้คุณสมบัติ translate แยกจาก transform
      จึงไม่ทับการหมุนหรือการยกตัวตอนชี้ที่การ์ดมีอยู่เดิม เนื้อหายังอยู่ในโครงสร้างให้โปรแกรมอ่านหน้าจออ่านได้ตลอด */
   @media (prefers-reduced-motion: no-preference) {
-    html.js .rv { opacity:0; translate:0 28px;
-      transition:opacity .75s cubic-bezier(.2,.7,.2,1) var(--rv-d, 0ms), translate .75s cubic-bezier(.2,.7,.2,1) var(--rv-d, 0ms),
+    html.js .rv { opacity:0; translate:0 44px;
+      transition:opacity .9s ease var(--rv-d, 0ms), translate 1s cubic-bezier(.2,.7,.2,1) var(--rv-d, 0ms),
         transform .15s, border-color .15s, box-shadow .2s; }
     html.js .rv.rv-in, html.js .rv:focus-within { opacity:1; translate:none; }
     html.js .board > .t.rv { animation:none; }
@@ -2743,8 +2743,8 @@
 </div>
 
 
-<script src="./analyzer.js"></script>
-<script src="./fixer.js"></script>
-<script src="./app.js"></script>
+<script src="./analyzer.js?v=20261105"></script>
+<script src="./fixer.js?v=20261105"></script>
+<script src="./app.js?v=20261105"></script>
 </body>
 </html>
