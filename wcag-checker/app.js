@@ -182,11 +182,13 @@
         '<dt>เครื่องมือนี้ตรวจ</dt><dd><ul>' + c.checksTh.map(function (k) {
           return '<li><span class="rule-id">' + esc(k.rule) + '</span> ' + esc(k.text) + '</li>';
         }).join('') + '</ul></dd></dl>' +
-        '<p class="std-more"><a href="' + esc(c.url) + '" target="_blank" rel="noopener">อ่านคำอธิบายฉบับเต็มของ W3C (ภาษาอังกฤษ)</a></p>' +
+        '<p class="std-more"><a href="#' + thAnchor(sc) + '">อ่านคำอธิบายฉบับเต็มภาษาไทย ›</a></p>' +
         '</article>';
     }).join('');
   }
   function stdAnchor(sc) { return 'sc-' + sc.replace('SC ', '').replace(/\./g, '-'); }
+  /* คำอธิบายฉบับเต็มภาษาไทยของแต่ละหลักเกณฑ์ (#understand-section) */
+  function thAnchor(sc) { return 'u-' + sc.replace('SC ', '').replace(/\./g, '-'); }
 
   /* มาตรฐานที่จุดนี้ละเมิด: เลขหลักเกณฑ์ ชื่อ ระดับ หลักการ แนวทาง กฎตรวจ และหลักเกณฑ์ที่ละเมิดร่วมด้วย */
   function standardBlock(p) {
@@ -203,8 +205,8 @@
         var rc = A.RELATED_CRITERIA[r.sc];
         return esc(rc.id + ' ' + rc.nameTh + ' ระดับ ' + rc.level + ' เพราะ' + r.reason);
       }).join(' · ') + ' <span class="muted">ระบบไม่ได้ตรวจหลักเกณฑ์นี้โดยตรง</span></dd>' : '') +
-      '<dt>อ้างอิง</dt><dd><a href="#' + stdAnchor(p.sc) + '">ความหมายของ ' + esc(p.sc) + ' ภาษาไทย</a> · ' +
-      '<a href="' + esc(c.url) + '" target="_blank" rel="noopener">คำอธิบายจาก W3C (ภาษาอังกฤษ)</a></dd></dl>';
+      '<dt>อ้างอิง</dt><dd><a href="#' + stdAnchor(p.sc) + '">ความหมายของ ' + esc(p.sc) + ' โดยสรุป</a> · ' +
+      '<a href="#' + thAnchor(p.sc) + '">คำอธิบายฉบับเต็มภาษาไทย</a></dd></dl>';
   }
 
   /* ================================================================ *
@@ -877,7 +879,7 @@
    * แบ่งเป็นหลายหน้าด้วย hash ในไฟล์เดียว ข้อมูลที่กรอกและผลตรวจจึงไม่หายเมื่อสลับหน้า
    * ลิงก์ #id ใดก็ได้จะเปิดหน้าที่มีองค์ประกอบนั้น แล้วเลื่อนไปที่จุดนั้น
    * ================================================================ */
-  var VIEW_TITLES = { home: 'หน้าแรก', standards: 'มาตรฐานที่ตรวจ', check: 'นำเข้าโค้ด',
+  var VIEW_TITLES = { home: 'หน้าแรก', standards: 'มาตรฐานที่ตรวจ', understand: 'คำอธิบายหลักเกณฑ์ภาษาไทย', check: 'นำเข้าโค้ด',
     checklist: 'แบบประเมิน', results: 'ผลการประเมิน', report: 'บันทึกและรายงาน' };
   var BASE_TITLE = document.title;
   var currentView = null;
@@ -889,7 +891,8 @@
 
   function updateRailCurrent() {
     document.querySelectorAll('[data-nav]').forEach(function (a) {
-      if (a.getAttribute('data-nav') === currentView) a.setAttribute('aria-current', 'page');
+      /* หน้าคำอธิบายฉบับเต็มเป็นหน้าย่อยของมาตรฐานที่ตรวจ */
+      if (a.getAttribute('data-nav') === (currentView === 'understand' ? 'standards' : currentView)) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');
     });
     updateStepper();
@@ -916,7 +919,7 @@
   }
 
   /* ลำดับหน้า ใช้บอกทิศทางของทรานซิชัน (ไปข้างหน้าเลื่อนเข้าจากขวา ย้อนกลับเลื่อนเข้าจากซ้าย) */
-  var VIEW_ORDER = ['home', 'standards', 'check', 'checklist', 'results', 'report'];
+  var VIEW_ORDER = ['home', 'standards', 'understand', 'check', 'checklist', 'results', 'report'];
   var motionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
   function reducedMotion() { return !!(motionQuery && motionQuery.matches); }
 
@@ -968,6 +971,7 @@
     } catch (e) {
       if (deep) target.scrollIntoView(true); else window.scrollTo(0, 0);
     }
+    setTimeout(function () { revealOnScreen(); }, 80);
     var resultsMain = target && target.id === 'results-section';
     if (moveFocus && (changed || deep || resultsMain)) {
       /* ย้ายโฟกัสไปหัวข้อของหน้าใหม่ โปรแกรมอ่านหน้าจอจึงรู้ว่าเปลี่ยนหน้าแล้ว */
@@ -1071,7 +1075,9 @@
     /* หน้ามาตรฐาน */
     '.std-toc', '.std-sec > .eyebrow', '.std-sec > h2', '.std-sec > h3', '.std-sec > p', '.std-2col > *',
     '.pour > .pour-card', '.std-sec > .lv-table', '.std-sec > .sc-map', '.std-cards > .std-card',
-    '.rule4 > li', '.std-bands > li', '.score-rules > li', '.lim-list > li'
+    '.rule4 > li', '.std-bands > li', '.score-rules > li', '.lim-list > li',
+    /* คำอธิบายฉบับเต็มภาษาไทย */
+    '.u-nav > a', '.u-art > .u-head', '.u-art > .u-sec', '.u-art > .u-src'
   ].join(',');
   var REVEAL_STEP_MS = 110, REVEAL_MAX_STEPS = 6;
 
@@ -1101,7 +1107,17 @@
       });
     }, { threshold: 0 });
     items.forEach(function (el) { ioIn.observe(el); ioOut.observe(el); });
+    revealOnScreen = function () {
+      /* ตอนเปิดหน้าหรือเปลี่ยนหน้า ชิ้นที่อยู่ในจออยู่แล้วให้ปรากฏทั้งหมด ไม่ปล่อยให้ส่วนล่างของจอว่างจนกว่าจะเลื่อน */
+      var h = window.innerHeight || document.documentElement.clientHeight;
+      items.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        if (r.height && r.top < h && r.bottom > 0) el.classList.add('rv-in');
+      });
+    };
+    setTimeout(revealOnScreen, 60);
   }
+  var revealOnScreen = function () {};
 
   function useMode(mode) {
     var r = $(mode === 'url' ? 'mode-url' : 'mode-snippet');

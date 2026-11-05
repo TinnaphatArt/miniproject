@@ -1873,6 +1873,58 @@
     html.js .rv:not(.rv-in) .fx-fill { animation-play-state:paused; }
   }
 
+  /* คำอธิบายหลักเกณฑ์ฉบับเต็มภาษาไทย (#understand-section) แทนลิงก์ไปเอกสารภาษาอังกฤษของ W3C */
+  .understand.view { background:none; border:0; padding:0; margin-top:0; box-shadow:none; }
+  .u-top { margin-bottom:var(--s-5); }
+  .u-top h1 { font-size:clamp(1.6rem, 1.3rem + 1.2vw, 2.2rem); line-height:1.3; margin:0 0 8px; }
+  .u-back { margin:0 0 8px; font-weight:700; }
+  .u-note { margin:12px 0 0; padding:12px 16px; border-radius:var(--r-sm); background:var(--warn-bg); border:1px solid var(--warn-line); font-size:.9rem; max-width:none; }
+  .u-nav { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; margin-top:var(--s-5); }
+  .u-nav a { display:flex; flex-direction:column; gap:2px; padding:14px 18px; border-radius:var(--r-md); background:var(--page); color:var(--ink);
+    text-decoration:none; box-shadow:var(--sh-1); border:1px solid var(--rule); }
+  .u-nav a:hover { border-color:var(--link); }
+  .u-nav b { color:var(--link); font-size:.9rem; }
+  .u-nav span { font-weight:700; font-size:1.05rem; }
+  .u-nav small { color:var(--ink-2); }
+  .u-art { margin:0 0 var(--s-6); padding:var(--s-6); border-radius:var(--r-lg); background:var(--page); border:1px solid var(--rule); scroll-margin-top:90px; }
+  .u-head { padding-bottom:var(--s-4); margin-bottom:var(--s-4); border-bottom:1px solid var(--rule); }
+  .u-head h2 { margin:0 0 8px; font-size:clamp(1.45rem, 1.2rem + 1vw, 1.9rem); line-height:1.3; }
+  .u-head h2 .en { display:block; font-size:.95rem; font-weight:400; color:var(--ink-2); }
+  .u-sum { margin:0; font-size:1.05rem; }
+  .u-sec { padding:var(--s-4) 0; border-bottom:1px solid var(--rule-2); }
+  .u-sec:last-of-type { border-bottom:0; }
+  .u-sec h3 { margin:0 0 10px; font-size:1.15rem; }
+  .u-sec h4 { margin:14px 0 8px; font-size:1rem; }
+  .u-sec p { margin:0 0 10px; max-width:78ch; }
+  .u-quote { margin:0; padding:14px 18px; border-radius:var(--r-sm); background:var(--p1); border-left:5px solid var(--blue, #1d4ed8); font-size:1.08rem; font-weight:600; }
+  .u-quote p { margin:0; }
+  .u-dl { display:grid; gap:8px; margin:0; }
+  .u-dl > div { display:grid; grid-template-columns:13em minmax(0, 1fr); gap:12px; padding:10px 14px; border-radius:var(--r-sm); background:var(--paper-2); }
+  .u-dl dt { font-weight:700; }
+  .u-dl dd { margin:0; }
+  .u-list, .u-steps { margin:0; padding-left:1.4em; display:grid; gap:6px; }
+  .u-steps li::marker { font-weight:700; color:var(--link); }
+  .u-ex { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; }
+  .u-ex li { display:flex; flex-direction:column; align-items:flex-start; gap:6px; padding:12px 14px; border-radius:var(--r-sm); background:var(--page); border:1px solid var(--good-line); }
+  .u-ex li.ux-bad { border-color:var(--bad-line); }
+  .u-ex code { font-size:.78rem; word-break:break-all; }
+  .u-ex li > span:last-child { font-size:.88rem; color:var(--ink-2); }
+  .u-2col { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:var(--s-5); }
+  .u-sec.u-2col > div > h3 + * { margin-top:0; }
+  .u-tech { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+  .u-tech li { display:grid; grid-template-columns:4.6em minmax(0, 1fr); gap:10px; align-items:baseline; }
+  .u-tech code { justify-self:start; padding:1px 8px; border-radius:6px; background:var(--good-bg); color:var(--good); font-weight:700; font-size:.82rem; }
+  .u-fail code { background:var(--bad-bg); color:var(--bad); }
+  .u-tech em { display:block; font-style:normal; font-size:.84rem; color:var(--link); font-weight:600; }
+  .u-aside { margin-top:12px !important; padding:10px 14px; border-radius:var(--r-sm); background:var(--p1); font-size:.92rem; }
+  .u-tool .u-2col > div { padding:14px 16px; border-radius:var(--r-sm); background:var(--paper-2); }
+  .ut-k { margin:0 0 8px !important; }
+  .u-tool .badge.none { display:inline-flex; align-items:center; padding:2px 10px; border-radius:6px; color:var(--st-ink); background:var(--st-none); font-weight:700; }
+  .u-src { margin:var(--s-4) 0 0; padding-top:var(--s-3); border-top:1px solid var(--rule); font-size:.88rem; color:var(--ink-2); }
+  .std-more a { font-weight:700; }
+  @media (max-width:900px) { .u-ex, .u-nav { grid-template-columns:minmax(0, 1fr); } .u-2col { grid-template-columns:minmax(0, 1fr); } }
+  @media (max-width:560px) { .u-art { padding:var(--s-5) var(--s-4); } .u-dl > div { grid-template-columns:minmax(0, 1fr); gap:2px; } }
+
   /* ---------- การพิมพ์รายงาน ---------- */
   @media print {
     .rv { opacity:1 !important; translate:none !important; transition:none !important; }
@@ -1885,7 +1937,7 @@
     .code-col.found code.snippet, .code-col.fix code.snippet { background:#fff !important; color:#000 !important; border:1px solid #999 !important; }
     .hero-art, .board-h, .t-feature { display:none !important; }
     [data-view][hidden] { display:block !important; }
-    [data-view="standards"], [data-view="check"], [data-view="checklist"], [data-view="report"] { display:none !important; }
+    [data-view="standards"], [data-view="understand"], [data-view="check"], [data-view="checklist"], [data-view="report"] { display:none !important; }
     .no-print, .sidebar, .skip-link, footer.site, .hero-fig, .intro-cta, .t-score, .t-fig, .t-contrast, .t-anatomy, .t-sites, .t-sec, .t-cta { display:none !important; }
     .board > .t { background:none !important; color:#000 !important; padding:0 0 8pt; min-height:0; }
     .t-lead { color:#000; }
@@ -2548,6 +2600,371 @@
   </section>
 
 
+  <!-- ============ คำอธิบายหลักเกณฑ์ฉบับเต็มภาษาไทย ============ -->
+  <section id="understand-section" class="no-print view understand" data-view="understand" aria-labelledby="h-understand">
+    <header class="sec-head u-top">
+      <p class="u-back"><a href="#standards-section">‹ กลับไปหน้ามาตรฐานที่ตรวจ</a></p>
+      <h1 id="h-understand">คำอธิบายหลักเกณฑ์ฉบับเต็ม ภาษาไทย</h1>
+      <p class="lead">อธิบายหลักเกณฑ์ WCAG 2.1 ทั้ง 3 ข้อที่เครื่องมือนี้ตรวจ ครบทุกเรื่องที่นักพัฒนาต้องรู้
+        ตั้งแต่ถ้อยคำของหลักเกณฑ์ เจตนา ผู้ได้ประโยชน์ ตัวอย่าง คำศัพท์ เทคนิคที่ W3C แนะนำ ข้อผิดพลาดที่พบบ่อย
+        วิธีตรวจด้วยตนเอง และส่วนที่เครื่องมือนี้ตรวจให้ได้</p>
+      <p class="u-note">ผู้พัฒนาเรียบเรียงเป็นภาษาไทยจากเอกสาร Understanding WCAG 2.1 และ Techniques for WCAG 2.1 ของ W3C
+        <strong>ไม่ใช่คำแปลอย่างเป็นทางการ</strong> ถ้อยคำของหลักเกณฑ์แปลจาก WCAG 2.1 (W3C Recommendation, 2018) Copyright © W3C
+        ถ้ามีข้อสงสัย ให้ยึดต้นฉบับของ W3C ซึ่งมีลิงก์อยู่ท้ายแต่ละหลักเกณฑ์</p>
+      <nav class="u-nav" aria-label="เลือกหลักเกณฑ์">
+        <a href="#u-1-1-1"><b>SC 1.1.1</b><span>ข้อความแทนภาพ</span><small>ระดับ A</small></a>
+        <a href="#u-1-3-1"><b>SC 1.3.1</b><span>โครงสร้างและความสัมพันธ์</span><small>ระดับ A</small></a>
+        <a href="#u-1-4-3"><b>SC 1.4.3</b><span>ความคมชัดของสี</span><small>ระดับ AA</small></a>
+      </nav>
+    </header>
+
+    <!-- ---------- SC 1.1.1 ---------- -->
+    <article class="u-art" id="u-1-1-1" aria-labelledby="u-1-1-1-h">
+      <div class="u-head">
+        <p class="eyebrow"><span>SC 1.1.1</span>ระดับ A · หลักการที่ 1 การรับรู้ได้ · แนวทาง 1.1 ทางเลือกที่เป็นข้อความ</p>
+        <h2 id="u-1-1-1-h">ข้อความแทนภาพ <span class="en">Non-text Content</span></h2>
+        <p class="u-sum">เนื้อหาที่ไม่ใช่ข้อความทุกชิ้น เช่น รูปภาพ ไอคอน กราฟ หรือปุ่มที่เป็นภาพ ต้องมีข้อความทดแทนที่ทำหน้าที่เดียวกัน</p>
+      </div>
+
+      <div class="u-sec">
+        <h3>ถ้อยคำของหลักเกณฑ์</h3>
+        <blockquote class="u-quote"><p>เนื้อหาที่ไม่ใช่ข้อความทุกชิ้นที่นำเสนอต่อผู้ใช้ ต้องมีข้อความทดแทนที่ทำหน้าที่เทียบเท่ากัน ยกเว้นกรณีที่ระบุด้านล่าง</p></blockquote>
+        <h4>ข้อยกเว้น</h4>
+        <dl class="u-dl">
+          <div><dt>ตัวควบคุมและช่องรับข้อมูล</dt><dd>ถ้าเนื้อหานั้นเป็นตัวควบคุมหรือรับข้อมูลจากผู้ใช้ ต้องมีชื่อที่บอกวัตถุประสงค์ (รายละเอียดอยู่ใน SC 4.1.2)</dd></div>
+          <div><dt>สื่อที่อิงเวลา</dt><dd>ถ้าเป็นเสียงหรือวิดีโอ ข้อความทดแทนอย่างน้อยต้องบอกได้ว่าเป็นสื่ออะไร (รายละเอียดอยู่ในแนวทาง 1.2)</dd></div>
+          <div><dt>แบบทดสอบ</dt><dd>ถ้าเป็นแบบทดสอบหรือแบบฝึกหัดที่จะใช้ไม่ได้ถ้านำเสนอเป็นข้อความ ข้อความทดแทนอย่างน้อยต้องบอกได้ว่าเป็นอะไร</dd></div>
+          <div><dt>ประสบการณ์ทางประสาทสัมผัส</dt><dd>ถ้าตั้งใจสร้างประสบการณ์เฉพาะ เช่น ดนตรีหรืองานศิลปะ ข้อความทดแทนอย่างน้อยต้องบอกได้ว่าเป็นอะไร</dd></div>
+          <div><dt>CAPTCHA</dt><dd>ต้องมีข้อความบอกว่าเป็นการยืนยันว่าเป็นคน และมี CAPTCHA แบบอื่นที่ใช้ประสาทสัมผัสต่างกันให้เลือก เช่น แบบเสียง</dd></div>
+          <div><dt>ภาพตกแต่ง การจัดรูปแบบ และสิ่งที่มองไม่เห็น</dt><dd>ต้องทำให้เทคโนโลยีช่วยเหลือข้ามไปได้ เช่น ใส่ <code>alt=""</code> หรือใส่ภาพผ่าน CSS</dd></div>
+        </dl>
+      </div>
+
+      <div class="u-sec">
+        <h3>เจตนาของหลักเกณฑ์</h3>
+        <p>ข้อความเปลี่ยนรูปแบบได้ตามที่ผู้ใช้ต้องการ ทั้งเป็นเสียงพูด อักษรเบรลล์ หรือขยายให้ใหญ่ แต่รูปภาพทำแบบนั้นไม่ได้
+          ข้อความทดแทนจึงเป็นสะพานที่ทำให้ทุกคนได้ข้อมูลเดียวกัน ไม่ว่าจะรับรู้ด้วยตา หู หรือนิ้วมือ</p>
+        <p>ข้อความทดแทนที่ดีต้องบอก<strong>หน้าที่</strong>ของภาพในบริบทนั้น ไม่ใช่บรรยายทุกรายละเอียด เช่น ภาพแว่นขยายบนปุ่มค้นหา
+          ข้อความทดแทนคือ “ค้นหา” ไม่ใช่ “รูปแว่นขยาย” ส่วนภาพที่ใส่เพื่อความสวยงามอย่างเดียว ควรให้โปรแกรมอ่านหน้าจอข้ามไป
+          เพื่อไม่ให้ผู้ใช้ต้องฟังข้อความที่ไม่มีประโยชน์</p>
+      </div>
+
+      <div class="u-sec">
+        <h3>ใครได้ประโยชน์</h3>
+        <ul class="u-list">
+          <li>ผู้พิการทางการเห็นที่ใช้โปรแกรมอ่านหน้าจอหรือเครื่องแสดงผลอักษรเบรลล์</li>
+          <li>ผู้มีสายตาเลือนราง และผู้ที่อ่านภาพหรือแผนภูมิได้ยาก</li>
+          <li>ผู้ที่บกพร่องทั้งการเห็นและการได้ยิน ซึ่งอ่านเนื้อหาผ่านอักษรเบรลล์</li>
+          <li>ผู้ที่มีความบกพร่องทางการเรียนรู้ ซึ่งใช้ซอฟต์แวร์อ่านออกเสียงข้อความ</li>
+          <li>ผู้ที่ภาพโหลดไม่ขึ้น หรือปิดการแสดงภาพเพื่อประหยัดอินเทอร์เน็ต</li>
+        </ul>
+      </div>
+
+      <div class="u-sec">
+        <h3>ตัวอย่าง</h3>
+        <ul class="u-ex">
+          <li class="ux-good"><span class="badge good">ผ่าน</span><b>ภาพที่สื่อข้อมูล</b><code>&lt;img src="chart.png" alt="ยอดขายไตรมาส 3 เพิ่มขึ้น 20% จากไตรมาส 2"&gt;</code><span>บอกข้อมูลเดียวกับที่ภาพบอก</span></li>
+          <li class="ux-good"><span class="badge good">ผ่าน</span><b>ภาพที่เป็นลิงก์</b><code>&lt;a href="/"&gt;&lt;img src="logo.png" alt="หน้าแรก"&gt;&lt;/a&gt;</code><span>บอกว่าลิงก์พาไปที่ใด</span></li>
+          <li class="ux-good"><span class="badge good">ผ่าน</span><b>ภาพตกแต่ง</b><code>&lt;img src="divider.png" alt=""&gt;</code><span>alt ว่างให้โปรแกรมอ่านหน้าจอข้ามไป</span></li>
+          <li class="ux-bad"><span class="badge bad">ไม่ผ่าน</span><b>ไม่มี alt</b><code>&lt;img src="chart.png"&gt;</code><span>โปรแกรมอ่านหน้าจออาจอ่านชื่อไฟล์แทน หรือไม่อ่านเลย</span></li>
+          <li class="ux-bad"><span class="badge bad">ไม่ผ่าน</span><b>alt เป็นชื่อไฟล์</b><code>&lt;img src="IMG_0042.jpg" alt="IMG_0042.jpg"&gt;</code><span>มีข้อความแต่ไม่ได้ทดแทนข้อมูลของภาพ</span></li>
+          <li class="ux-bad"><span class="badge bad">ไม่ผ่าน</span><b>ภาพตกแต่งมีข้อความ alt</b><code>&lt;img src="line.png" alt="เส้นคั่นสีฟ้า"&gt;</code><span>ผู้ใช้ต้องฟังข้อความที่ไม่มีประโยชน์</span></li>
+        </ul>
+      </div>
+
+      <div class="u-sec">
+        <h3>คำศัพท์สำคัญ</h3>
+        <dl class="u-dl">
+          <div><dt>เนื้อหาที่ไม่ใช่ข้อความ</dt><dd>เนื้อหาที่ไม่ใช่ลำดับของตัวอักษรที่โปรแกรมอ่านได้ หรือลำดับตัวอักษรที่ไม่ได้สื่อความหมายในภาษาใด เช่น รูปภาพ ไอคอน กราฟ ภาพของตัวอักษร และภาพที่วาดด้วยตัวอักษร (ASCII art)</dd></div>
+          <div><dt>ข้อความทดแทน</dt><dd>ข้อความที่ผูกกับเนื้อหาที่ไม่ใช่ข้อความในโค้ด ให้โปรแกรมอ่านได้ และใช้แทนเนื้อหานั้น เช่น แอตทริบิวต์ <code>alt</code></dd></div>
+          <div><dt>ภาพตกแต่งล้วน</dt><dd>ภาพที่ใช้เพื่อความสวยงามเท่านั้น ไม่มีข้อมูลและไม่มีหน้าที่ ถ้าเอาออกแล้วเนื้อหายังครบเหมือนเดิม</dd></div>
+        </dl>
+      </div>
+
+      <div class="u-sec u-2col">
+        <div>
+          <h3>เทคนิคที่ W3C แนะนำ</h3>
+          <ul class="u-tech">
+            <li><code>G94</code>ข้อความทดแทนสั้น ๆ ที่ทำหน้าที่เดียวกับภาพ</li>
+            <li><code>G95</code>ข้อความทดแทนสั้น ๆ ที่บรรยายภาพโดยย่อ เมื่อบอกหน้าที่ทั้งหมดในข้อความสั้นไม่ได้</li>
+            <li><code>H37</code>ใช้แอตทริบิวต์ alt กับแท็ก img</li>
+            <li><code>H36</code>ใช้ alt กับภาพที่เป็นปุ่มส่งข้อมูล (input type="image")</li>
+            <li><code>H24</code>ใช้ alt กับแท็ก area ในภาพแผนที่</li>
+            <li><code>ARIA6</code>ใช้ aria-label เป็นชื่อของวัตถุ</li>
+            <li><code>ARIA10</code>ใช้ aria-labelledby ให้ข้อความทดแทน</li>
+            <li><code>H67</code>ใช้ alt ว่างและไม่ใส่ title กับภาพที่ต้องการให้เทคโนโลยีช่วยเหลือข้าม</li>
+            <li><code>C9</code>ใส่ภาพตกแต่งด้วย CSS</li>
+          </ul>
+        </div>
+        <div>
+          <h3>ข้อผิดพลาดที่ทำให้ไม่ผ่าน</h3>
+          <ul class="u-tech u-fail">
+            <li><code>F65</code>ไม่ใส่ alt หรือข้อความทดแทนกับ img, area และ input type="image" <em>ตรงกับกฎ R-ALT-01</em></li>
+            <li><code>F30</code>ข้อความทดแทนที่ไม่ได้ทดแทนจริง เช่น ชื่อไฟล์หรือข้อความชั่วคราว</li>
+            <li><code>F39</code>ใส่ข้อความทดแทนที่ไม่ว่างให้ภาพที่ควรถูกข้าม</li>
+            <li><code>F38</code>ไม่ทำเครื่องหมายภาพตกแต่งให้เทคโนโลยีช่วยเหลือข้ามได้</li>
+            <li><code>F3</code>ใช้ CSS ใส่ภาพที่สื่อข้อมูลสำคัญ</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="u-sec">
+        <h3>วิธีตรวจด้วยตนเอง</h3>
+        <ol class="u-steps">
+          <li>หาเนื้อหาที่ไม่ใช่ข้อความทั้งหมดในหน้า ทั้งรูปภาพ ไอคอน ปุ่มที่เป็นภาพ และกราฟ</li>
+          <li>ภาพที่สื่อข้อมูล ให้ถามตัวเองว่า “ถ้าเอาภาพออกแล้ววางข้อความ alt แทน ผู้อ่านยังได้ข้อมูลครบไหม”</li>
+          <li>ภาพที่อยู่ในลิงก์หรือปุ่ม ข้อความทดแทนต้องบอกปลายทางหรือสิ่งที่จะเกิดขึ้นเมื่อกด</li>
+          <li>ภาพตกแต่ง ตรวจว่าใช้ <code>alt=""</code> หรือใส่ผ่าน CSS</li>
+          <li>ลองฟังด้วยโปรแกรมอ่านหน้าจอ เช่น NVDA บน Windows หรือ VoiceOver บน macOS และ iPhone</li>
+        </ol>
+      </div>
+
+      <div class="u-sec u-tool">
+        <h3>เครื่องมือนี้ตรวจส่วนไหน</h3>
+        <div class="u-2col">
+          <div class="ut-yes"><p class="ut-k"><span class="badge good">ตรวจให้</span></p>
+            <ul class="u-list">
+              <li>แท็ก <code>&lt;img&gt;</code> ทุกตัวว่ามีแอตทริบิวต์ alt หรือไม่ (กฎ R-ALT-01)</li>
+              <li>ภาพที่ alt ว่าง ส่งให้ผู้ประเมินยืนยันว่าเป็นภาพตกแต่งจริง (กฎ R-ALT-02 และแบบประเมินข้อ CL-1.1.1)</li>
+              <li>ข้ามภาพที่ประกาศ <code>role="presentation"</code> หรือ <code>aria-hidden="true"</code></li>
+            </ul></div>
+          <div class="ut-no"><p class="ut-k"><span class="badge none">ยังไม่ได้ตรวจ</span></p>
+            <ul class="u-list">
+              <li>ความหมายของข้อความ alt ว่าตรงกับภาพหรือไม่</li>
+              <li>ปุ่มภาพ <code>input type="image"</code>, แท็ก area, svg, canvas และไอคอนฟอนต์</li>
+              <li>ภาพที่ใส่ผ่าน CSS, CAPTCHA, เสียงและวิดีโอ</li>
+            </ul></div>
+        </div>
+      </div>
+      <p class="u-src">ต้นฉบับ: <a href="https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html" target="_blank" rel="noopener">Understanding SC 1.1.1 Non-text Content (W3C, ภาษาอังกฤษ)</a>
+        · <a href="#sc-1-1-1">สรุปสั้นในหน้ามาตรฐาน</a></p>
+    </article>
+
+    <!-- ---------- SC 1.3.1 ---------- -->
+    <article class="u-art" id="u-1-3-1" aria-labelledby="u-1-3-1-h">
+      <div class="u-head">
+        <p class="eyebrow"><span>SC 1.3.1</span>ระดับ A · หลักการที่ 1 การรับรู้ได้ · แนวทาง 1.3 ปรับเปลี่ยนได้</p>
+        <h2 id="u-1-3-1-h">โครงสร้างและความสัมพันธ์ <span class="en">Info and Relationships</span></h2>
+        <p class="u-sum">โครงสร้างที่ตาเห็น เช่น หัวข้อ รายการ ตาราง และป้ายกำกับช่องกรอก ต้องเขียนไว้ในโค้ดด้วย ไม่ใช่แค่จัดหน้าตาให้ดูเหมือน</p>
+      </div>
+
+      <div class="u-sec">
+        <h3>ถ้อยคำของหลักเกณฑ์</h3>
+        <blockquote class="u-quote"><p>ข้อมูล โครงสร้าง และความสัมพันธ์ที่สื่อผ่านการนำเสนอ ต้องให้โปรแกรมระบุได้ หรือมีบอกไว้ในข้อความ</p></blockquote>
+      </div>
+
+      <div class="u-sec">
+        <h3>เจตนาของหลักเกณฑ์</h3>
+        <p>คนที่มองเห็นเข้าใจโครงสร้างของหน้าได้จากหน้าตา เช่น ตัวหนังสือใหญ่และหนาคือหัวข้อ ข้อความข้างช่องกรอกคือชื่อช่อง
+          แถวและคอลัมน์บอกว่าข้อมูลใดคู่กัน ข้อมูลเหล่านี้ต้องเขียนไว้ในโค้ดด้วยแท็กที่มีความหมายด้วย
+          โปรแกรมอ่านหน้าจอจึงบอกผู้ใช้ได้ว่า “หัวข้อระดับ 2” หรือ “อีเมล ช่องแก้ไขข้อความ”</p>
+        <p>เมื่อผู้ใช้เปลี่ยนวิธีรับรู้ เช่น ฟังเป็นเสียง ขยายตัวอักษร หรือปิดการจัดรูปแบบของหน้า โครงสร้างต้องยังอยู่ครบ
+          ถ้าโครงสร้างอยู่แค่ในสีหรือขนาดตัวอักษร ข้อมูลส่วนนั้นจะหายไปทันที</p>
+      </div>
+
+      <div class="u-sec">
+        <h3>ใครได้ประโยชน์</h3>
+        <ul class="u-list">
+          <li>ผู้พิการทางการเห็นที่ใช้โปรแกรมอ่านหน้าจอ ซึ่งกระโดดอ่านตามหัวข้อและฟังชื่อของช่องกรอก</li>
+          <li>ผู้ที่ใช้คีย์บอร์ดแทนเมาส์ และผู้ที่ใช้ซอฟต์แวร์สั่งงานด้วยเสียง</li>
+          <li>ผู้ที่ปรับสี ตัวอักษร หรือรูปแบบหน้าเว็บเอง เพื่อให้อ่านง่ายขึ้น</li>
+          <li>ผู้ที่มีความบกพร่องทางการเรียนรู้ ซึ่งใช้ซอฟต์แวร์ช่วยจัดหน้าใหม่ให้อ่านง่าย</li>
+        </ul>
+      </div>
+
+      <div class="u-sec">
+        <h3>ตัวอย่าง</h3>
+        <ul class="u-ex">
+          <li class="ux-good"><span class="badge good">ผ่าน</span><b>หัวข้อตามโครงเรื่อง</b><code>&lt;h1&gt;ร้านค้า&lt;/h1&gt; &lt;h2&gt;สินค้าใหม่&lt;/h2&gt;</code><span>ระดับหัวข้อตรงกับลำดับของเนื้อหา</span></li>
+          <li class="ux-good"><span class="badge good">ผ่าน</span><b>ป้ายกำกับผูกกับช่องกรอก</b><code>&lt;label for="email"&gt;อีเมล&lt;/label&gt; &lt;input id="email" type="email"&gt;</code><span>คลิกที่ป้ายแล้วเคอร์เซอร์เข้าไปในช่อง</span></li>
+          <li class="ux-good"><span class="badge good">ผ่าน</span><b>กลุ่มตัวเลือก</b><code>&lt;fieldset&gt;&lt;legend&gt;เพศ&lt;/legend&gt; …&lt;/fieldset&gt;</code><span>บอกได้ว่าตัวเลือกเหล่านี้ตอบคำถามเดียวกัน</span></li>
+          <li class="ux-bad"><span class="badge bad">ไม่ผ่าน</span><b>หัวข้อที่ทำด้วยการจัดรูปแบบ</b><code>&lt;p class="big-bold"&gt;สินค้าใหม่&lt;/p&gt;</code><span>ตาเห็นเป็นหัวข้อ แต่โปรแกรมไม่รู้</span></li>
+          <li class="ux-bad"><span class="badge bad">ไม่ผ่าน</span><b>ใช้ placeholder แทนป้ายกำกับ</b><code>&lt;input type="text" placeholder="ชื่อ"&gt;</code><span>ข้อความหายไปเมื่อเริ่มพิมพ์ และบางโปรแกรมไม่อ่าน</span></li>
+          <li class="ux-bad"><span class="badge bad">ไม่ผ่าน</span><b>จัดตารางด้วยช่องว่าง</b><code>ชื่อ&amp;nbsp;&amp;nbsp;&amp;nbsp;ราคา&lt;br&gt;</code><span>โปรแกรมไม่รู้ว่าข้อมูลใดอยู่คอลัมน์ใด</span></li>
+        </ul>
+      </div>
+
+      <div class="u-sec">
+        <h3>คำศัพท์สำคัญ</h3>
+        <dl class="u-dl">
+          <div><dt>โปรแกรมระบุได้</dt><dd>ซอฟต์แวร์ รวมถึงเทคโนโลยีช่วยเหลือ อ่านค่านั้นได้จากโค้ด เช่น รู้ว่าข้อความนี้เป็นหัวข้อเพราะใช้แท็ก h2</dd></div>
+          <div><dt>ความสัมพันธ์</dt><dd>ความเกี่ยวข้องระหว่างส่วนต่าง ๆ ของเนื้อหา เช่น ป้ายกำกับกับช่องกรอก หัวตารางกับข้อมูลในตาราง</dd></div>
+          <div><dt>การนำเสนอ</dt><dd>การแสดงเนื้อหาในรูปแบบที่ผู้ใช้รับรู้ได้ เช่น สี ขนาด ตำแหน่ง หรือเสียง</dd></div>
+        </dl>
+      </div>
+
+      <div class="u-sec u-2col">
+        <div>
+          <h3>เทคนิคที่ W3C แนะนำ</h3>
+          <ul class="u-tech">
+            <li><code>G115</code>ใช้แท็กที่มีความหมายบอกโครงสร้าง</li>
+            <li><code>G140</code>แยกข้อมูลและโครงสร้างออกจากการนำเสนอ</li>
+            <li><code>H42</code>ใช้ h1 ถึง h6 ระบุหัวข้อ</li>
+            <li><code>H44</code>ใช้แท็ก label ผูกป้ายกำกับกับช่องกรอก</li>
+            <li><code>H48</code>ใช้ ol, ul และ dl สำหรับรายการ</li>
+            <li><code>H51</code>ใช้แท็กตารางกับข้อมูลที่เป็นตาราง</li>
+            <li><code>H63</code>ใช้แอตทริบิวต์ scope ผูกหัวตารางกับข้อมูล</li>
+            <li><code>H71</code>ใช้ fieldset และ legend จัดกลุ่มช่องกรอก</li>
+            <li><code>ARIA16</code>ใช้ aria-labelledby ตั้งชื่อตัวควบคุม</li>
+          </ul>
+        </div>
+        <div>
+          <h3>ข้อผิดพลาดที่ทำให้ไม่ผ่าน</h3>
+          <ul class="u-tech u-fail">
+            <li><code>F2</code>ใช้การเปลี่ยนรูปแบบตัวอักษรสื่อข้อมูล โดยไม่ใช้แท็กที่บอกความหมาย</li>
+            <li><code>F43</code>ใช้แท็กโครงสร้างผิดความหมาย ไม่ตรงกับความสัมพันธ์ของเนื้อหา</li>
+            <li><code>F33</code>ใช้ช่องว่างจัดข้อความเป็นหลายคอลัมน์</li>
+            <li><code>F34</code>ใช้ช่องว่างจัดข้อความเป็นตาราง</li>
+          </ul>
+          <p class="u-aside"><b>เรื่องลำดับหัวข้อ</b> WCAG ไม่ได้เขียนห้ามข้ามระดับหัวข้อไว้ตรง ๆ แต่หลักเกณฑ์นี้ต้องการให้โครงสร้างในโค้ดตรงกับที่ตาเห็น
+            และเทคนิค H42 ให้ใช้ระดับหัวข้อตามโครงเรื่องจริง โครงงานนี้จึงใช้ “การข้ามระดับ” เป็นสัญญาณที่เครื่องตรวจได้ว่าโครงร่างของหน้าอาจขาดช่วง (กฎ R-HEAD-01)</p>
+        </div>
+      </div>
+
+      <div class="u-sec">
+        <h3>วิธีตรวจด้วยตนเอง</h3>
+        <ol class="u-steps">
+          <li>เปิดรายการหัวข้อของโปรแกรมอ่านหน้าจอ (NVDA กด Insert + F7) ดูว่าหัวข้อและระดับตรงกับโครงเรื่องของหน้า</li>
+          <li>คลิกที่ข้อความป้ายกำกับของแต่ละช่อง ถ้าผูกไว้ถูก เคอร์เซอร์จะเข้าไปในช่องนั้น</li>
+          <li>ปิดการจัดรูปแบบของหน้า (Firefox: เมนู View → Page Style → No Style) แล้วดูว่ายังอ่านรู้เรื่อง</li>
+          <li>ตารางข้อมูลต้องมีหัวตาราง และกลุ่มปุ่มตัวเลือกต้องมีคำถามกำกับด้วย fieldset และ legend</li>
+          <li>ข้อความที่สำคัญเพราะเป็นตัวหนาหรือสีต่าง ต้องมีแท็กที่บอกความหมาย เช่น strong หรือบอกไว้ในข้อความ</li>
+        </ol>
+      </div>
+
+      <div class="u-sec u-tool">
+        <h3>เครื่องมือนี้ตรวจส่วนไหน</h3>
+        <div class="u-2col">
+          <div class="ut-yes"><p class="ut-k"><span class="badge good">ตรวจให้</span></p>
+            <ul class="u-list">
+              <li>ลำดับหัวข้อ h1 ถึง h6 ว่ากระโดดข้ามระดับหรือไม่ (กฎ R-HEAD-01)</li>
+              <li>ช่องกรอกมีป้ายกำกับด้วย 4 วิธี คือ label for, label ครอบ, aria-label หรือ aria-labelledby ที่ชี้ไปยัง id ที่มีอยู่จริง (กฎ R-LABEL-01)</li>
+              <li>แบบประเมินข้อ CL-1.3.1 ให้คนยืนยันว่าหัวข้อและป้ายกำกับสื่อความหมาย</li>
+            </ul></div>
+          <div class="ut-no"><p class="ut-k"><span class="badge none">ยังไม่ได้ตรวจ</span></p>
+            <ul class="u-list">
+              <li>ตาราง รายการ และ landmark ของหน้า</li>
+              <li>การจัดกลุ่มด้วย fieldset และ legend</li>
+              <li>ข้อความที่ทำให้เป็นหัวข้อด้วยการจัดรูปแบบอย่างเดียว และลำดับการอ่าน</li>
+            </ul></div>
+        </div>
+      </div>
+      <p class="u-src">ต้นฉบับ: <a href="https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html" target="_blank" rel="noopener">Understanding SC 1.3.1 Info and Relationships (W3C, ภาษาอังกฤษ)</a>
+        · <a href="#sc-1-3-1">สรุปสั้นในหน้ามาตรฐาน</a></p>
+    </article>
+
+    <!-- ---------- SC 1.4.3 ---------- -->
+    <article class="u-art" id="u-1-4-3" aria-labelledby="u-1-4-3-h">
+      <div class="u-head">
+        <p class="eyebrow"><span>SC 1.4.3</span>ระดับ AA · หลักการที่ 1 การรับรู้ได้ · แนวทาง 1.4 แยกแยะได้</p>
+        <h2 id="u-1-4-3-h">ความคมชัดของสี <span class="en">Contrast (Minimum)</span></h2>
+        <p class="u-sum">ข้อความต้องเข้มพอเมื่อเทียบกับพื้นหลัง อย่างน้อย 4.5 : 1 สำหรับข้อความทั่วไป และ 3 : 1 สำหรับข้อความขนาดใหญ่</p>
+      </div>
+
+      <div class="u-sec">
+        <h3>ถ้อยคำของหลักเกณฑ์</h3>
+        <blockquote class="u-quote"><p>การนำเสนอข้อความและภาพของข้อความ ต้องมีอัตราส่วนความคมชัดอย่างน้อย 4.5 : 1 ยกเว้นกรณีต่อไปนี้</p></blockquote>
+        <h4>ข้อยกเว้น</h4>
+        <dl class="u-dl">
+          <div><dt>ข้อความขนาดใหญ่</dt><dd>ข้อความขนาดใหญ่และภาพของข้อความขนาดใหญ่ ต้องมีอัตราส่วนอย่างน้อย 3 : 1</dd></div>
+          <div><dt>ส่วนที่ไม่สำคัญ</dt><dd>ข้อความที่อยู่ในตัวควบคุมที่ใช้งานไม่ได้ (เช่น ปุ่มที่ปิดอยู่) ข้อความตกแต่งล้วน ข้อความที่ไม่มีใครมองเห็น
+            หรือข้อความที่เป็นส่วนของภาพซึ่งมีเนื้อหาภาพอื่นที่สำคัญกว่า ไม่มีข้อกำหนดเรื่องความคมชัด</dd></div>
+          <div><dt>โลโก้</dt><dd>ข้อความที่เป็นส่วนของโลโก้หรือชื่อตราสินค้า ไม่มีข้อกำหนดเรื่องความคมชัด</dd></div>
+        </dl>
+      </div>
+
+      <div class="u-sec">
+        <h3>เจตนาของหลักเกณฑ์</h3>
+        <p>ให้ผู้ที่มองเห็นไม่ชัดในระดับปานกลางอ่านข้อความได้ โดยไม่ต้องใช้เทคโนโลยีช่วยปรับสี ค่า 4.5 : 1 ชดเชยการมองเห็นที่ลดลง
+          ทั้งจากสายตาเลือนรางระดับปานกลาง การบกพร่องในการเห็นสี และความไวต่อความต่างของแสงที่ลดลงตามอายุ</p>
+        <p>หลักเกณฑ์วัดจาก<strong>ความสว่าง</strong>ของสีตัวอักษรเทียบกับพื้นหลัง ไม่ได้วัดจากเฉดสี สีแดงกับสีเขียวที่สว่างใกล้กันจึงอาจไม่ผ่าน
+          แม้ตาปกติจะเห็นว่าต่างกันมาก ค่าที่ได้ต้องไม่ปัดเศษขึ้น เช่น 4.48 : 1 ถือว่าไม่ผ่าน</p>
+      </div>
+
+      <div class="u-sec">
+        <h3>ใครได้ประโยชน์</h3>
+        <ul class="u-list">
+          <li>ผู้มีสายตาเลือนราง และผู้สูงอายุที่ความไวต่อความต่างของแสงลดลง</li>
+          <li>ผู้ที่บกพร่องในการเห็นสี ซึ่งแยกบางสีออกจากกันได้ยาก</li>
+          <li>ทุกคนที่ใช้จอคุณภาพต่ำ จอที่ลดความสว่าง หรือใช้มือถือกลางแดด</li>
+        </ul>
+      </div>
+
+      <div class="u-sec">
+        <h3>ตัวอย่าง</h3>
+        <ul class="u-ex">
+          <li class="ux-good"><span class="badge good">ผ่าน</span><b>ข้อความทั่วไป 7.00 : 1</b><code>color:#595959; background-color:#ffffff</code><span>เทาเข้มบนพื้นขาว อ่านง่าย</span></li>
+          <li class="ux-good"><span class="badge good">ผ่าน</span><b>เกือบถึงเกณฑ์แต่ผ่าน 4.54 : 1</b><code>color:#767676; background-color:#ffffff</code><span>สีเทาที่อ่อนที่สุดที่ผ่านบนพื้นขาว</span></li>
+          <li class="ux-good"><span class="badge good">ผ่าน</span><b>ข้อความขนาดใหญ่ 3.03 : 1</b><code>font-size:32px; color:#949494; background-color:#ffffff</code><span>ผ่านเพราะข้อความใหญ่ใช้เกณฑ์ 3 : 1 แต่เครื่องมือนี้จะแจ้งไว้ก่อน (ดูด้านล่าง)</span></li>
+          <li class="ux-bad"><span class="badge bad">ไม่ผ่าน</span><b>เทาอ่อนบนขาว 1.61 : 1</b><code>color:#cccccc; background-color:#ffffff</code><span>ผู้มีสายตาเลือนรางอ่านไม่ออก</span></li>
+          <li class="ux-bad"><span class="badge bad">ไม่ผ่าน</span><b>ต่ำกว่าเกณฑ์เล็กน้อย 4.48 : 1</b><code>color:#777777; background-color:#ffffff</code><span>ห้ามปัดเศษเป็น 4.5</span></li>
+          <li class="ux-bad"><span class="badge bad">ไม่ผ่าน</span><b>ข้อความบนภาพพื้นหลัง</b><code>background-image:url(beach.jpg); color:#ffffff</code><span>บางจุดของภาพสว่างจนตัวอักษรขาวกลืนหาย</span></li>
+        </ul>
+      </div>
+
+      <div class="u-sec">
+        <h3>คำศัพท์สำคัญ</h3>
+        <dl class="u-dl">
+          <div><dt>อัตราส่วนความคมชัด</dt><dd><code>(L1 + 0.05) ÷ (L2 + 0.05)</code> เมื่อ L1 คือความสว่างสัมพัทธ์ของสีที่สว่างกว่า และ L2 ของสีที่มืดกว่า ค่าอยู่ระหว่าง 1 : 1 ถึง 21 : 1</dd></div>
+          <div><dt>ความสว่างสัมพัทธ์</dt><dd><code>L = 0.2126 R + 0.7152 G + 0.0722 B</code> โดยแปลงค่าสี sRGB แต่ละช่องก่อน
+            ถ้าค่า (หารด้วย 255) ไม่เกิน 0.03928 ให้หารด้วย 12.92 ถ้าเกิน ให้ใช้ ((ค่า + 0.055) ÷ 1.055) ยกกำลัง 2.4</dd></div>
+          <div><dt>ข้อความขนาดใหญ่</dt><dd>อย่างน้อย 18 พอยต์ (ประมาณ 24px) หรือ 14 พอยต์ตัวหนา (ประมาณ 18.66px)</dd></div>
+          <div><dt>ภาพของข้อความ</dt><dd>ข้อความที่ทำเป็นรูปภาพ เช่น แบนเนอร์ที่มีตัวอักษร ต้องผ่านเกณฑ์เดียวกับข้อความจริง</dd></div>
+        </dl>
+      </div>
+
+      <div class="u-sec u-2col">
+        <div>
+          <h3>เทคนิคที่ W3C แนะนำ</h3>
+          <ul class="u-tech">
+            <li><code>G18</code>ให้อัตราส่วนระหว่างข้อความกับพื้นหลังอย่างน้อย 4.5 : 1</li>
+            <li><code>G145</code>ให้อัตราส่วนอย่างน้อย 3 : 1 สำหรับข้อความขนาดใหญ่</li>
+            <li><code>G148</code>ไม่กำหนดสีตัวอักษรและสีพื้นหลัง ปล่อยให้ผู้ใช้ตั้งค่าเอง</li>
+            <li><code>G174</code>มีปุ่มให้สลับไปใช้การแสดงผลที่คมชัดพอ</li>
+          </ul>
+        </div>
+        <div>
+          <h3>ข้อผิดพลาดที่ทำให้ไม่ผ่าน</h3>
+          <ul class="u-tech u-fail">
+            <li><code>F83</code>ใช้ภาพพื้นหลังที่ทำให้ความคมชัดกับข้อความไม่พอ</li>
+          </ul>
+          <p class="u-aside"><b>อย่าลืมสถานะอื่น</b> ข้อความตอนชี้เมาส์ ตอนได้รับโฟกัส และข้อความในโหมดมืด ต้องผ่านเกณฑ์เหมือนกัน</p>
+        </div>
+      </div>
+
+      <div class="u-sec">
+        <h3>วิธีตรวจด้วยตนเอง</h3>
+        <ol class="u-steps">
+          <li>หาข้อความทุกส่วนในหน้า รวมข้อความบนปุ่ม ลิงก์ ป้ายกำกับ ข้อความเล็ก ๆ และภาพของข้อความ</li>
+          <li>วัดสีตัวอักษรเทียบกับสีพื้นที่อยู่ด้านหลังจริง ด้วยเครื่องมือวัด เช่น เครื่องมือนักพัฒนาของ Chrome หรือ Edge (แสดงค่าในช่องเลือกสี) หรือโปรแกรม Colour Contrast Analyser</li>
+          <li>ข้อความขนาดใหญ่ใช้เกณฑ์ 3 : 1 ข้อความทั่วไปใช้ 4.5 : 1</li>
+          <li>ข้อความบนภาพหรือพื้นไล่สี ให้วัดจุดที่สีพื้นใกล้กับสีตัวอักษรที่สุด</li>
+          <li>ตรวจซ้ำในสถานะชี้เมาส์ ได้รับโฟกัส และโหมดมืด</li>
+        </ol>
+      </div>
+
+      <div class="u-sec u-tool">
+        <h3>เครื่องมือนี้ตรวจส่วนไหน</h3>
+        <div class="u-2col">
+          <div class="ut-yes"><p class="ut-k"><span class="badge good">ตรวจให้</span></p>
+            <ul class="u-list">
+              <li>องค์ประกอบที่กำหนดทั้ง color และ background-color ไว้ใน style คำนวณด้วยสูตรของ W3C เทียบเกณฑ์ 4.5 : 1 (กฎ R-CONTRAST-01)</li>
+              <li>ค่าสีที่อ่านไม่ได้ เช่น transparent หรือสีไล่ระดับ ส่งให้ตรวจเพิ่ม ไม่ให้ผ่าน</li>
+              <li>แบบประเมินข้อ CL-1.4.3 ให้คนวัดข้อความบนภาพหรือพื้นไล่สี</li>
+            </ul></div>
+          <div class="ut-no"><p class="ut-k"><span class="badge none">ยังไม่ได้ตรวจ</span></p>
+            <ul class="u-list">
+              <li>สีที่กำหนดในไฟล์ CSS หรือแท็ก &lt;style&gt; สีพื้นที่สืบทอดจากองค์ประกอบแม่ และพื้นหลังแบบย่อ background:</li>
+              <li>ความโปร่งใสของสี และภาพของข้อความ</li>
+              <li>ข้อยกเว้นข้อความขนาดใหญ่ ระบบใช้ 4.5 : 1 กับทุกขนาดเป็นกฎคัดกรอง จึงอาจแจ้งข้อความใหญ่ที่ผ่าน 3 : 1 ไว้ก่อน</li>
+            </ul></div>
+        </div>
+      </div>
+      <p class="u-src">ต้นฉบับ: <a href="https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html" target="_blank" rel="noopener">Understanding SC 1.4.3 Contrast (Minimum) (W3C, ภาษาอังกฤษ)</a>
+        · <a href="#sc-1-4-3">สรุปสั้นในหน้ามาตรฐาน</a></p>
+    </article>
+  </section>
+
   <!-- ============ ขั้นที่ 1 : รับข้อมูล ============ -->
   <section id="input-section" class="no-print view" data-view="check" aria-labelledby="h-input">
     <header class="sec-head">
@@ -2722,7 +3139,7 @@
   <div class="ft-top">
     <p class="ft-brand"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="15" fill="none" stroke="#fff" stroke-width="2"/><circle cx="16" cy="8.6" r="2.3" fill="#fff"/><path d="M8.8 12.3c2.4.8 4.8 1.2 7.2 1.2s4.8-.4 7.2-1.2M16 13.6v4.9l-3.1 6.3M16 18.5l3.1 6.3" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>ตรวจการเข้าถึงเว็บไซต์<small>สร้างเว็บที่ทุกคนใช้งานได้</small></span></p>
     <nav aria-label="ลิงก์ท้ายหน้า"><ul class="ft-links">
-      <li><a href="#home">หน้าแรก</a></li><li><a href="#standards-section">มาตรฐานที่ตรวจ</a></li><li><a href="#input-section">ตรวจโค้ด</a></li><li><a href="#results-section">ผลการประเมิน</a></li><li><a href="./tests/runner.html">ผลวัดความแม่นยำ</a></li><li><a href="./tests/bugcases.html">ชุดทดสอบ 100 กรณี</a></li>
+      <li><a href="#home">หน้าแรก</a></li><li><a href="#standards-section">มาตรฐานที่ตรวจ</a></li><li><a href="#understand-section">คำอธิบายหลักเกณฑ์ภาษาไทย</a></li><li><a href="#input-section">ตรวจโค้ด</a></li><li><a href="#results-section">ผลการประเมิน</a></li><li><a href="./tests/runner.html">ผลวัดความแม่นยำ</a></li><li><a href="./tests/bugcases.html">ชุดทดสอบ 100 กรณี</a></li>
     </ul></nav>
   </div>
   <div class="ft-note">
@@ -2743,8 +3160,8 @@
 </div>
 
 
-<script src="./analyzer.js?v=20261105"></script>
-<script src="./fixer.js?v=20261105"></script>
-<script src="./app.js?v=20261105"></script>
+<script src="./analyzer.js?v=20261105c"></script>
+<script src="./fixer.js?v=20261105c"></script>
+<script src="./app.js?v=20261105c"></script>
 </body>
 </html>
