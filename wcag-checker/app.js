@@ -859,19 +859,8 @@
   }
 
   /* เมนูขั้นตอนด้านซ้าย: เมื่อมีผลแล้วให้ขั้นที่ 3 ลิงก์ไปยังหัวข้อย่อยของผลพร้อมจำนวน */
-  function renderResultsNav(result) {
-    var li = $('nav-results');
-    if (!li) return;
-    var sub = [['#r-score', 'คะแนน', result.score === null ? '—' : result.score.toFixed(2), ''],
-      ['#h-dash', 'ผิดที่ส่วนไหน', '', ''],
-      ['#h-coverage', 'ความครอบคลุม', '', ''],
-      ['#h-issues', 'จุดที่ต้องแก้', String(result.issueCount), result.issueCount ? 'bad' : '']];
-    if (result.needsReviewCount) sub.push(['#h-review', 'ต้องตรวจเพิ่ม', String(result.needsReviewCount), '']);
-    li.innerHTML = '<a href="#results-section" data-nav="results"><span class="t">ผลการประเมิน</span></a>' +
-      '<ol class="sub">' + sub.map(function (s) {
-        return '<li><a href="' + s[0] + '"><span class="t">' + esc(s[1]) + '</span>' +
-          (s[2] ? '<span class="cnt ' + s[3] + '">' + esc(s[2]) + '</span>' : '') + '</a></li>';
-      }).join('') + '</ol>';
+  /* เมนูบนไม่มีขั้นตอนตรวจแล้ว (ย้ายไปแถบขั้นตอน #pg-band) จึงเหลือแค่อัปเดตสถานะเมนูและแถบขั้นตอน */
+  function renderResultsNav() {
     updateRailCurrent();
   }
 
@@ -891,8 +880,7 @@
 
   function updateRailCurrent() {
     document.querySelectorAll('[data-nav]').forEach(function (a) {
-      /* หน้าคำอธิบายฉบับเต็มเป็นหน้าย่อยของมาตรฐานที่ตรวจ */
-      if (a.getAttribute('data-nav') === (currentView === 'understand' ? 'standards' : currentView)) a.setAttribute('aria-current', 'page');
+      if (a.getAttribute('data-nav') === currentView) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');
     });
     updateStepper();
@@ -908,6 +896,10 @@
     var hasResult = !$('results-section').classList.contains('hidden');
     var allAnswered = Object.keys(readChecklist()).length === A.CHECKLIST_QUESTIONS.length;
     var done = { check: hasResult, checklist: hasResult && allAnswered, results: hasResult, report: false };
+    /* ตัวนับผลในแถบขั้นตอน (เดิมอยู่ในเมนูบน) */
+    var cnt = $('ps-cnt');
+    if (cnt) cnt.textContent = !hasResult || !state.result ? '(ยังไม่ได้ตรวจ)'
+      : state.result.score === null ? '(ยังไม่มีคะแนน)' : '(คะแนน ' + state.result.score.toFixed(2) + ')';
     band.querySelectorAll('li[data-step]').forEach(function (li) {
       var k = li.getAttribute('data-step'), a = li.querySelector('a'), s = li.querySelector('.ps-s');
       var cur = k === currentView, isDone = !!done[k] && !cur;
@@ -1076,8 +1068,8 @@
     '.std-toc', '.std-sec > .eyebrow', '.std-sec > h2', '.std-sec > h3', '.std-sec > p', '.std-2col > *',
     '.pour > .pour-card', '.std-sec > .lv-table', '.std-sec > .sc-map', '.std-cards > .std-card',
     '.rule4 > li', '.std-bands > li', '.score-rules > li', '.lim-list > li',
-    /* คำอธิบายฉบับเต็มภาษาไทย */
-    '.u-nav > a', '.u-art > .u-head', '.u-art > .u-sec', '.u-art > .u-src'
+    /* คำอธิบายฉบับเต็มภาษาไทย (แถบชิป .u-nav ไม่ใส่ เพราะติดอยู่ด้านบนตลอด) */
+    '.u-art > .u-head', '.u-art > .u-sec', '.u-art > .u-src'
   ].join(',');
   var REVEAL_STEP_MS = 110, REVEAL_MAX_STEPS = 6;
 
@@ -1118,6 +1110,41 @@
     setTimeout(revealOnScreen, 60);
   }
   var revealOnScreen = function () {};
+
+  /* ================================================================ *
+   * หน้าคำอธิบายหลักเกณฑ์: ชิปของข้อที่กำลังอ่าน และความสูงแถบเมนูสำหรับแถบชิปที่ติดด้านบน
+   * ================================================================ */
+  function initUnderstandNav() {
+    var root = document.documentElement, bar = document.querySelector('.sidebar');
+    function setHeaderHeight() {
+      if (!bar || bar.classList.contains('nav-open')) return;
+      root.style.setProperty('--hdr-h', bar.offsetHeight + 'px');
+    }
+    setHeaderHeight();
+    window.addEventListener('resize', setHeaderHeight);
+    window.addEventListener('load', setHeaderHeight);
+
+    var nav = document.querySelector('.u-nav');
+    var links = nav ? Array.prototype.slice.call(nav.querySelectorAll('a')) : [];
+    if (!links.length || typeof IntersectionObserver === 'undefined') return;
+    var byId = {};
+    links.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var a = byId[en.target.id];
+        if (!a) return;
+        links.forEach(function (x) { if (x !== a) x.removeAttribute('aria-current'); });
+        a.setAttribute('aria-current', 'location');
+        /* เลื่อนแถบชิปแนวนอนให้เห็นชิปปัจจุบัน โดยไม่เลื่อนหน้า */
+        if (nav.scrollWidth > nav.clientWidth) {
+          var left = a.offsetLeft - (nav.clientWidth - a.offsetWidth) / 2;
+          try { nav.scrollTo({ left: left, behavior: reducedMotion() ? 'auto' : 'smooth' }); } catch (e) { nav.scrollLeft = left; }
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    document.querySelectorAll('.u-art').forEach(function (el) { io.observe(el); });
+  }
 
   function useMode(mode) {
     var r = $(mode === 'url' ? 'mode-url' : 'mode-snippet');
@@ -1410,6 +1437,7 @@
     renderStandards();
     renderChecklist();
     initReveal();
+    initUnderstandNav();
 
     window.addEventListener('hashchange', function () { route(true); });
     route(false);

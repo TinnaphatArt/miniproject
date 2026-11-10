@@ -24,61 +24,225 @@
   @font-face { font-family:"Plex Mono"; font-weight:600 700; font-display:swap; src:url(./fonts/plex-mono-latin-600.woff2) format("woff2"); }
 
   /* ============================================================
-     สไตล์ achromatic-ledger (จากสกิล design-taste-frontend, seed 414134130)
-     กรอบหน้าไม่มีสี สีอยู่ที่ข้อมูลและสถานะเท่านั้น สีน้ำเงิน #1d5fbf ใช้กับข้อมูลหลัก (ตำแหน่งคะแนน) และลิงก์
-     พื้นเทาฟ้าแบบสมุดบัญชี การ์ดขาวเส้นขอบบาง ไม่มีเงา ไม่มีไล่สี มุมการ์ด 8 px ปุ่ม 6 px
-     ข้อความทุกคู่ผ่าน 4.5:1 และเส้นขอบช่องกรอกผ่าน 3:1 ตาม WCAG 1.4.11 (เข้มกว่าค่าแนะนำของสกิลโดยตั้งใจ)
+     โทเค็นทั้งหมดของเว็บ (รวมจาก 7 จุดเดิมเหลือชุดเดียว 10 พ.ย. 2569)
+     โหมดสว่างอยู่ใน :root · โหมดมืดเขียนสองที่ด้วยค่าเดียวกัน (ตามระบบ และเมื่อบังคับด้วย data-theme)
+     แก้สีหรือระยะห่างที่นี่ที่เดียว ห้ามเพิ่มบล็อก :root ใหม่กลางไฟล์
      ============================================================ */
   :root {
-    color-scheme: light;
-    --ground:#f2f4f7;  --page:#ffffff;  --paper-2:#f6f7f9;  --paper-3:#e7eaee;
-    --rule:#dfe3e8;  --rule-2:#eef0f3;  --control:#8a919c;
-    --ink:#0a0a0a;  --ink-2:#555d6a;  --muted:#555d6a;
-    --link:#1d5fbf;  --hue:#1d5fbf;
-    --btn:#141414;  --btn-ink:#ffffff;  --btn-hover:#363636;
-    --btn2:#e5e5e5;  --btn2-hover:#d6d6d6;
-    --mark:#ffc845;  --mark-ink:#0a0a0a;
-    --il-a:#2b2f36;  --il-b:#7b8390;  --il-c:#dde1e7;  --il-d:#f1f3f6;
-
-    --good:#1f7a45;  --good-bg:#e3f6ea;  --good-line:#b9dfc6;
-    --ok:#1d5fbf;    --ok-bg:#eaf1fb;    --ok-line:#c4d6f2;
-    --warn:#92400e;  --warn-bg:#fffbeb;  --warn-line:#fde68a;
-    --bad:#c4242a;   --bad-bg:#ffedea;   --bad-line:#f6c4bf;
-
-    --radius:10px;  --radius-c:6px;  --gap:12px;
+    /* พื้นและเส้น */
+    color-scheme:light;
+    --ground:#f4f7fd;
+    --page:#ffffff;
+    --paper-2:#f7f8fd;
+    --paper-3:#eceefa;
+    --rule:#e5e7f2;
+    --rule-2:#eef0f7;
+    --control:#8a919c;
+    --p1:#e8efff;
+    --p2:#fdf2f8;
+    --p3:#ecfdf5;
+    --p4:#fff7ed;
+    --deep:#0b2463;
+    --tile-dark:#0b2463;
+    --tile-dark-ink:#ffffff;
+    --tile-dark-2:#c9c9c9;
+    /* ตัวอักษรและลิงก์ */
+    --ink:#1b1d2a;
+    --ink-2:#545a6e;
+    --muted:#545a6e;
+    --link:#1d4ed8;
+    --hue:#1d4ed8;
+    --mark:#ffc845;
+    --mark-ink:#0a0a0a;
+    /* สีแบรนด์ */
+    --navy:#0b2463;
+    --blue:#1d4ed8;
+    --blue-2:#2563eb;
+    --yellow:#fbbf24;
+    --yellow-2:#f59e0b;
+    --grad:linear-gradient(135deg, #0b2463 0%, #123a9c 55%, #1d4ed8 100%);
+    --mint:#a1ffcb;
+    --mint-ink:#1a1a1a;
+    --mint-hover:#7ff2b4;
+    /* ปุ่ม */
+    --btn:#1d4ed8;
+    --btn-ink:#ffffff;
+    --btn-hover:#1e40af;
+    --btn2:#e8efff;
+    --btn2-hover:#dbe6ff;
+    --btn-h:44px;
+    --btn-h-sm:36px;
+    --btn-h-lg:52px;
+    /* สีสถานะ (ข้อความบนพื้นอ่อน --good ฯลฯ · กล่องสีทึบตัวขาว --st-*) */
+    --good:#1f7a45;
+    --good-bg:#e3f6ea;
+    --good-line:#b9dfc6;
+    --ok:#1d5fbf;
+    --ok-bg:#eaf1fb;
+    --ok-line:#c4d6f2;
+    --warn:#92400e;
+    --warn-bg:#fffbeb;
+    --warn-line:#fde68a;
+    --bad:#c4242a;
+    --bad-bg:#ffedea;
+    --bad-line:#f6c4bf;
+    --st-good:#15803d;
+    --st-bad:#b91c1c;
+    --st-warn:#b45309;
+    --st-none:#5b6474;
+    --st-ink:#ffffff;
+    --sev-c:#dc2626;
+    --sev-s:#f59e0b;
+    --sev-a:#6366f1;
+    /* กล่องโค้ดผิด/ถูก */
+    --code-bad-bg:#fff1f2;
+    --code-bad:#4c0519;
+    --code-bad-ink:#ffe4e6;
+    --code-good-bg:#f0fdf4;
+    --code-good:#052e16;
+    --code-good-ink:#dcfce7;
+    /* ภาพประกอบ */
+    --il-a:#2b2f36;
+    --il-b:#7b8390;
+    --il-c:#dde1e7;
+    --il-d:#f1f3f6;
+    /* มุมโค้ง เงา และระยะห่าง */
+    --radius:20px;
+    --radius-c:6px;
+    --gap:12px;
+    --r-xs:8px;
+    --r-sm:12px;
+    --r-md:16px;
+    --r-lg:24px;
+    --r-pill:999px;
+    --shadow:0 14px 34px -18px rgba(11,36,99,.35);
+    --sh-1:0 1px 2px rgba(11,36,99,.05), 0 10px 28px -14px rgba(11,36,99,.22);
+    --sh-2:0 28px 56px -26px rgba(11,36,99,.5);
+    --s-1:4px;
+    --s-2:8px;
+    --s-3:12px;
+    --s-4:16px;
+    --s-5:24px;
+    --s-6:32px;
+    --s-7:48px;
+    --s-8:96px;
+    --hdr-h:64px; /* ความสูงแถบเมนู app.js ตั้งค่าจริงตอนโหลดและเปลี่ยนขนาดจอ */
+    /* ฟอนต์ */
     --f-body:"Sarabun","TH Sarabun New","Noto Sans Thai",Tahoma,sans-serif;
     --f-head:"Sarabun","TH Sarabun New","Noto Sans Thai",Tahoma,sans-serif;
     --f-mono:"Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Sarabun",monospace;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      color-scheme: dark;
-      --ground:#0a0a0a;  --page:#141414;  --paper-2:#1b1b1b;  --paper-3:#2a2a2a;
-      --rule:#2a2a2a;  --rule-2:#202020;  --control:#7a7a7a;
-      --ink:#f5f5f5;  --ink-2:#ababab;  --muted:#ababab;
-      --link:#8db9ff;  --hue:#6ea8ff;
-      --btn:#f5f5f5;  --btn-ink:#0a0a0a;  --btn-hover:#d4d4d4;
-      --btn2:#2a2a2a;  --btn2-hover:#363636;
-      --il-a:#d9dce1;  --il-b:#8a919c;  --il-c:#33373d;  --il-d:#1f2226;
-      --good:#6fd39a;  --good-bg:#12271b;  --good-line:#2a5a3b;
-      --ok:#8db9ff;    --ok-bg:#15233a;    --ok-line:#2f4a75;
-      --warn:#f0bf66;  --warn-bg:#2a2110;  --warn-line:#5c4820;
-      --bad:#ff8a80;   --bad-bg:#2c1714;   --bad-line:#62302b;
+      /* พื้นและเส้น */
+      color-scheme:dark;
+      --ground:#0a1226;
+      --page:#111b35;
+      --paper-2:#1c2036;
+      --paper-3:#272b47;
+      --rule:#2a2e4a;
+      --rule-2:#22263f;
+      --control:#7a7a7a;
+      --p1:#1b2a52;
+      --p2:#2a1d33;
+      --p3:#14302a;
+      --p4:#33261a;
+      --deep:#050c1f;
+      --tile-dark:#050c1f;
+      /* ตัวอักษรและลิงก์ */
+      --ink:#eef0fb;
+      --ink-2:#b3b8d0;
+      --muted:#b3b8d0;
+      --link:#93b4ff;
+      --hue:#93b4ff;
+      /* ปุ่ม */
+      --btn:#93b4ff;
+      --btn-ink:#0a1226;
+      --btn-hover:#b8ceff;
+      --btn2:#1b2a52;
+      --btn2-hover:#24366a;
+      /* สีสถานะ (ข้อความบนพื้นอ่อน --good ฯลฯ · กล่องสีทึบตัวขาว --st-*) */
+      --good:#6fd39a;
+      --good-bg:#12271b;
+      --good-line:#2a5a3b;
+      --ok:#8db9ff;
+      --ok-bg:#15233a;
+      --ok-line:#2f4a75;
+      --warn:#f0bf66;
+      --warn-bg:#2a2110;
+      --warn-line:#5c4820;
+      --bad:#ff8a80;
+      --bad-bg:#2c1714;
+      --bad-line:#62302b;
+      --st-good:#6fd39a;
+      --st-bad:#ff8a80;
+      --st-warn:#f0bf66;
+      --st-none:#a3adbd;
+      --st-ink:#0a1226;
+      /* กล่องโค้ดผิด/ถูก */
+      --code-bad-bg:#2a1418;
+      --code-good-bg:#11241a;
+      /* ภาพประกอบ */
+      --il-a:#d9dce1;
+      --il-b:#8a919c;
+      --il-c:#33373d;
+      --il-d:#1f2226;
     }
   }
   :root[data-theme="dark"] {
-    color-scheme: dark;
-    --ground:#0a0a0a;  --page:#141414;  --paper-2:#1b1b1b;  --paper-3:#2a2a2a;
-    --rule:#2a2a2a;  --rule-2:#202020;  --control:#7a7a7a;
-    --ink:#f5f5f5;  --ink-2:#ababab;  --muted:#ababab;
-    --link:#8db9ff;  --hue:#6ea8ff;
-    --btn:#f5f5f5;  --btn-ink:#0a0a0a;  --btn-hover:#d4d4d4;
-    --btn2:#2a2a2a;  --btn2-hover:#363636;
-    --il-a:#d9dce1;  --il-b:#8a919c;  --il-c:#33373d;  --il-d:#1f2226;
-    --good:#6fd39a;  --good-bg:#12271b;  --good-line:#2a5a3b;
-    --ok:#8db9ff;    --ok-bg:#15233a;    --ok-line:#2f4a75;
-    --warn:#f0bf66;  --warn-bg:#2a2110;  --warn-line:#5c4820;
-    --bad:#ff8a80;   --bad-bg:#2c1714;   --bad-line:#62302b;
+    /* พื้นและเส้น */
+    color-scheme:dark;
+    --ground:#0a1226;
+    --page:#111b35;
+    --paper-2:#1c2036;
+    --paper-3:#272b47;
+    --rule:#2a2e4a;
+    --rule-2:#22263f;
+    --control:#7a7a7a;
+    --p1:#1b2a52;
+    --p2:#2a1d33;
+    --p3:#14302a;
+    --p4:#33261a;
+    --deep:#050c1f;
+    --tile-dark:#050c1f;
+    /* ตัวอักษรและลิงก์ */
+    --ink:#eef0fb;
+    --ink-2:#b3b8d0;
+    --muted:#b3b8d0;
+    --link:#93b4ff;
+    --hue:#93b4ff;
+    /* ปุ่ม */
+    --btn:#93b4ff;
+    --btn-ink:#0a1226;
+    --btn-hover:#b8ceff;
+    --btn2:#1b2a52;
+    --btn2-hover:#24366a;
+    /* สีสถานะ (ข้อความบนพื้นอ่อน --good ฯลฯ · กล่องสีทึบตัวขาว --st-*) */
+    --good:#6fd39a;
+    --good-bg:#12271b;
+    --good-line:#2a5a3b;
+    --ok:#8db9ff;
+    --ok-bg:#15233a;
+    --ok-line:#2f4a75;
+    --warn:#f0bf66;
+    --warn-bg:#2a2110;
+    --warn-line:#5c4820;
+    --bad:#ff8a80;
+    --bad-bg:#2c1714;
+    --bad-line:#62302b;
+    --st-good:#6fd39a;
+    --st-bad:#ff8a80;
+    --st-warn:#f0bf66;
+    --st-none:#a3adbd;
+    --st-ink:#0a1226;
+    /* กล่องโค้ดผิด/ถูก */
+    --code-bad-bg:#2a1418;
+    --code-good-bg:#11241a;
+    /* ภาพประกอบ */
+    --il-a:#d9dce1;
+    --il-b:#8a919c;
+    --il-c:#33373d;
+    --il-d:#1f2226;
   }
 
   * { box-sizing:border-box; }
@@ -439,9 +603,6 @@
 
   /* ---------- กระดานไทล์ส่วนบน (ทิศทาง "The well-kept board" seed 1915788929, โทนเทาและเขียวมิ้นต์) ----------
      ตาราง 12 คอลัมน์ ช่องว่าง 8 px ไทล์สีเรียบ มุม 10 px ไม่มีเส้นขอบและเงา ทุกไทล์มีเนื้อหาจริงของโครงงาน */
-  :root { --tile-dark:#232323; --tile-dark-ink:#ffffff; --tile-dark-2:#c9c9c9; --mint:#a1ffcb; --mint-ink:#1a1a1a; --mint-hover:#7ff2b4; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --tile-dark:#262626; } }
-  :root[data-theme="dark"] { --tile-dark:#262626; }
   .board { display:grid; grid-template-columns:repeat(12, minmax(0, 1fr)); gap:8px; }
   .board-2 { margin-top:8px; }
   .board > .t { margin:0; border-radius:10px; padding:22px 24px; min-width:0; }
@@ -575,24 +736,6 @@
      ธีมสดใส (3 พ.ย. 2569 ผู้พัฒนาเลือกเองจากตัวเลือก): ไล่สีน้ำเงิน-ม่วง-ชมพู การ์ดมุมโค้งมน ไอคอนสี
      ต่างจากกฎของสกิล design-taste-frontend โดยตั้งใจ แต่ข้อความทุกคู่ยังผ่าน 4.5:1 (ขาวบนทุกจุดของไล่สีได้ 6.3:1 ขึ้นไป)
      ============================================================ */
-  :root {
-    --ground:#f5f6fc;  --rule:#e5e7f2;  --rule-2:#eef0f7;  --paper-2:#f7f8fd;  --paper-3:#eceefa;
-    --ink:#1b1d2a;  --ink-2:#545a6e;  --muted:#545a6e;  --link:#4338ca;  --hue:#6d28d9;
-    --btn:#4338ca;  --btn-hover:#3730a3;  --btn2:#eef0ff;  --btn2-hover:#e0e4ff;
-    --grad:linear-gradient(120deg, #2b48d6 0%, #6d28d9 55%, #a21caf 100%);
-    --p1:#eef2ff; --p2:#fdf2f8; --p3:#ecfdf5; --p4:#fff7ed; --deep:#1e1b4b;
-    --radius:20px;  --shadow:0 12px 32px -16px rgba(67,56,202,.35);  --tile-dark:#1e1b4b;
-  }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-    --ground:#0f1020; --page:#171a2e; --rule:#2a2e4a; --rule-2:#22263f; --paper-2:#1c2036; --paper-3:#272b47;
-    --ink:#eef0fb; --ink-2:#b3b8d0; --muted:#b3b8d0; --link:#a5b4fc; --hue:#c4b5fd;
-    --btn:#a5b4fc; --btn-ink:#14152a; --btn-hover:#c7d2fe; --btn2:#272b47; --btn2-hover:#323758;
-    --p1:#1f2447; --p2:#2a1d33; --p3:#14302a; --p4:#33261a; --deep:#0b0a24; --tile-dark:#0b0a24; } }
-  :root[data-theme="dark"] {
-    --ground:#0f1020; --page:#171a2e; --rule:#2a2e4a; --rule-2:#22263f; --paper-2:#1c2036; --paper-3:#272b47;
-    --ink:#eef0fb; --ink-2:#b3b8d0; --muted:#b3b8d0; --link:#a5b4fc; --hue:#c4b5fd;
-    --btn:#a5b4fc; --btn-ink:#14152a; --btn-hover:#c7d2fe; --btn2:#272b47; --btn2-hover:#323758;
-    --p1:#1f2447; --p2:#2a1d33; --p3:#14302a; --p4:#33261a; --deep:#0b0a24; --tile-dark:#0b0a24; }
 
   /* แถบเมนูด้านบนแทนแถบข้าง */
   .app { display:block; }
@@ -741,9 +884,6 @@
 
 
   /* ---------- แนวทางจาก PDF A11yChecker หน้า 2, 5, 8, 9, 10, 11 ---------- */
-  :root { --code-bad-bg:#fff1f2; --code-bad:#4c0519; --code-bad-ink:#ffe4e6; --code-good-bg:#f0fdf4; --code-good:#052e16; --code-good-ink:#dcfce7; --sev-c:#dc2626; --sev-s:#f59e0b; --sev-a:#6366f1; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --code-bad-bg:#2a1418; --code-good-bg:#11241a; } }
-  :root[data-theme="dark"] { --code-bad-bg:#2a1418; --code-good-bg:#11241a; }
 
   /* ขั้นตอนการใช้งาน (หน้า 9) */
   .flow { grid-column:1 / -1; list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:28px; counter-reset:none; }
@@ -827,14 +967,6 @@
      ธีมน้ำเงิน-เหลือง ตามภาพตัวอย่างที่ผู้พัฒนาให้มา (3 พ.ย. 2569)
      น้ำเงินเข้ม #0b2463 น้ำเงิน #1d4ed8 เหลือง #fbbf24 ข้อความทุกคู่ผ่าน 4.5:1
      ============================================================ */
-  :root {
-    --navy:#0b2463; --blue:#1d4ed8; --blue-2:#2563eb; --yellow:#fbbf24; --yellow-2:#f59e0b;
-    --ground:#f4f7fd; --link:#1d4ed8; --hue:#1d4ed8; --btn:#1d4ed8; --btn-hover:#1e40af; --btn2:#e8efff; --btn2-hover:#dbe6ff;
-    --grad:linear-gradient(135deg, #0b2463 0%, #123a9c 55%, #1d4ed8 100%); --deep:#0b2463; --tile-dark:#0b2463;
-    --p1:#e8efff; --shadow:0 14px 34px -18px rgba(11,36,99,.35);
-  }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ground:#0a1226; --page:#111b35; --link:#93b4ff; --hue:#93b4ff; --btn:#93b4ff; --btn-ink:#0a1226; --btn-hover:#b8ceff; --btn2:#1b2a52; --btn2-hover:#24366a; --p1:#1b2a52; --deep:#050c1f; --tile-dark:#050c1f; } }
-  :root[data-theme="dark"] { --ground:#0a1226; --page:#111b35; --link:#93b4ff; --hue:#93b4ff; --btn:#93b4ff; --btn-ink:#0a1226; --btn-hover:#b8ceff; --btn2:#1b2a52; --btn2-hover:#24366a; --p1:#1b2a52; --deep:#050c1f; --tile-dark:#050c1f; }
   body { overflow-x:clip; }
 
   /* แถบเมนู */
@@ -845,7 +977,7 @@
   .steps a { border-radius:0; padding:6px 10px; background:none !important; position:relative; }
   .steps a[aria-current="page"] { color:var(--link); }
   .steps a[aria-current="page"]::after { content:""; position:absolute; left:10px; right:10px; bottom:0; height:3px; border-radius:2px; background:var(--link); }
-  .nav-cta { display:inline-flex; align-items:center; gap:8px; margin-left:8px; padding:8px 20px; min-height:40px; border-radius:999px; background:var(--yellow); color:#0b2463; font-weight:700; text-decoration:none; box-shadow:0 8px 18px -10px rgba(245,158,11,.9); }
+  .nav-cta { display:inline-flex; align-items:center; gap:8px; margin-left:8px; padding:8px 20px; min-height:40px; border-radius:999px; background:var(--yellow); color:var(--navy); font-weight:700; text-decoration:none; box-shadow:0 8px 18px -10px rgba(245,158,11,.9); }
   .nav-cta:hover { background:#fcd34d; }
   .nav-cta svg { width:14px; height:14px; }
   .steps-foot { display:none !important; }
@@ -864,7 +996,7 @@
   .yc { width:20px; height:20px; flex:none; }
   .hero2-cta { margin:26px 0 0; display:flex; flex-wrap:wrap; gap:14px; }
   .btn-y, .btn-o, .btn-blue { display:inline-flex; align-items:center; gap:10px; min-height:48px; padding:10px 26px; border-radius:999px; font-family:var(--f-head); font-weight:700; font-size:1.02rem; text-decoration:none; border:0; cursor:pointer; transition:transform .15s, background-color .15s; }
-  .btn-y { background:var(--yellow); color:#0b2463; box-shadow:0 12px 24px -12px rgba(245,158,11,.9); }
+  .btn-y { background:var(--yellow); color:var(--navy); box-shadow:0 12px 24px -12px rgba(245,158,11,.9); }
   .btn-y:hover { background:#fcd34d; transform:translateY(-1px); }
   .btn-o { color:#fff; box-shadow:inset 0 0 0 2px rgba(255,255,255,.85); background:transparent; }
   .btn-o:hover { background:rgba(255,255,255,.1); }
@@ -879,8 +1011,8 @@
   .lt-bar { display:flex; gap:5px; align-items:center; padding:2px 4px 8px; }
   .lt-bar i { width:7px; height:7px; border-radius:50%; background:#475569; }
   .lt-bar span { flex:1; height:8px; margin-left:8px; border-radius:4px; background:#1e293b; }
-  .lt-body { background:#fff; border-radius:8px; padding:18px; display:flex; gap:16px; align-items:center; color:#0b2463; }
-  .lt-a11y { width:92px; height:92px; flex:none; border-radius:50%; background:#1d4ed8; color:#fff; display:grid; place-items:center; }
+  .lt-body { background:#fff; border-radius:8px; padding:18px; display:flex; gap:16px; align-items:center; color:var(--navy); }
+  .lt-a11y { width:92px; height:92px; flex:none; border-radius:50%; background:var(--blue); color:#fff; display:grid; place-items:center; }
   .lt-a11y svg { width:62px; height:62px; }
   .lt-list p { margin:0; display:flex; align-items:center; gap:8px; font-size:.86rem; font-weight:600; line-height:1.9; }
   .lt-list p svg { width:20px; height:20px; }
@@ -921,7 +1053,7 @@
   .feats li { display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 14px; }
   .feats li + li { border-left:1px solid var(--rule); }
   .fi svg { width:40px; height:40px; display:block; margin-bottom:6px; }
-  .fi-1 { color:#1d4ed8; } .fi-2 { color:#f59e0b; } .fi-3 { color:#2563eb; } .fi-4 { color:#0ea5e9; } .fi-5 { color:#e11d48; }
+  .fi-1 { color:var(--blue); } .fi-2 { color:#f59e0b; } .fi-3 { color:#2563eb; } .fi-4 { color:#0ea5e9; } .fi-5 { color:#e11d48; }
   .feats b { font-size:1rem; }
   .feats small { color:var(--ink-2); font-size:.86rem; line-height:1.5; }
 
@@ -1064,7 +1196,7 @@
   .cb-name { font-size:.92rem; }
   .cb-lv { font-size:.78rem; color:var(--ink-2); }
   .cb-bar { height:12px; border-radius:6px; background:var(--paper-3); overflow:hidden; }
-  .cb-bar i { display:block; height:100%; border-radius:6px; background:linear-gradient(90deg, #1d4ed8, #3b82f6); }
+  .cb-bar i { display:block; height:100%; border-radius:6px; background:linear-gradient(90deg, var(--blue), #3b82f6); }
   .cb-val { font-size:.88rem; font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap; }
   @media (max-width:760px) {
     .kpis { grid-template-columns:repeat(2, minmax(0, 1fr)) !important; }
@@ -1101,18 +1233,18 @@
   .ld-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
   .ld-head b { font-size:.92rem; } .ld-head span { font-size:.7rem; color:#64748b; }
   .ld-row { display:flex; gap:14px; align-items:center; margin-bottom:10px; }
-  .ld-gauge { width:86px; height:86px; flex:none; border-radius:50%; position:relative; display:grid; place-content:center; text-align:center; background:conic-gradient(#1d4ed8 calc(var(--score) * 1%), #e2e8f0 0); }
+  .ld-gauge { width:86px; height:86px; flex:none; border-radius:50%; position:relative; display:grid; place-content:center; text-align:center; background:conic-gradient(var(--blue) calc(var(--score) * 1%), #e2e8f0 0); }
   .ld-gauge::before { content:""; position:absolute; inset:9px; border-radius:50%; background:#fff; }
   .ld-gauge b, .ld-gauge span { position:relative; line-height:1.1; }
-  .ld-gauge b { font-size:1.15rem; color:#0b2463; } .ld-gauge span { font-size:.65rem; color:#64748b; }
+  .ld-gauge b { font-size:1.15rem; color:var(--navy); } .ld-gauge span { font-size:.65rem; color:#64748b; }
   .ld-kpis { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:6px; flex:1; }
   .ld-k { display:flex; flex-direction:column; align-items:center; padding:6px 4px; border-radius:10px; font-size:.68rem; font-weight:600; }
   .ld-k b { font-size:1.1rem; line-height:1.2; }
   .k-bad { background:#fee2e2; color:#b91c1c; } .k-warn { background:#fef3c7; color:#92400e; } .k-good { background:#dcfce7; color:#166534; }
   .ld-bars p { margin:0; display:grid; grid-template-columns:4.2em minmax(0, 1fr) 2.6em; gap:6px; align-items:center; font-size:.68rem; line-height:1.9; }
   .ld-bars i { height:6px; border-radius:3px; background:#e2e8f0; overflow:hidden; display:block; }
-  .ld-bars em { display:block; height:100%; background:#1d4ed8; border-radius:3px; }
-  .ld-bars b { text-align:right; color:#0b2463; }
+  .ld-bars em { display:block; height:100%; background:var(--blue); border-radius:3px; }
+  .ld-bars b { text-align:right; color:var(--navy); }
 
   .caps { margin:0 0 72px; }
   .caps h2, .how-text h2, .rp-text h2, .sec-h2 { letter-spacing:-.01em; }
@@ -1124,7 +1256,7 @@
   .cap h3 { margin:6px 0 0; font-size:1.08rem; }
   .cap p { margin:0; font-size:.92rem; color:var(--ink-2); }
   .cap .f-sc { margin-top:auto; }
-  .cap-vis { height:132px; border-radius:18px; background:linear-gradient(160deg, #e8efff, #f5f8ff); display:flex; align-items:center; justify-content:center; gap:10px; position:relative; overflow:hidden; color:#0b2463; }
+  .cap-vis { height:132px; border-radius:18px; background:linear-gradient(160deg, #e8efff, #f5f8ff); display:flex; align-items:center; justify-content:center; gap:10px; position:relative; overflow:hidden; color:var(--navy); }
   .cv-img { width:76px; height:58px; border-radius:10px; background:#bfdbfe; position:relative; overflow:hidden; }
   .cv-img::before { content:""; position:absolute; left:8px; right:8px; bottom:-8px; height:36px; background:#60a5fa; clip-path:polygon(0 100%, 35% 30%, 55% 60%, 75% 35%, 100% 100%); }
   .cv-img i { position:absolute; right:10px; top:8px; width:12px; height:12px; border-radius:50%; background:#fbbf24; }
@@ -1132,14 +1264,14 @@
   .cv-sw { width:96px; padding:10px; border-radius:14px; background:#fff; display:flex; flex-direction:column; gap:4px; box-shadow:0 6px 14px -8px rgba(11,36,99,.5); }
   .cv-sw b { font-size:1.6rem; line-height:1; } .cv-sw small { font-size:.68rem; font-weight:700; }
   .cv-aa { width:44px; height:26px; display:block; }
-  .cv-pass b { color:#0b2463; } .cv-pass small { color:#166534; }
+  .cv-pass b { color:var(--navy); } .cv-pass small { color:#166534; }
   .cv-fail b { color:#cbd5e1; } .cv-fail small { color:#b91c1c; }
   .cv-head { flex-direction:column; align-items:flex-start; gap:6px; padding-left:24%; }
-  .cv-head span { display:block; height:16px; border-radius:4px; background:#1d4ed8; color:#fff; font-size:.6rem; font-weight:700; padding:0 6px; line-height:16px; }
-  .cv-head .h1 { width:64%; } .cv-head .h2 { width:50%; margin-left:12%; background:#2563eb; } .cv-head .h3 { width:38%; margin-left:24%; background:#93c5fd; color:#0b2463; }
+  .cv-head span { display:block; height:16px; border-radius:4px; background:var(--blue); color:#fff; font-size:.6rem; font-weight:700; padding:0 6px; line-height:16px; }
+  .cv-head .h1 { width:64%; } .cv-head .h2 { width:50%; margin-left:12%; background:#2563eb; } .cv-head .h3 { width:38%; margin-left:24%; background:#93c5fd; color:var(--navy); }
   .cv-form { flex-direction:column; align-items:flex-start; gap:6px; padding-left:16%; }
   .cv-lab { font-size:.8rem; font-weight:700; }
-  .cv-in { width:150px; height:28px; border-radius:8px; background:#fff; box-shadow:inset 0 0 0 2px #1d4ed8; }
+  .cv-in { width:150px; height:28px; border-radius:8px; background:#fff; box-shadow:inset 0 0 0 2px var(--blue); }
   .cv-link { font-family:var(--f-mono); font-size:.64rem; padding:2px 8px; border-radius:999px; background:#dbeafe; }
   .how { margin-bottom:72px; } .report2 { margin-bottom:72px; } .feats { margin-bottom:64px; }
   @media (max-width:1100px) { .caps-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
@@ -1186,10 +1318,10 @@
   .pg-steps a:focus-visible { outline:3px solid #fff; outline-offset:2px; }
   .ps-n { width:32px; height:32px; flex:none; border-radius:50%; display:grid; place-items:center; box-shadow:inset 0 0 0 2px rgba(255,255,255,.7); font-size:.95rem; }
   .ps-n svg { display:none; width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; }
-  .pg-steps .done .ps-n { background:#fff; color:#0b2463; box-shadow:none; }
+  .pg-steps .done .ps-n { background:#fff; color:var(--navy); box-shadow:none; }
   .pg-steps .done .ps-n b { display:none; } .pg-steps .done .ps-n svg { display:block; }
   .pg-steps .cur a { color:#fff; font-weight:700; }
-  .pg-steps .cur .ps-n { background:var(--yellow); color:#0b2463; box-shadow:0 0 0 5px rgba(251,191,36,.28); }
+  .pg-steps .cur .ps-n { background:var(--yellow); color:var(--navy); box-shadow:0 0 0 5px rgba(251,191,36,.28); }
   @media (max-width:760px) {
     .pg-steps li:not(.cur) .ps-t { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
     .pg-steps a { padding:6px; }
@@ -1315,13 +1447,6 @@
    * มุมโค้ง: การ์ดหลัก 24 · แผงในการ์ด 16 · รายการย่อยและช่องกรอก 12 · ป้ายเล็ก 8 · ปุ่มและชิป 999
    * เงา: ระดับ 1 การ์ดทั่วไป · ระดับ 2 การ์ดลอยเหนือพื้นสี
    * ระยะห่าง: 4 8 12 16 24 32 48 96 */
-  :root {
-    --r-xs:8px; --r-sm:12px; --r-md:16px; --r-lg:24px; --r-pill:999px;
-    --sh-1:0 1px 2px rgba(11,36,99,.05), 0 10px 28px -14px rgba(11,36,99,.22);
-    --sh-2:0 28px 56px -26px rgba(11,36,99,.5);
-    --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:24px; --s-6:32px; --s-7:48px; --s-8:96px;
-    --btn-h:44px; --btn-h-sm:36px; --btn-h-lg:52px;
-  }
 
   /* ---------- หน้าแรกแบบ Premium: ช่องตรวจอยู่ในส่วนหัว + ภาพจำลองแดชบอร์ดหลายชั้น ----------
    * ภาพจำลองเป็นภาพตกแต่ง (aria-hidden) ใช้สีตายตัวเหมือนภาพหน้าจอจริง ตัวเลขมาจากตัวอย่างบทที่ 3.7.2 */
@@ -1343,7 +1468,7 @@
   .view > ul.feats { position:relative; z-index:2; margin-top:-64px; }
 
   .hero2 .hero2-art { height:auto; max-width:none; padding:24px 0 40px; }
-  .mk-win { position:relative; z-index:1; margin-left:6%; border-radius:18px; overflow:hidden; background:#fff; color:#0b2463; box-shadow:0 40px 80px -30px rgba(0,0,0,.6); transform:perspective(1300px) rotateY(-7deg) rotateX(2deg); }
+  .mk-win { position:relative; z-index:1; margin-left:6%; border-radius:18px; overflow:hidden; background:#fff; color:var(--navy); box-shadow:0 40px 80px -30px rgba(0,0,0,.6); transform:perspective(1300px) rotateY(-7deg) rotateX(2deg); }
   .mk-bar { display:flex; align-items:center; gap:6px; padding:10px 14px; background:#eef2fb; border-bottom:1px solid #dbe3f4; }
   .mk-bar i { width:9px; height:9px; border-radius:50%; background:#cbd5e1; }
   .mk-bar i:first-child { background:#fbbf24; }
@@ -1363,10 +1488,10 @@
   .mk-k.bad { background:#fee2e2; color:#b91c1c; } .mk-k.warn { background:#fef3c7; color:#92400e; } .mk-k.good { background:#dcfce7; color:#166534; }
   .mk-bars p { margin:0; display:grid; grid-template-columns:4.4em minmax(0, 1fr) 2.6em; gap:8px; align-items:center; font-size:.7rem; line-height:1.9; color:#334155; }
   .mk-bars i { display:block; height:6px; border-radius:3px; background:#e2e8f0; overflow:hidden; }
-  .mk-bars em { display:block; height:100%; border-radius:3px; background:#1d4ed8; }
-  .mk-bars b { text-align:right; color:#0b2463; }
+  .mk-bars em { display:block; height:100%; border-radius:3px; background:var(--blue); }
+  .mk-bars b { text-align:right; color:var(--navy); }
   .mk-rows { display:grid; gap:6px; padding-top:12px; border-top:1px solid #e2e8f0; }
-  .mk-rows p { margin:0; display:flex; align-items:center; gap:8px; font-size:.74rem; font-weight:600; color:#0b2463; }
+  .mk-rows p { margin:0; display:flex; align-items:center; gap:8px; font-size:.74rem; font-weight:600; color:var(--navy); }
   .mk-rows code { margin-left:auto; padding:1px 6px; border-radius:6px; background:#f1f5f9; color:#334155; font-size:.66rem; }
   .mk-sev { padding:1px 8px; border-radius:999px; font-size:.64rem; font-weight:700; }
   .mk-sev.bad { background:#fee2e2; color:#b91c1c; } .mk-sev.warn { background:#fef3c7; color:#92400e; }
@@ -1376,9 +1501,9 @@
   .mk-fix .mk-fix-h { padding:0 0 6px; font-family:var(--f-body); font-weight:700; color:#c7d2fe; }
   .mk-del { background:rgba(248,113,113,.18); color:#fecaca; }
   .mk-fix .mk-add { margin-top:3px; background:rgba(74,222,128,.16); color:#dcfce7; }
-  .mk-chip { left:-2%; top:4px; display:flex; align-items:center; gap:10px; padding:10px 14px; background:#fff; color:#0b2463; font-size:.78rem; }
+  .mk-chip { left:-2%; top:4px; display:flex; align-items:center; gap:10px; padding:10px 14px; background:#fff; color:var(--navy); font-size:.78rem; }
   .mk-chip small { display:block; font-size:.66rem; font-weight:600; color:#166534; }
-  .mk-aa { width:34px; height:34px; border-radius:10px; display:grid; place-items:center; background:#0b2463; color:#fbbf24; font-weight:700; }
+  .mk-aa { width:34px; height:34px; border-radius:10px; display:grid; place-items:center; background:var(--navy); color:#fbbf24; font-weight:700; }
   @media (prefers-reduced-motion: no-preference) {
     .mk-float { animation:float 6s ease-in-out infinite; }
     .mk-chip { animation-delay:-3s; }
@@ -1471,7 +1596,7 @@
   .flow-vis svg { display:block; width:100%; height:auto; }
   .fv-code { font-family:var(--f-mono); font-size:9.5px; }
   .fv-chip { font-family:var(--f-mono); font-size:8.5px; font-weight:700; text-anchor:middle; }
-  .fv-num { font-family:var(--f-body); font-size:11px; font-weight:700; fill:#0b2463; text-anchor:middle; }
+  .fv-num { font-family:var(--f-body); font-size:11px; font-weight:700; fill:var(--navy); text-anchor:middle; }
   .how .flow li + li::before { top:96px; }
   @media (max-width:560px) { .how .flow li + li::before { display:none; } }
   @media (prefers-reduced-motion: no-preference) {
@@ -1556,7 +1681,7 @@
   .cm tbody th { text-align:left; line-height:1.3; }
   .cm td { padding:8px 6px; border-radius:10px; text-align:center; border:0; }
   .cm td b { display:block; font-size:1.35rem; line-height:1.1; }
-  .cm-ok { background:#1d4ed8; color:#fff; }
+  .cm-ok { background:var(--blue); color:#fff; }
   .cm-zero { background:color-mix(in srgb, currentColor 9%, transparent); color:inherit; }
 
   /* ---------- ทรานซิชันตอนเปลี่ยนหน้า ----------
@@ -1595,7 +1720,7 @@
   button:hover, button.primary:hover, .btn-link:hover, .btn-blue:hover { background:#1e40af; filter:none; }
   button.secondary, .btn-ghost, .res-actions .btn-ghost { background:var(--p1); color:var(--link); box-shadow:none; }
   button.secondary:hover, .btn-ghost:hover { background:var(--p1); box-shadow:inset 0 0 0 2px var(--link); }
-  .btn-y, .nav-cta { background:var(--yellow); color:#0b2463; box-shadow:0 10px 22px -12px rgba(245,158,11,.9); }
+  .btn-y, .nav-cta { background:var(--yellow); color:var(--navy); box-shadow:0 10px 22px -12px rgba(245,158,11,.9); }
   .btn-y:hover, .nav-cta:hover { background:#fcd34d; }
   .btn-o { background:transparent; color:#fff; box-shadow:inset 0 0 0 2px rgba(255,255,255,.85); }
   .btn-o:hover { background:rgba(255,255,255,.1); }
@@ -1620,9 +1745,6 @@
 
   /* ================= รอบข้อเสนอแนะผู้ประเมิน (4 พ.ย. 2569) =================
      สถานะเป็นกล่องสีทึบ · แถบเกณฑ์คะแนนด้านบน · ความครอบคลุมของคะแนน · ตรวจซ้ำหลังแก้ · เลขบรรทัดของจุดที่ผิด */
-  :root { --st-good:#15803d; --st-bad:#b91c1c; --st-warn:#b45309; --st-none:#5b6474; --st-ink:#ffffff; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --st-good:#6fd39a; --st-bad:#ff8a80; --st-warn:#f0bf66; --st-none:#a3adbd; --st-ink:#0a1226; } }
-  :root[data-theme="dark"] { --st-good:#6fd39a; --st-bad:#ff8a80; --st-warn:#f0bf66; --st-none:#a3adbd; --st-ink:#0a1226; }
 
   .badge.good, .badge.bad, .badge.warn, .part .badge.none, .cp-list .badge.none {
     display:inline-flex; align-items:center; gap:5px; padding:2px 10px 2px 7px; border-radius:6px;
@@ -1653,7 +1775,7 @@
   .bd.on { color:var(--st-ink); box-shadow:var(--sh-1); }
   .bd-bad.on  { background:var(--st-bad); }
   .bd-warn.on { background:var(--st-warn); }
-  .bd-ok.on   { background:var(--blue, #1d4ed8); }
+  .bd-ok.on   { background:var(--blue); }
   .bd-good.on { background:var(--st-good); }
   .bd em { margin-top:4px; font-style:normal; font-weight:700; font-size:.86rem; }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .bd-ok.on { background:#8db9ff; } }
@@ -1741,7 +1863,7 @@
 
   /* ลิงก์ไปยังจุดที่ผิด: ทำเป็นปุ่มทรงแคปซูลให้รู้ว่ากดได้และพาเลื่อนลงไป */
   a.part .part-go { align-self:flex-start; display:inline-flex; align-items:center; gap:6px; margin-top:auto; padding:6px 14px;
-    border-radius:var(--r-pill); background:var(--blue, #1d4ed8); color:#fff; text-decoration:none; font-weight:700; }
+    border-radius:var(--r-pill); background:var(--blue); color:#fff; text-decoration:none; font-weight:700; }
   a.part:hover .part-go, a.part:focus-visible .part-go { background:var(--link); }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) a.part .part-go { background:#93b4ff; color:#0a1226; } }
   :root[data-theme="dark"] a.part .part-go { background:#93b4ff; color:#0a1226; }
@@ -1756,9 +1878,10 @@
   .view[data-view="home"] > .band + .band { border-top:0; }
   .view[data-view="home"] > ul.feats { margin-bottom:64px; }
   .view[data-view="home"] > .band:last-child { margin-bottom:-48px; }
-  .eyebrow { display:inline-flex; align-items:center; gap:8px; margin:0 0 10px; font-size:.86rem; font-weight:700; color:var(--link); }
-  .eyebrow span { display:inline-grid; place-items:center; min-width:32px; height:24px; padding:0 8px; border-radius:var(--r-pill);
-    background:var(--blue, #1d4ed8); color:#fff; font-size:.78rem; letter-spacing:.04em; }
+  /* ป้ายเลขไม่ตัดบรรทัดและไม่ย่อ ข้อความด้านขวาตัดบรรทัดแทน (เดิมป้าย SC ถูกบีบจนเห็นแค่ "SC" ที่ 375px) */
+  .eyebrow { display:inline-flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin:0 0 10px; font-size:.86rem; font-weight:700; color:var(--link); }
+  .eyebrow span { display:inline-grid; place-items:center; flex-shrink:0; white-space:nowrap; min-width:32px; min-height:24px; padding:0 8px; border-radius:var(--r-pill);
+    background:var(--blue); color:#fff; font-size:.78rem; letter-spacing:.04em; }
   .band > .sec-h2, .why h2 { font-size:clamp(1.5rem, 1.2rem + 1vw, 2rem); line-height:1.3; letter-spacing:-.01em; margin:0 0 18px; }
   .view > .how.band-a .flow a, .view > .how.band-a .flow li > div { background:var(--ground) !important; box-shadow:none; border:1px solid var(--rule); }
   .view > .how.band-a .flow li:nth-child(2) > div { box-shadow:0 0 0 2px var(--blue) !important; border-color:transparent; }
@@ -1771,7 +1894,7 @@
   .why { display:grid; grid-template-columns:minmax(0, .85fr) minmax(0, 1.15fr); gap:var(--s-6); align-items:start; }
   .why-lead { margin:0 0 var(--s-5); color:var(--ink-2); }
   .why-stats { list-style:none; margin:0; padding:0; display:grid; gap:12px; }
-  .why-stats li { display:grid; gap:2px; padding:18px 22px; border-radius:var(--r-md); background:var(--navy, #0b2463); color:#fff; }
+  .why-stats li { display:grid; gap:2px; padding:18px 22px; border-radius:var(--r-md); background:var(--navy); color:#fff; }
   .why-stats b { font-size:clamp(1.8rem, 1.4rem + 1.4vw, 2.4rem); line-height:1.15; color:var(--yellow, #fbbf24); }
   .why-stats span { color:#eef2ff; }
   .why-stats small { margin-top:4px; color:#c7d2fe; font-size:.78rem; }
@@ -1803,7 +1926,7 @@
   .std-toc a { display:inline-flex; align-items:center; gap:8px; min-height:40px; padding:4px 14px 4px 6px; border-radius:var(--r-pill);
     background:var(--page); color:var(--ink); font-weight:600; text-decoration:none; box-shadow:var(--sh-1); }
   .std-toc a:hover { color:var(--link); }
-  .std-toc a span { display:inline-grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--blue, #1d4ed8); color:#fff; font-size:.82rem; }
+  .std-toc a span { display:inline-grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--blue); color:#fff; font-size:.82rem; }
   .std-sec { margin:0 0 var(--s-5); padding:var(--s-6); border-radius:var(--r-lg); background:var(--page); border:1px solid var(--rule); scroll-margin-top:90px; }
   .std-sec:nth-of-type(even) { background:var(--p1); border-color:transparent; }
   .std-sec > h2 { margin:0 0 12px; font-size:clamp(1.35rem, 1.15rem + .8vw, 1.75rem); line-height:1.3; }
@@ -1813,10 +1936,10 @@
   .ver-line { list-style:none; display:flex; margin:16px 0 0; padding:0; gap:0; }
   .ver-line li { flex:1; position:relative; padding:14px 8px 0; border-top:4px solid var(--rule); display:flex; flex-direction:column; gap:2px; }
   .ver-line li::before { content:""; position:absolute; top:-10px; left:8px; width:16px; height:16px; border-radius:50%; background:var(--page); border:4px solid var(--control); }
-  .ver-line li.on { border-top-color:var(--blue, #1d4ed8); }
-  .ver-line li.on::before { border-color:var(--blue, #1d4ed8); background:var(--yellow, #fbbf24); }
+  .ver-line li.on { border-top-color:var(--blue); }
+  .ver-line li.on::before { border-color:var(--blue); background:var(--yellow, #fbbf24); }
   .ver-line span { font-size:.84rem; color:var(--ink-2); }
-  .tree { margin:0; padding:var(--s-5); border-radius:var(--r-md); background:var(--navy, #0b2463); color:#fff; }
+  .tree { margin:0; padding:var(--s-5); border-radius:var(--r-md); background:var(--navy); color:#fff; }
   .tree figcaption { margin:0 0 12px; font-weight:700; color:#e0e7ff; }
   .tree ol { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
   .tree li { position:relative; display:grid; grid-template-columns:9.5em minmax(0, 1fr); gap:10px; align-items:center; }
@@ -1827,7 +1950,7 @@
   .rule4 { list-style:none; margin:var(--s-4) 0 0; padding:0; display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:var(--s-4); }
   .r4 { display:flex; flex-direction:column; gap:10px; padding:var(--s-5); border-radius:var(--r-md); background:var(--page); box-shadow:var(--sh-1); }
   .r4-top { display:flex; align-items:center; gap:12px; margin:0; }
-  .r4-n { flex:none; display:grid; place-items:center; width:44px; height:44px; border-radius:14px; background:var(--blue, #1d4ed8); color:#fff; font-size:1.3rem; font-weight:800; }
+  .r4-n { flex:none; display:grid; place-items:center; width:44px; height:44px; border-radius:14px; background:var(--blue); color:#fff; font-size:1.3rem; font-weight:800; }
   .r4-t { display:block; font-size:1.15rem; }
   .r4-sc { display:block; font-size:.84rem; color:var(--ink-2); }
   .r4-what, .r4-skip { margin:0; }
@@ -1896,7 +2019,7 @@
   .u-sec h3 { margin:0 0 10px; font-size:1.15rem; }
   .u-sec h4 { margin:14px 0 8px; font-size:1rem; }
   .u-sec p { margin:0 0 10px; max-width:78ch; }
-  .u-quote { margin:0; padding:14px 18px; border-radius:var(--r-sm); background:var(--p1); border-left:5px solid var(--blue, #1d4ed8); font-size:1.08rem; font-weight:600; }
+  .u-quote { margin:0; padding:14px 18px; border-radius:var(--r-sm); background:var(--p1); border-left:5px solid var(--blue); font-size:1.08rem; font-weight:600; }
   .u-quote p { margin:0; }
   .u-dl { display:grid; gap:8px; margin:0; }
   .u-dl > div { display:grid; grid-template-columns:13em minmax(0, 1fr); gap:12px; padding:10px 14px; border-radius:var(--r-sm); background:var(--paper-2); }
@@ -1924,6 +2047,40 @@
   .std-more a { font-weight:700; }
   @media (max-width:900px) { .u-ex, .u-nav { grid-template-columns:minmax(0, 1fr); } .u-2col { grid-template-columns:minmax(0, 1fr); } }
   @media (max-width:560px) { .u-art { padding:var(--s-5) var(--s-4); } .u-dl > div { grid-template-columns:minmax(0, 1fr); gap:2px; } }
+
+  /* ---------- แผนแก้ UI หน้าคำอธิบายหลักเกณฑ์ (10 พ.ย. 2569) ----------
+     --hdr-h ตั้งจาก app.js ตามความสูงจริงของแถบเมนู (จอ 320px แถบสูงกว่าเพราะตัดเป็นสองแถว) */
+  .u-back { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:0 0 8px; font-size:.92rem; color:var(--ink-2); }
+  .u-back a { font-weight:700; }
+  .u-back [aria-current] { color:var(--ink); font-weight:600; }
+  .u-art { scroll-margin-top:calc(var(--hdr-h) + 16px); }
+  .u-nav { margin:0 0 var(--s-6); }
+  .u-nav a[aria-current] { border-color:var(--link); background:var(--p1); box-shadow:0 0 0 1px var(--link); }
+  @media (max-width:900px) {
+    /* แถบชิปเลือกหลักเกณฑ์ติดใต้แถบเมนู เลื่อนแนวนอนได้ ชิปของข้อที่กำลังอ่านเป็นสีทึบ */
+    .u-nav { position:sticky; top:var(--hdr-h); z-index:15; display:flex; gap:8px; overflow-x:auto; scrollbar-width:none;
+      margin:0 -16px var(--s-5); padding:10px 16px; background:var(--ground); border-bottom:1px solid var(--rule); }
+    .u-nav::-webkit-scrollbar { display:none; }
+    .u-nav a { flex:none; flex-direction:row; align-items:center; gap:6px; min-height:44px; padding:0 14px; border-radius:var(--r-pill); box-shadow:none; }
+    .u-nav small { display:none; }
+    .u-nav span { font-size:.95rem; }
+    .u-nav a[aria-current] { background:var(--link); color:#fff; border-color:var(--link); box-shadow:none; }
+    .u-nav a[aria-current] b { color:#fff; }
+    .u-art { scroll-margin-top:calc(var(--hdr-h) + 76px); }
+  }
+  @media (max-width:900px) and (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .u-nav a[aria-current], :root:not([data-theme="light"]) .u-nav a[aria-current] b { color:#0a1226; } }
+  @media (max-width:900px) { :root[data-theme="dark"] .u-nav a[aria-current], :root[data-theme="dark"] .u-nav a[aria-current] b { color:#0a1226; } }
+  .u-pager { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; margin-top:var(--s-4); }
+  .u-pager a { display:inline-flex; align-items:center; min-height:44px; font-weight:700; color:var(--link); }
+  .u-next { margin-left:auto; }
+  .u-try { margin:10px 0 0 !important; }
+  .u-try a { display:inline-flex; align-items:center; min-height:44px; font-weight:700; }
+  .u-cta { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--s-4) var(--s-5);
+    margin-top:var(--s-6); padding:var(--s-5) var(--s-6); border-radius:var(--r-lg); background:var(--tile-dark); color:#fff; }
+  .u-cta h2 { margin:0 0 4px; font-size:1.3rem; color:#fff; }
+  .u-cta p { margin:0; color:#d6dbf5; }
+  @media (max-width:600px) { .u-cta { padding:var(--s-5); } .u-cta .btn-y { width:100%; justify-content:center; } }
+  .ps-cnt { font-weight:400; font-size:.82rem; opacity:.9; }
 
   /* ---------- การพิมพ์รายงาน ---------- */
   @media print {
@@ -1973,14 +2130,8 @@
     <ul class="steps">
       <li><a href="#home" data-nav="home"><span class="t">หน้าแรก</span></a></li>
       <li><a href="#standards-section" data-nav="standards"><span class="t">มาตรฐานที่ตรวจ</span></a></li>
+      <li><a href="#understand-section" data-nav="understand"><span class="t">คำอธิบายหลักเกณฑ์</span></a></li>
     </ul>
-    <p class="rail-title" id="rail-title">ขั้นตอนการประเมิน</p>
-    <ol class="steps" aria-labelledby="rail-title">
-      <li><a href="#input-section" data-nav="check"><span class="t">นำเข้าโค้ด</span></a></li>
-      <li><a href="#checklist-section" data-nav="checklist"><span class="t">แบบประเมิน</span></a></li>
-      <li id="nav-results"><a href="#results-section" data-nav="results"><span class="t">ผลการประเมิน</span><span class="cnt">ยังไม่ได้ตรวจ</span></a></li>
-      <li><a href="#history-section" data-nav="report"><span class="t">บันทึกและรายงาน</span></a></li>
-    </ol>
     <a class="nav-cta" href="#input-section"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M6 4l10 6-10 6z" fill="currentColor"/></svg>เริ่มตรวจ</a>
     <ul class="steps steps-foot">
       <li><a href="./tests/runner.html"><span class="t">ผลวัดความแม่นยำ</span></a></li>
@@ -1995,7 +2146,7 @@
   <ol class="pg-steps">
     <li data-step="check"><a href="#input-section"><span class="ps-n" aria-hidden="true"><b>1</b><svg viewBox="0 0 20 20" focusable="false"><path d="M5.8 10.2l2.7 2.7 5.7-5.8"/></svg></span><span class="ps-t">นำเข้าโค้ด</span><span class="ps-s sr-only"></span></a></li>
     <li data-step="checklist"><a href="#checklist-section"><span class="ps-n" aria-hidden="true"><b>2</b><svg viewBox="0 0 20 20" focusable="false"><path d="M5.8 10.2l2.7 2.7 5.7-5.8"/></svg></span><span class="ps-t">ตอบแบบประเมิน</span><span class="ps-s sr-only"></span></a></li>
-    <li data-step="results"><a href="#results-section"><span class="ps-n" aria-hidden="true"><b>3</b><svg viewBox="0 0 20 20" focusable="false"><path d="M5.8 10.2l2.7 2.7 5.7-5.8"/></svg></span><span class="ps-t">ดูผลการประเมิน</span><span class="ps-s sr-only"></span></a></li>
+    <li data-step="results"><a href="#results-section"><span class="ps-n" aria-hidden="true"><b>3</b><svg viewBox="0 0 20 20" focusable="false"><path d="M5.8 10.2l2.7 2.7 5.7-5.8"/></svg></span><span class="ps-t">ดูผลการประเมิน <small class="ps-cnt" id="ps-cnt">(ยังไม่ได้ตรวจ)</small></span><span class="ps-s sr-only"></span></a></li>
     <li data-step="report"><a href="#history-section"><span class="ps-n" aria-hidden="true"><b>4</b><svg viewBox="0 0 20 20" focusable="false"><path d="M5.8 10.2l2.7 2.7 5.7-5.8"/></svg></span><span class="ps-t">บันทึกและรายงาน</span><span class="ps-s sr-only"></span></a></li>
   </ol>
 </nav>
@@ -2603,7 +2754,7 @@
   <!-- ============ คำอธิบายหลักเกณฑ์ฉบับเต็มภาษาไทย ============ -->
   <section id="understand-section" class="no-print view understand" data-view="understand" aria-labelledby="h-understand">
     <header class="sec-head u-top">
-      <p class="u-back"><a href="#standards-section">‹ กลับไปหน้ามาตรฐานที่ตรวจ</a></p>
+      <nav class="u-back" aria-label="ตำแหน่งปัจจุบัน"><a href="#standards-section">มาตรฐานที่ตรวจ</a> <span aria-hidden="true">›</span> <span aria-current="page">คำอธิบายหลักเกณฑ์</span></nav>
       <h1 id="h-understand">คำอธิบายหลักเกณฑ์ฉบับเต็ม ภาษาไทย</h1>
       <p class="lead">อธิบายหลักเกณฑ์ WCAG 2.1 ทั้ง 3 ข้อที่เครื่องมือนี้ตรวจ ครบทุกเรื่องที่นักพัฒนาต้องรู้
         ตั้งแต่ถ้อยคำของหลักเกณฑ์ เจตนา ผู้ได้ประโยชน์ ตัวอย่าง คำศัพท์ เทคนิคที่ W3C แนะนำ ข้อผิดพลาดที่พบบ่อย
@@ -2611,12 +2762,12 @@
       <p class="u-note">ผู้พัฒนาเรียบเรียงเป็นภาษาไทยจากเอกสาร Understanding WCAG 2.1 และ Techniques for WCAG 2.1 ของ W3C
         <strong>ไม่ใช่คำแปลอย่างเป็นทางการ</strong> ถ้อยคำของหลักเกณฑ์แปลจาก WCAG 2.1 (W3C Recommendation, 2018) Copyright © W3C
         ถ้ามีข้อสงสัย ให้ยึดต้นฉบับของ W3C ซึ่งมีลิงก์อยู่ท้ายแต่ละหลักเกณฑ์</p>
-      <nav class="u-nav" aria-label="เลือกหลักเกณฑ์">
-        <a href="#u-1-1-1"><b>SC 1.1.1</b><span>ข้อความแทนภาพ</span><small>ระดับ A</small></a>
-        <a href="#u-1-3-1"><b>SC 1.3.1</b><span>โครงสร้างและความสัมพันธ์</span><small>ระดับ A</small></a>
-        <a href="#u-1-4-3"><b>SC 1.4.3</b><span>ความคมชัดของสี</span><small>ระดับ AA</small></a>
-      </nav>
     </header>
+    <nav class="u-nav" aria-label="เลือกหลักเกณฑ์">
+      <a href="#u-1-1-1"><b>SC 1.1.1</b><span>ข้อความแทนภาพ</span><small>ระดับ A</small></a>
+      <a href="#u-1-3-1"><b>SC 1.3.1</b><span>โครงสร้างและความสัมพันธ์</span><small>ระดับ A</small></a>
+      <a href="#u-1-4-3"><b>SC 1.4.3</b><span>ความคมชัดของสี</span><small>ระดับ AA</small></a>
+    </nav>
 
     <!-- ---------- SC 1.1.1 ---------- -->
     <article class="u-art" id="u-1-1-1" aria-labelledby="u-1-1-1-h">
@@ -2727,7 +2878,8 @@
               <li>แท็ก <code>&lt;img&gt;</code> ทุกตัวว่ามีแอตทริบิวต์ alt หรือไม่ (กฎ R-ALT-01)</li>
               <li>ภาพที่ alt ว่าง ส่งให้ผู้ประเมินยืนยันว่าเป็นภาพตกแต่งจริง (กฎ R-ALT-02 และแบบประเมินข้อ CL-1.1.1)</li>
               <li>ข้ามภาพที่ประกาศ <code>role="presentation"</code> หรือ <code>aria-hidden="true"</code></li>
-            </ul></div>
+            </ul>
+            <p class="u-try"><a href="#input-section">ลองตรวจข้อความแทนภาพในโค้ดของคุณ →</a></p></div>
           <div class="ut-no"><p class="ut-k"><span class="badge none">ยังไม่ได้ตรวจ</span></p>
             <ul class="u-list">
               <li>ความหมายของข้อความ alt ว่าตรงกับภาพหรือไม่</li>
@@ -2738,6 +2890,10 @@
       </div>
       <p class="u-src">ต้นฉบับ: <a href="https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html" target="_blank" rel="noopener">Understanding SC 1.1.1 Non-text Content (W3C, ภาษาอังกฤษ)</a>
         · <a href="#sc-1-1-1">สรุปสั้นในหน้ามาตรฐาน</a></p>
+      <nav class="u-pager" aria-label="ไปต่อจาก SC 1.1.1">
+        <a href="#h-understand">↑ กลับขึ้นด้านบน</a>
+        <a href="#u-1-3-1" class="u-next">ข้อถัดไป: SC 1.3.1 โครงสร้างและความสัมพันธ์ →</a>
+      </nav>
     </article>
 
     <!-- ---------- SC 1.3.1 ---------- -->
@@ -2840,7 +2996,8 @@
               <li>ลำดับหัวข้อ h1 ถึง h6 ว่ากระโดดข้ามระดับหรือไม่ (กฎ R-HEAD-01)</li>
               <li>ช่องกรอกมีป้ายกำกับด้วย 4 วิธี คือ label for, label ครอบ, aria-label หรือ aria-labelledby ที่ชี้ไปยัง id ที่มีอยู่จริง (กฎ R-LABEL-01)</li>
               <li>แบบประเมินข้อ CL-1.3.1 ให้คนยืนยันว่าหัวข้อและป้ายกำกับสื่อความหมาย</li>
-            </ul></div>
+            </ul>
+            <p class="u-try"><a href="#input-section">ลองตรวจหัวข้อและป้ายกำกับในโค้ดของคุณ →</a></p></div>
           <div class="ut-no"><p class="ut-k"><span class="badge none">ยังไม่ได้ตรวจ</span></p>
             <ul class="u-list">
               <li>ตาราง รายการ และ landmark ของหน้า</li>
@@ -2851,6 +3008,10 @@
       </div>
       <p class="u-src">ต้นฉบับ: <a href="https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html" target="_blank" rel="noopener">Understanding SC 1.3.1 Info and Relationships (W3C, ภาษาอังกฤษ)</a>
         · <a href="#sc-1-3-1">สรุปสั้นในหน้ามาตรฐาน</a></p>
+      <nav class="u-pager" aria-label="ไปต่อจาก SC 1.3.1">
+        <a href="#h-understand">↑ กลับขึ้นด้านบน</a>
+        <a href="#u-1-4-3" class="u-next">ข้อถัดไป: SC 1.4.3 ความคมชัดของสี →</a>
+      </nav>
     </article>
 
     <!-- ---------- SC 1.4.3 ---------- -->
@@ -2951,7 +3112,8 @@
               <li>องค์ประกอบที่กำหนดทั้ง color และ background-color ไว้ใน style คำนวณด้วยสูตรของ W3C เทียบเกณฑ์ 4.5 : 1 (กฎ R-CONTRAST-01)</li>
               <li>ค่าสีที่อ่านไม่ได้ เช่น transparent หรือสีไล่ระดับ ส่งให้ตรวจเพิ่ม ไม่ให้ผ่าน</li>
               <li>แบบประเมินข้อ CL-1.4.3 ให้คนวัดข้อความบนภาพหรือพื้นไล่สี</li>
-            </ul></div>
+            </ul>
+            <p class="u-try"><a href="#input-section">ลองตรวจความคมชัดของสีในโค้ดของคุณ →</a></p></div>
           <div class="ut-no"><p class="ut-k"><span class="badge none">ยังไม่ได้ตรวจ</span></p>
             <ul class="u-list">
               <li>สีที่กำหนดในไฟล์ CSS หรือแท็ก &lt;style&gt; สีพื้นที่สืบทอดจากองค์ประกอบแม่ และพื้นหลังแบบย่อ background:</li>
@@ -2962,7 +3124,18 @@
       </div>
       <p class="u-src">ต้นฉบับ: <a href="https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html" target="_blank" rel="noopener">Understanding SC 1.4.3 Contrast (Minimum) (W3C, ภาษาอังกฤษ)</a>
         · <a href="#sc-1-4-3">สรุปสั้นในหน้ามาตรฐาน</a></p>
+      <nav class="u-pager" aria-label="ไปต่อจาก SC 1.4.3">
+        <a href="#h-understand">↑ กลับขึ้นด้านบน</a>
+      </nav>
     </article>
+
+    <aside class="u-cta" aria-labelledby="u-cta-h">
+      <div>
+        <h2 id="u-cta-h">พร้อมตรวจหน้าเว็บของคุณแล้วหรือยัง</h2>
+        <p>วางโค้ด HTML ระบุลิงก์ หรืออัปโหลดไฟล์ ระบบตรวจทั้ง 3 หลักเกณฑ์นี้ให้ในไม่กี่วินาที</p>
+      </div>
+      <a class="btn-y" href="#input-section">เริ่มตรวจโค้ด</a>
+    </aside>
   </section>
 
   <!-- ============ ขั้นที่ 1 : รับข้อมูล ============ -->
@@ -3160,8 +3333,8 @@
 </div>
 
 
-<script src="./analyzer.js?v=20261105c"></script>
-<script src="./fixer.js?v=20261105c"></script>
-<script src="./app.js?v=20261105c"></script>
+<script src="./analyzer.js?v=20261110"></script>
+<script src="./fixer.js?v=20261110"></script>
+<script src="./app.js?v=20261110"></script>
 </body>
 </html>
