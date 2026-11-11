@@ -1,0 +1,183 @@
+/* compare.css — สไตล์ของแดชบอร์ดเทียบหลายเว็บไซต์
+   โหลดภายใน Shadow DOM ของ compare.js จึงไม่ชนกับสไตล์ของหน้าที่นำไปวาง (index.html และ compare.html) */
+:host {
+  display:block; color:var(--ink); font-family:var(--font); font-size:16px; line-height:1.6;
+  --bg:#fbfbfd;  --surface:#ffffff;  --surface-2:#f4f5f8;  --surface-3:#eceef4;
+  --border:#e2e4ec;  --border-strong:#cdd1de;
+  --ink:#14151a;  --ink-2:#565a6b;
+  --brand:#2451b8;  --brand-ink:#ffffff;  --brand-soft:#eaf0fb;  --brand-border:#c3d3f0;
+  --good:#0b6b3f;  --good-bg:#e8f5ee;  --good-border:#b4ddc7;
+  --warn:#7a4a00;  --warn-bg:#fdf4e3;  --warn-border:#e8d0a2;
+  --bad:#a3161d;   --bad-bg:#fceaea;   --bad-border:#eab8ba;
+  --none:#565a6b;  --none-bg:#eceef4;  --none-border:#d6d9e3;
+  --track:#e6e8ef; --tick:#9aa0b3;
+  --focus:#0b5fff;
+  --code-bg:#f4f5f8;
+  --r-sm:6px; --r-md:10px; --r-lg:14px;
+  --font:"Sarabun","Noto Sans Thai","IBM Plex Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"Cascadia Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :host(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --bg:#0f1117;  --surface:#171922;  --surface-2:#1d202b;  --surface-3:#242835;
+    --border:#2b2f3d;  --border-strong:#3a4052;
+    --ink:#eceef5;  --ink-2:#a8adc0;
+    --brand:#8ab0ff;  --brand-ink:#0f1117;  --brand-soft:#151d2e;  --brand-border:#2b3d5f;
+    --good:#6ee7a8;  --good-bg:#12281d;  --good-border:#245c3d;
+    --warn:#f5c46b;  --warn-bg:#2a2113;  --warn-border:#5c4720;
+    --bad:#ff9aa0;   --bad-bg:#2b1517;   --bad-border:#5f2b30;
+    --none:#a8adc0;  --none-bg:#242835;  --none-border:#3a4052;
+    --track:#2b2f3d; --tick:#6b7186;
+    --focus:#7aa2ff;
+    --code-bg:#1d202b;
+  }
+}
+:host([data-theme="dark"]) {
+  color-scheme: dark;
+  --bg:#0f1117;  --surface:#171922;  --surface-2:#1d202b;  --surface-3:#242835;
+  --border:#2b2f3d;  --border-strong:#3a4052;
+  --ink:#eceef5;  --ink-2:#a8adc0;
+  --brand:#8ab0ff;  --brand-ink:#0f1117;  --brand-soft:#151d2e;  --brand-border:#2b3d5f;
+  --good:#6ee7a8;  --good-bg:#12281d;  --good-border:#245c3d;
+  --warn:#f5c46b;  --warn-bg:#2a2113;  --warn-border:#5c4720;
+  --bad:#ff9aa0;   --bad-bg:#2b1517;   --bad-border:#5f2b30;
+  --none:#a8adc0;  --none-bg:#242835;  --none-border:#3a4052;
+  --track:#2b2f3d; --tick:#6b7186;
+  --focus:#7aa2ff;
+  --code-bg:#1d202b;
+}
+
+*, *::before, *::after { box-sizing:border-box; }
+h1, h2, h3, h4 { text-wrap:balance; line-height:1.3; margin:0; }
+.cmp-title { font-size:clamp(1.7rem, 1.3rem + 1.6vw, 2.35rem); font-weight:800; letter-spacing:-.01em; }
+:host([data-level="2"]) .cmp-title { font-size:clamp(1.35rem, 1.15rem + .8vw, 1.7rem); }
+.cmp-h { font-size:1.35rem; font-weight:700; }
+p { margin:0; }
+a { color:var(--brand); }
+code, .mono { font-family:var(--mono); font-size:.86em; }
+:focus-visible { outline:3px solid var(--focus); outline-offset:2px; border-radius:4px; }
+.num { font-variant-numeric:tabular-nums; }
+.muted { color:var(--ink-2); }
+.eyebrow { font-size:.8rem; font-weight:600; letter-spacing:.04em; color:var(--ink-2); }
+
+/* ---------- ส่วนหัว ---------- */
+.top { display:grid; gap:14px; padding-bottom:26px; border-bottom:1px solid var(--border); }
+.dataset { display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center; }
+.dataset .tag { font-size:.78rem; font-weight:700; padding:2px 10px; border-radius:999px;
+  background:var(--brand-soft); color:var(--brand); border:1px solid var(--brand-border); }
+.dataset .tag.own { background:var(--good-bg); color:var(--good); border-color:var(--good-border); }
+.lede { font-size:1.08rem; max-width:68ch; }
+.scope { display:flex; flex-wrap:wrap; gap:8px; }
+.sc-pill { display:inline-flex; gap:6px; align-items:baseline; padding:4px 10px; border-radius:var(--r-sm);
+  background:var(--surface); border:1px solid var(--border); font-size:.86rem; }
+.sc-pill b { font-family:var(--mono); font-size:.8rem; }
+.sc-pill .lvl { font-size:.72rem; font-weight:700; color:var(--ink-2); }
+
+section { display:grid; gap:14px; padding-top:36px; }
+.sec-head { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:end; gap:10px; }
+.sec-head p { max-width:70ch; }
+
+/* ---------- ตารางเทียบ ---------- */
+.scroll { overflow-x:auto; border:1px solid var(--border); border-radius:var(--r-lg); background:var(--surface); }
+table { border-collapse:collapse; width:100%; }
+caption { text-align:left; padding:0; }
+th, td { text-align:left; vertical-align:top; padding:12px; border-bottom:1px solid var(--border); }
+tbody tr:last-child > * { border-bottom:0; }
+thead th { font-size:.8rem; font-weight:700; color:var(--ink-2); background:var(--surface-2); white-space:nowrap; }
+thead th .sc { display:block; font-family:var(--mono); font-weight:500; font-size:.74rem; }
+.matrix { min-width:900px; }
+.matrix tbody th { font-weight:700; min-width:128px; }
+.site-name { display:block; font-size:1rem; }
+.site-meta { display:block; font-weight:400; font-size:.8rem; color:var(--ink-2); overflow-wrap:anywhere; }
+.score { min-width:170px; }
+.score-top { display:flex; align-items:baseline; gap:8px; }
+.score-num { font-size:1.35rem; font-weight:800; font-variant-numeric:tabular-nums; }
+.bar { position:relative; height:8px; margin-top:8px; background:var(--track); border-radius:4px; }
+.bar .fill { position:absolute; inset:0 auto 0 0; background:var(--brand); border-radius:0 4px 4px 0; }
+.bar .tick { position:absolute; top:-3px; bottom:-3px; width:1px; background:var(--tick); }
+.scored { display:block; margin-top:6px; font-size:.76rem; color:var(--ink-2); }
+.bar-scale { position:relative; height:14px; font-size:.66rem; color:var(--ink-2); }
+.bar-scale span { position:absolute; transform:translateX(-50%); font-variant-numeric:tabular-nums; }
+.band { font-size:.74rem; font-weight:700; padding:1px 8px; border-radius:999px; border:1px solid; white-space:nowrap; }
+.t-good { color:var(--good); background:var(--good-bg); border-color:var(--good-border); }
+.t-ok   { color:var(--brand); background:var(--brand-soft); border-color:var(--brand-border); }
+.t-warn { color:var(--warn); background:var(--warn-bg); border-color:var(--warn-border); }
+.t-bad  { color:var(--bad); background:var(--bad-bg); border-color:var(--bad-border); }
+.t-none { color:var(--none); background:var(--none-bg); border-color:var(--none-border); }
+
+.cell { display:grid; gap:5px; justify-items:start; min-width:108px; }
+.chip { display:inline-flex; align-items:center; gap:6px; padding:2px 9px 2px 7px; border-radius:var(--r-sm);
+  border:1px solid; font-size:.84rem; font-weight:600; white-space:nowrap; }
+.chip i { font-style:normal; font-weight:800; width:1em; text-align:center; }
+.cell small { font-size:.76rem; color:var(--ink-2); }
+.total { font-size:1.35rem; font-weight:800; }
+
+.table-tools { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+button, .btn { font:inherit; font-size:.9rem; font-weight:600; cursor:pointer; border-radius:var(--r-md);
+  padding:8px 14px; border:1px solid var(--border-strong); background:var(--surface); color:var(--ink); }
+button:hover { background:var(--surface-2); }
+button.primary { background:var(--brand); color:var(--brand-ink); border-color:var(--brand); }
+button.primary:hover { filter:brightness(1.06); }
+button:disabled { opacity:.55; cursor:progress; }
+.note-inline { font-size:.84rem; color:var(--ink-2); }
+
+/* ---------- ข้อค้นพบ ---------- */
+.findings { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:12px; }
+.finding { display:grid; gap:6px; align-content:start; padding:16px 18px; background:var(--surface);
+  border:1px solid var(--border); border-radius:var(--r-lg); }
+.finding .chip { justify-self:start; }
+.finding p { font-size:.95rem; }
+
+/* ---------- ทะเบียนจุดที่ผิด ---------- */
+.filters { display:flex; flex-wrap:wrap; gap:12px 18px; align-items:end; }
+.field { display:grid; gap:4px; }
+.field label { font-size:.8rem; font-weight:600; color:var(--ink-2); }
+select, input[type="text"], textarea {
+  font:inherit; font-size:.92rem; color:var(--ink); background:var(--surface);
+  border:1px solid var(--border-strong); border-radius:var(--r-md); padding:7px 10px; }
+.register { min-width:1080px; }
+.register .code-col { min-width:270px; }
+.snippets { display:grid; gap:6px; }
+.snippets details summary { cursor:pointer; font-size:.82rem; color:var(--brand); font-weight:600; }
+.snippets details[open] summary { margin-bottom:6px; }
+.count { display:block; margin-top:6px; font-size:.82rem; font-weight:700; }
+.register td { font-size:.9rem; }
+.register .what { min-width:150px; }
+.register .what b { display:block; }
+.snippet { display:block; font-family:var(--mono); font-size:.78rem; line-height:1.5; background:var(--code-bg);
+  border:1px solid var(--border); border-radius:var(--r-sm); padding:6px 8px; max-width:300px;
+  white-space:pre-wrap; word-break:break-all; }
+.std { min-width:190px; }
+.std .sc-main { font-weight:700; }
+.std .sc-main code { font-size:.82rem; }
+.std .related { display:block; margin-top:6px; font-size:.78rem; color:var(--ink-2); }
+.impact { min-width:230px; max-width:320px; }
+.fix { min-width:200px; max-width:280px; }
+.register-count { font-size:.86rem; color:var(--ink-2); }
+.empty { padding:22px; text-align:center; color:var(--ink-2); }
+
+/* ---------- มาตรฐาน ---------- */
+.standards { min-width:760px; }
+.standards td:first-child { white-space:nowrap; }
+
+/* ---------- ตรวจชุดของคุณ ---------- */
+.runner { display:grid; gap:14px; padding:20px; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); }
+.slots { display:grid; gap:10px; }
+.slot { display:grid; grid-template-columns:28px minmax(140px, 220px) 1fr; gap:10px; align-items:start; }
+.slot .idx { font-weight:800; color:var(--ink-2); padding-top:26px; text-align:right; font-variant-numeric:tabular-nums; }
+.slot textarea { width:100%; min-height:42px; resize:vertical; font-family:var(--mono); font-size:.82rem; }
+.slot input { width:100%; }
+.run-actions { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+#run-status { font-size:.9rem; }
+#run-status .err { color:var(--bad); }
+#run-status ul { margin:6px 0 0; padding-left:1.2em; }
+
+.method { display:grid; gap:8px; max-width:78ch; }
+.method ul { margin:0; padding-left:1.2em; display:grid; gap:6px; }
+
+@media (max-width: 640px) {
+  .slot { grid-template-columns:1fr; }
+  .slot .idx { padding-top:0; text-align:left; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition:none !important; animation:none !important; } }

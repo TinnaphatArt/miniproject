@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 48%22%3E%3Crect width=%2248%22 height=%2248%22 rx=%2211%22 fill=%22%232451b8%22/%3E%3Ccircle cx=%2224%22 cy=%2224%22 r=%2217%22 fill=%22none%22 stroke=%22%23ffffff%22 stroke-opacity=%22.34%22 stroke-width=%223%22/%3E%3Ccircle cx=%2224%22 cy=%2224%22 r=%2217%22 fill=%22none%22 stroke=%22%23a9c8ff%22 stroke-width=%223%22 stroke-linecap=%22round%22 stroke-dasharray=%2280 107%22 transform=%22rotate(-90 24 24)%22/%3E%3Ccircle cx=%2224%22 cy=%2215.4%22 r=%222.9%22 fill=%22%23ffffff%22/%3E%3Cpath d=%22M15.6 22H32.4%22 stroke=%22%23ffffff%22 stroke-width=%222.9%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M24 20v5.6m0 0-4 7m4-7 4 7%22 stroke=%22%23ffffff%22 stroke-width=%222.9%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/%3E%3C/svg%3E">
+<title>ทดสอบกับเว็บไซต์ภายนอก — ตรวจหลายเว็บพร้อมกัน</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg:#fbfbfd; --surface:#ffffff; --surface-2:#f4f5f8; --surface-3:#eceef4;
+    --border:#e2e4ec; --border-strong:#cdd1de;
+    --ink:#14151a; --ink-2:#565a6b; --brand:#2451b8;
+    --good:#0b6b3f; --good-bg:#e8f5ee; --good-border:#b4ddc7;
+    --warn:#7a4a00; --warn-bg:#fdf4e3; --warn-border:#e8d0a2;
+    --bad:#a3161d;  --bad-bg:#fceaea;  --bad-border:#eab8ba;
+    --focus:#0b5fff;
+    --shadow-sm:0 1px 2px rgba(16,20,40,.06), 0 1px 3px rgba(16,20,40,.04);
+    --shadow-md:0 2px 4px rgba(16,20,40,.05), 0 8px 20px rgba(16,20,40,.07);
+    --r-md:12px; --r-lg:16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#0f1117; --surface:#171922; --surface-2:#1d202b; --surface-3:#242835;
+      --border:#2b2f3d; --border-strong:#3a4052;
+      --ink:#eceef5; --ink-2:#a8adc0; --brand:#8ab0ff;
+      --good:#6ee7a8; --good-bg:#12281d; --good-border:#245c3d;
+      --warn:#f5c46b; --warn-bg:#2a2113; --warn-border:#5c4720;
+      --bad:#ff9aa0;  --bad-bg:#2b1517;  --bad-border:#5f2b30;
+      --focus:#7aa2ff;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+      --shadow-md:0 2px 4px rgba(0,0,0,.35), 0 8px 20px rgba(0,0,0,.4);
+    }
+  }
+  * { box-sizing:border-box; }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition-duration:.01ms !important; } }
+  body {
+    margin:0; padding:32px 24px 72px; background:var(--bg); color:var(--ink);
+    font-family:"Sarabun","Noto Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+    line-height:1.7; font-size:16px; -webkit-font-smoothing:antialiased;
+  }
+  main { max-width:1080px; margin:0 auto; }
+  h1 { font-size:1.55rem; margin:0 0 6px; letter-spacing:-.01em; }
+  h2 { font-size:1.2rem; margin:38px 0 10px; padding-bottom:8px; border-bottom:2px solid var(--border-strong); letter-spacing:-.005em; }
+  h3 { font-size:1.02rem; margin:22px 0 8px; }
+  p.sub { color:var(--ink-2); margin:0 0 22px; font-size:.94rem; max-width:80ch; }
+  a { color:var(--brand); text-underline-offset:3px; }
+  :focus-visible { outline:3px solid var(--focus); outline-offset:3px; border-radius:6px; }
+
+  table { border-collapse:collapse; width:100%; margin:12px 0 8px; font-size:.92rem; }
+  caption { text-align:left; font-weight:700; padding:8px 0; color:var(--ink-2); font-size:.88rem; }
+  th, td { border-bottom:1px solid var(--border); padding:9px 12px; text-align:left; vertical-align:top; }
+  thead th { background:var(--surface-2); border-bottom:2px solid var(--border-strong); font-size:.86rem; }
+  tbody tr:hover { background:var(--surface-2); }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:var(--r-md); background:var(--surface); }
+  .table-wrap table { margin:0; }
+  .table-wrap th:first-child, .table-wrap td:first-child { padding-left:16px; }
+
+  .tag { display:inline-block; padding:2px 11px; border-radius:999px; font-size:.83rem; font-weight:700; border:1px solid; }
+  .tag.good { color:var(--good); background:var(--good-bg); border-color:var(--good-border); }
+  .tag.bad  { color:var(--bad);  background:var(--bad-bg);  border-color:var(--bad-border); }
+  .tag.warn { color:var(--warn); background:var(--warn-bg); border-color:var(--warn-border); }
+
+  .banner {
+    padding:16px 22px; border-radius:var(--r-lg); border:1px solid; border-left-width:4px;
+    margin:20px 0; font-weight:700; box-shadow:var(--shadow-sm);
+  }
+  .banner.good { color:var(--good); background:var(--good-bg); border-color:var(--good-border); border-left-color:var(--good); }
+  .banner.bad  { color:var(--bad);  background:var(--bad-bg);  border-color:var(--bad-border);  border-left-color:var(--bad); }
+
+  details { margin:10px 0; border:1px solid var(--border); border-radius:var(--r-md); padding:12px 16px; background:var(--surface); }
+  details[open] { box-shadow:var(--shadow-sm); }
+  summary { cursor:pointer; font-weight:700; }
+  summary:hover { color:var(--brand); }
+  pre { overflow-x:auto; background:var(--surface-2); border:1px solid var(--border); padding:12px; border-radius:var(--r-md);
+        font-size:.82rem; line-height:1.6; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.86em; }
+  footer { margin-top:48px; color:var(--ink-2); font-size:.87rem; border-top:1px solid var(--border); padding-top:16px; }
+  ul { margin:8px 0 8px 20px; padding:0; } li + li { margin-top:4px; }
+  @media (max-width:560px) { body { padding:24px 16px 56px; } }
+
+  .lead-nav { display:flex; flex-wrap:wrap; gap:8px 16px; margin:0 0 18px; font-size:.92rem; }
+  label.fl { display:block; font-weight:700; margin:16px 0 6px; }
+  textarea { width:100%; min-height:220px; font:inherit; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.88rem;
+    padding:12px; border-radius:var(--r-md); border:1px solid #8a919c; background:var(--surface); color:var(--ink); }
+  .bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:12px 0; }
+  button { font:inherit; font-weight:700; min-height:44px; padding:8px 18px; border-radius:999px; border:1px solid var(--brand); cursor:pointer; }
+  button.pri { background:var(--brand); color:var(--surface); }
+  button.sec { background:var(--surface); color:var(--brand); }
+  button:disabled { opacity:.55; cursor:not-allowed; }
+  #prog { color:var(--ink-2); }
+  .st { display:inline-flex; padding:1px 8px; border-radius:6px; font-size:.8rem; font-weight:700; color:#fff; }
+  .st.ok { background:#15803d; } .st.no { background:#b91c1c; } .st.rv { background:#b45309; } .st.na { background:#5b6474; }
+  @media (prefers-color-scheme: dark) { .st { color:#0f1117; } .st.ok { background:#6ee7a8; } .st.no { background:#ff9aa0; } .st.rv { background:#f5c46b; } .st.na { background:#a3adbd; } }
+  td.u { word-break:break-all; min-width:14em; }
+</style>
+</head>
+<body>
+<main>
+  <h1>ทดสอบกับเว็บไซต์ภายนอก</h1>
+  <p class="sub">
+    ตรวจหลายเว็บไซต์ต่อเนื่องด้วยระบบตรวจตัวเดียวกับหน้าเครื่องมือ ดึงโค้ดผ่านบริการตัวกลางชุดเดียวกัน
+    และกันที่อยู่ภายในเครือข่ายด้วยการตรวจ SSRF เดิม ผลอยู่ในเบราว์เซอร์ของคุณเท่านั้น ไม่ส่งและไม่เก็บโค้ด HTML ที่ใด
+    ดาวน์โหลดผลเป็นไฟล์ CSV เพื่อนำไปใส่ในรายงานได้ ไฟล์มีเฉพาะตัวเลขสรุป
+  </p>
+  <p class="lead-nav"><a href="../index.html">กลับหน้าเครื่องมือ</a> <a href="./bugcases.html">ชุดทดสอบ 100 กรณี</a> <a href="./runner.html">ผลวัดความแม่นยำ (F1)</a></p>
+  <label class="fl" for="urls">รายการเว็บไซต์ (บรรทัดละหนึ่งลิงก์ แก้ไขได้)</label>
+  <textarea id="urls" spellcheck="false">https://pkg.go.dev
+https://packagist.org
+https://pypi.org
+https://rubygems.org
+https://www.nuget.org
+https://www.thaigov.go.th
+https://www.dga.or.th
+https://www.moe.go.th
+https://www.chula.ac.th
+https://mahidol.ac.th
+https://www.ku.ac.th
+https://www.bot.or.th
+https://www.thairath.co.th
+https://www.wikipedia.org
+https://www.w3.org/WAI/
+https://www.gov.uk
+https://developer.mozilla.org</textarea>
+  <div class="bar">
+    <button type="button" class="pri" id="run">เริ่มตรวจทุกเว็บ</button>
+    <button type="button" class="sec" id="stop" disabled>หยุด</button>
+    <button type="button" class="sec" id="csv" disabled>ดาวน์โหลด CSV</button>
+    <span id="prog" role="status" aria-live="polite"></span>
+  </div>
+  <div id="out"></div>
+</main>
+<script src="../analyzer.js"></script>
+<script>
+(function () {
+  'use strict';
+  var A = window.WcagAnalyzer, esc = A.escapeHtml;
+  /* บริการตัวกลางชุดเดียวกับ PROXIES ใน app.js ถ้าแก้ที่หนึ่งต้องแก้อีกที่ด้วย */
+  var PROXIES = [
+    { name: 'AllOrigins', build: function (u) { return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u); } },
+    { name: 'Codetabs', build: function (u) { return 'https://api.codetabs.com/v1/proxy/?quest=' + encodeURIComponent(u); } },
+    { name: 'isomorphic-git CORS proxy', build: function (u) { return 'https://cors.isomorphic-git.org/' + u; } }
+  ];
+  var TIMEOUT = 15000, rows = [], stopped = false;
+  var $ = function (id) { return document.getElementById(id); };
+
+  function fetchHtml(url) {
+    var i = 0, t0 = Date.now();
+    function next() {
+      if (i >= PROXIES.length) return Promise.reject(new Error('ดึงข้อมูลไม่สำเร็จทุกช่องทาง'));
+      var px = PROXIES[i++], ctl = new AbortController(), tm = setTimeout(function () { ctl.abort(); }, TIMEOUT);
+      return fetch(px.build(url), { signal: ctl.signal }).then(function (r) {
+        clearTimeout(tm); if (!r.ok) throw new Error('รหัส ' + r.status); return r.text();
+      }).then(function (t) {
+        if (!t || !t.trim()) throw new Error('เนื้อหาว่าง');
+        return { html: t, proxy: px.name, ms: Date.now() - t0 };
+      }).catch(function () { clearTimeout(tm); return next(); });
+    }
+    return next();
+  }
+
+  function summarize(url, got, res) {
+    var row = { url: url, ok: true, error: '', score: res.score, band: res.interpretation.band, proxy: got.proxy,
+      fetch_ms: got.ms, analysis_ms: +res.analysisMs.toFixed(2), elements: res.elementCount,
+      needs_review: res.needsReviewCount, issues: res.issueCount, checked_at: new Date().toISOString() };
+    var scored = 0;
+    A.CRITERIA_ORDER.forEach(function (sc) {
+      var c = res.byCriterion[sc], k = sc.replace('SC ', 'sc').replace(/\./g, '');
+      row[k + '_counted'] = c.counted; row[k + '_fail'] = c.fail; row[k + '_review'] = c.needsReview;
+      if (c.counted) scored++;
+    });
+    row.sc_scored = scored;
+    ['R-ALT-01', 'R-ALT-02', 'R-HEAD-01', 'R-LABEL-01', 'R-CONTRAST-01'].forEach(function (id) {
+      row[id] = res.pairs.filter(function (p) { return p.ruleId === id && (p.status === 'fail' || p.status === 'needs_review'); }).length;
+    });
+    return row;
+  }
+
+  function render() {
+    var done = rows.filter(function (r) { return r.ok; });
+    var avg = done.length ? done.reduce(function (s, r) { return s + (r.score || 0); }, 0) / done.filter(function (r) { return r.score !== null; }).length : null;
+    var full = done.filter(function (r) { return r.sc_scored === 3; }).length;
+    var h = '<h2>ผล ' + rows.length + ' เว็บ</h2><p>ตรวจสำเร็จ ' + done.length + ' เว็บ · ' +
+      'คิดคะแนนได้ครบ 3 หลักเกณฑ์ ' + full + ' เว็บ' + (avg !== null && !isNaN(avg) ? ' · คะแนนเฉลี่ย ' + avg.toFixed(2) : '') + '</p>' +
+      '<div class="table-wrap" tabindex="0" role="region" aria-label="ตารางผลการตรวจเว็บไซต์ภายนอก"><table><thead><tr><th scope="col">เว็บไซต์</th><th scope="col" class="num">คะแนน</th><th scope="col">ระดับ</th>' +
+      '<th scope="col" class="num">คิดจากหลักเกณฑ์</th><th scope="col" class="num">ไม่ผ่าน</th><th scope="col" class="num">ต้องตรวจเพิ่ม</th>' +
+      '<th scope="col" class="num">ตรวจได้ 1.1.1 / 1.3.1 / 1.4.3</th><th scope="col" class="num">องค์ประกอบ</th><th scope="col" class="num">ดึง + วิเคราะห์ (มิลลิวินาที)</th></tr></thead><tbody>' +
+      rows.map(function (r) {
+        if (!r.ok) return '<tr><td class="u">' + esc(r.url) + '</td><td colspan="8"><span class="st no">ไม่สำเร็จ</span> ' + esc(r.error) + '</td></tr>';
+        return '<tr><td class="u">' + esc(r.url) + '</td><td class="num">' + (r.score === null ? '—' : r.score.toFixed(2)) + '</td><td>' + esc(r.band) + '</td>' +
+          '<td class="num">' + (r.sc_scored === 3 ? '<span class="st ok">3 / 3</span>' : '<span class="st rv">' + r.sc_scored + ' / 3</span>') + '</td>' +
+          '<td class="num">' + r.issues + '</td><td class="num">' + r.needs_review + '</td>' +
+          '<td class="num">' + r.sc111_counted + ' / ' + r.sc131_counted + ' / ' + r.sc143_counted + '</td>' +
+          '<td class="num">' + r.elements + '</td><td class="num">' + r.fetch_ms + ' + ' + r.analysis_ms + '</td></tr>';
+      }).join('') + '</tbody></table></div>' +
+      '<p class="sub">คอลัมน์ “คิดจากหลักเกณฑ์” บอกว่าคะแนนของเว็บนั้นคิดจากกี่หลักเกณฑ์ ถ้าไม่ครบ 3 คะแนนสูงไม่ได้แปลว่าผ่านทั้งหมด</p>';
+    $('out').innerHTML = h;
+  }
+
+  function toCsv() {
+    var cols = ['url', 'ok', 'error', 'score', 'band', 'sc_scored', 'sc111_counted', 'sc111_fail', 'sc111_review', 'sc131_counted', 'sc131_fail',
+      'sc131_review', 'sc143_counted', 'sc143_fail', 'sc143_review', 'R-ALT-01', 'R-ALT-02', 'R-HEAD-01', 'R-LABEL-01', 'R-CONTRAST-01',
+      'issues', 'needs_review', 'elements', 'fetch_ms', 'analysis_ms', 'proxy', 'checked_at'];
+    var q = function (v) { v = v === null || v === undefined ? '' : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    return '\ufeff' + cols.join(',') + '\n' + rows.map(function (r) { return cols.map(function (c) { return q(r[c]); }).join(','); }).join('\n');
+  }
+
+  $('run').addEventListener('click', function () {
+    var list = $('urls').value.split(/\s+/).map(function (s) { return s.trim(); }).filter(Boolean);
+    rows = []; stopped = false;
+    $('run').disabled = true; $('stop').disabled = false; $('csv').disabled = true;
+    var i = 0;
+    (function step() {
+      if (stopped || i >= list.length) {
+        $('run').disabled = false; $('stop').disabled = true; $('csv').disabled = !rows.length;
+        $('prog').textContent = (stopped ? 'หยุดแล้ว' : 'ตรวจครบแล้ว') + ' ' + rows.length + ' เว็บ';
+        render(); return;
+      }
+      var raw = list[i++], check = A.validateTargetUrl(raw);
+      $('prog').textContent = 'กำลังตรวจเว็บที่ ' + i + ' จาก ' + list.length + ': ' + raw;
+      if (!check.ok) { rows.push({ url: raw, ok: false, error: check.reason }); render(); return step(); }
+      fetchHtml(check.url).then(function (got) {
+        var res = A.analyze(got.html, { source: 'url' });
+        rows.push(summarize(check.url, got, res));
+      }).catch(function (e) { rows.push({ url: check.url, ok: false, error: e.message }); })
+        .then(function () { render(); step(); });
+    })();
+  });
+  $('stop').addEventListener('click', function () { stopped = true; });
+  $('csv').addEventListener('click', function () {
+    var blob = new Blob([toCsv()], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'wcag-external-sites-' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 48%22%3E%3Crect width=%2248%22 height=%2248%22 rx=%2211%22 fill=%22%232451b8%22/%3E%3Ccircle cx=%2224%22 cy=%2224%22 r=%2217%22 fill=%22none%22 stroke=%22%23ffffff%22 stroke-opacity=%22.34%22 stroke-width=%223%22/%3E%3Ccircle cx=%2224%22 cy=%2224%22 r=%2217%22 fill=%22none%22 stroke=%22%23a9c8ff%22 stroke-width=%223%22 stroke-linecap=%22round%22 stroke-dasharray=%2280 107%22 transform=%22rotate(-90 24 24)%22/%3E%3Ccircle cx=%2224%22 cy=%2215.4%22 r=%222.9%22 fill=%22%23ffffff%22/%3E%3Cpath d=%22M15.6 22H32.4%22 stroke=%22%23ffffff%22 stroke-width=%222.9%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M24 20v5.6m0 0-4 7m4-7 4 7%22 stroke=%22%23ffffff%22 stroke-width=%222.9%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22/%3E%3C/svg%3E">
+<title>ชุดทดสอบ 100 กรณีข้อผิดพลาด — ตรวจพบและตรวจซ้ำหลังแก้</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg:#fbfbfd; --surface:#ffffff; --surface-2:#f4f5f8; --surface-3:#eceef4;
+    --border:#e2e4ec; --border-strong:#cdd1de;
+    --ink:#14151a; --ink-2:#565a6b; --brand:#2451b8;
+    --good:#0b6b3f; --good-bg:#e8f5ee; --good-border:#b4ddc7;
+    --warn:#7a4a00; --warn-bg:#fdf4e3; --warn-border:#e8d0a2;
+    --bad:#a3161d;  --bad-bg:#fceaea;  --bad-border:#eab8ba;
+    --focus:#0b5fff;
+    --shadow-sm:0 1px 2px rgba(16,20,40,.06), 0 1px 3px rgba(16,20,40,.04);
+    --shadow-md:0 2px 4px rgba(16,20,40,.05), 0 8px 20px rgba(16,20,40,.07);
+    --r-md:12px; --r-lg:16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#0f1117; --surface:#171922; --surface-2:#1d202b; --surface-3:#242835;
+      --border:#2b2f3d; --border-strong:#3a4052;
+      --ink:#eceef5; --ink-2:#a8adc0; --brand:#8ab0ff;
+      --good:#6ee7a8; --good-bg:#12281d; --good-border:#245c3d;
+      --warn:#f5c46b; --warn-bg:#2a2113; --warn-border:#5c4720;
+      --bad:#ff9aa0;  --bad-bg:#2b1517;  --bad-border:#5f2b30;
+      --focus:#7aa2ff;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+      --shadow-md:0 2px 4px rgba(0,0,0,.35), 0 8px 20px rgba(0,0,0,.4);
+    }
+  }
+  * { box-sizing:border-box; }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition-duration:.01ms !important; } }
+  body {
+    margin:0; padding:32px 24px 72px; background:var(--bg); color:var(--ink);
+    font-family:"Sarabun","Noto Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+    line-height:1.7; font-size:16px; -webkit-font-smoothing:antialiased;
+  }
+  main { max-width:1080px; margin:0 auto; }
+  h1 { font-size:1.55rem; margin:0 0 6px; letter-spacing:-.01em; }
+  h2 { font-size:1.2rem; margin:38px 0 10px; padding-bottom:8px; border-bottom:2px solid var(--border-strong); letter-spacing:-.005em; }
+  h3 { font-size:1.02rem; margin:22px 0 8px; }
+  p.sub { color:var(--ink-2); margin:0 0 22px; font-size:.94rem; max-width:80ch; }
+  a { color:var(--brand); text-underline-offset:3px; }
+  :focus-visible { outline:3px solid var(--focus); outline-offset:3px; border-radius:6px; }
+
+  table { border-collapse:collapse; width:100%; margin:12px 0 8px; font-size:.92rem; }
+  caption { text-align:left; font-weight:700; padding:8px 0; color:var(--ink-2); font-size:.88rem; }
+  th, td { border-bottom:1px solid var(--border); padding:9px 12px; text-align:left; vertical-align:top; }
+  thead th { background:var(--surface-2); border-bottom:2px solid var(--border-strong); font-size:.86rem; }
+  tbody tr:hover { background:var(--surface-2); }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:var(--r-md); background:var(--surface); }
+  .table-wrap table { margin:0; }
+  .table-wrap th:first-child, .table-wrap td:first-child { padding-left:16px; }
+
+  .tag { display:inline-block; padding:2px 11px; border-radius:999px; font-size:.83rem; font-weight:700; border:1px solid; }
+  .tag.good { color:var(--good); background:var(--good-bg); border-color:var(--good-border); }
+  .tag.bad  { color:var(--bad);  background:var(--bad-bg);  border-color:var(--bad-border); }
+  .tag.warn { color:var(--warn); background:var(--warn-bg); border-color:var(--warn-border); }
+
+  .banner {
+    padding:16px 22px; border-radius:var(--r-lg); border:1px solid; border-left-width:4px;
+    margin:20px 0; font-weight:700; box-shadow:var(--shadow-sm);
+  }
+  .banner.good { color:var(--good); background:var(--good-bg); border-color:var(--good-border); border-left-color:var(--good); }
+  .banner.bad  { color:var(--bad);  background:var(--bad-bg);  border-color:var(--bad-border);  border-left-color:var(--bad); }
+
+  details { margin:10px 0; border:1px solid var(--border); border-radius:var(--r-md); padding:12px 16px; background:var(--surface); }
+  details[open] { box-shadow:var(--shadow-sm); }
+  summary { cursor:pointer; font-weight:700; }
+  summary:hover { color:var(--brand); }
+  pre { overflow-x:auto; background:var(--surface-2); border:1px solid var(--border); padding:12px; border-radius:var(--r-md);
+        font-size:.82rem; line-height:1.6; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.86em; }
+  footer { margin-top:48px; color:var(--ink-2); font-size:.87rem; border-top:1px solid var(--border); padding-top:16px; }
+  ul { margin:8px 0 8px 20px; padding:0; } li + li { margin-top:4px; }
+  @media (max-width:560px) { body { padding:24px 16px 56px; } }
+
+  .lead-nav { display:flex; flex-wrap:wrap; gap:8px 16px; margin:0 0 18px; font-size:.92rem; }
+  .kpis { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:12px; margin:18px 0; }
+  .kpi { padding:16px 18px; border-radius:var(--r-lg); background:var(--surface); border:1px solid var(--border); box-shadow:var(--shadow-sm); }
+  .kpi b { display:block; font-size:1.9rem; line-height:1.2; font-variant-numeric:tabular-nums; }
+  .kpi span { color:var(--ink-2); font-size:.9rem; }
+  .kpi.good b { color:var(--good); } .kpi.warn b { color:var(--warn); } .kpi.bad b { color:var(--bad); }
+  @media (max-width:760px) { .kpis { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+  .rules { margin:10px 0 0; }
+  td code { word-break:break-all; }
+  td.res { white-space:nowrap; }
+  .st { display:inline-flex; align-items:center; gap:4px; padding:1px 8px; border-radius:6px; font-size:.8rem; font-weight:700; color:#fff; }
+  .st.ok { background:#15803d; } .st.no { background:#b91c1c; } .st.rv { background:#b45309; } .st.na { background:#5b6474; }
+  @media (prefers-color-scheme: dark) { .st { color:#0f1117; } .st.ok { background:#6ee7a8; } .st.no { background:#ff9aa0; } .st.rv { background:#f5c46b; } .st.na { background:#a3adbd; } }
+  .filters { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
+  .filters button { font:inherit; font-size:.86rem; font-weight:700; padding:6px 12px; border-radius:999px; border:1px solid var(--border-strong); background:var(--surface); color:var(--ink); cursor:pointer; }
+  .filters button[aria-pressed="true"] { background:var(--brand); border-color:var(--brand); color:var(--surface); }
+  .code2 { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:10px; }
+  .code2 pre { margin:4px 0 0; white-space:pre-wrap; word-break:break-all; }
+  @media (max-width:760px) { .code2 { grid-template-columns:minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<main>
+  <h1>ชุดทดสอบ 100 กรณีข้อผิดพลาด</h1>
+  <p class="sub">
+    โค้ดที่มีข้อผิดพลาดไม่ซ้ำกัน 100 รูปแบบ ครอบคลุมกฎตรวจทั้ง 5 รหัส แต่ละกรณีมีโค้ดผิดและโค้ดหลังแก้
+    หน้านี้รันระบบตรวจตัวจริง (<code>analyzer.js</code>) ในเบราว์เซอร์ของคุณทุกครั้งที่เปิด ตัวเลขจึงมาจากการรันจริง ไม่ได้พิมพ์ไว้
+  </p>
+  <p class="lead-nav"><a href="../index.html">กลับหน้าเครื่องมือ</a> <a href="./runner.html">ผลวัดความแม่นยำ (F1)</a> <a href="./sites.html">ทดสอบกับเว็บไซต์ภายนอก</a></p>
+  <h2>วิธีทดสอบ</h2>
+  <ol class="rules">
+    <li><strong>ตรวจพบ</strong> ตรวจโค้ดผิดแล้วต้องได้สถานะตามที่คาดไว้ (ไม่ผ่าน หรือ ต้องตรวจเพิ่ม) ครบจำนวนจุด และไม่มีจุดผิดอื่นปน</li>
+    <li><strong>ตรวจซ้ำหลังแก้ (Feedback Loop)</strong> ตรวจโค้ดที่ผู้พัฒนาแก้แล้ว รายการนั้นต้องหายไปทั้งหมด และคะแนนต้องสูงขึ้น</li>
+    <li><strong>แก้อัตโนมัติตามตัวอย่าง</strong> ใช้วิธีแก้เดียวกับ “ตัวอย่างโค้ดหลังแก้” ในหน้าผล (<code>fixer.js</code>) แล้วตรวจซ้ำ
+      ใช้กับกรณีที่ระบบตัดสินว่าไม่ผ่าน ส่วนภาพ alt ว่างต้องให้คนตัดสินจึงไม่แก้อัตโนมัติ</li>
+  </ol>
+  <h2>ประวัติการรัน</h2>
+  <div class="table-wrap" tabindex="0" role="region" aria-label="ตารางประวัติการรัน"><table>
+    <caption>ผลที่บันทึกไว้แต่ละรอบ ตารางนี้เขียนไว้ตายตัว ส่วนผลด้านล่างรันใหม่ทุกครั้งที่เปิดหน้า</caption>
+    <thead><tr><th scope="col">รอบ</th><th scope="col" class="num">ตรวจพบ</th><th scope="col" class="num">ตรวจซ้ำหลังแก้</th><th scope="col">สิ่งที่พบและการแก้</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">รอบที่ 1 · 4 พ.ย. 2569</th><td class="num">98 / 100</td><td class="num">98 / 100</td>
+        <td>พบบั๊กจริง 2 จุด <strong>BC-080</strong> ช่องกรอกที่ aria-labelledby ชี้ไปยัง id ที่ไม่มีอยู่ ระบบให้ผ่าน
+          และ <strong>BC-100</strong> ค่าสีที่มี !important ระบบอ่านไม่ได้ จึงส่งเป็นต้องตรวจเพิ่มแทนไม่ผ่าน
+          แก้ใน <code>analyzer.js</code> ให้ aria-labelledby ต้องชี้ไปยัง id ที่มีอยู่จริง และตัด !important ออกก่อนอ่านค่าสี</td></tr>
+      <tr><th scope="row">รอบที่ 2 · 4 พ.ย. 2569 หลังแก้</th><td class="num">100 / 100</td><td class="num">100 / 100</td>
+        <td>รันชุดวัดความแม่นยำ A–I ซ้ำ ค่า F1 ทั้งสามหลักเกณฑ์ยังเป็น 1.000 และตัวอย่างคะแนน 57.62 ยังตรงกับบทที่ 3.7.2</td></tr>
+    </tbody>
+  </table></div>
+  <h2>ผลการรันครั้งนี้</h2>
+  <div id="output" role="status">กำลังรัน…</div>
+</main>
+<script src="../analyzer.js"></script>
+<script src="../fixer.js"></script>
+<script src="./bugcases.js"></script>
+<script>
+(function () {
+  'use strict';
+  var A = window.WcagAnalyzer, F = window.WcagFixer, B = window.WCAG_BUG_CASES;
+  var esc = A.escapeHtml;
+  var LABEL = { fail: 'ไม่ผ่าน', needs_review: 'ต้องตรวจเพิ่ม', pass: 'ผ่าน', not_applicable: 'ไม่นับ' };
+  var CLS = { fail: 'no', needs_review: 'rv', pass: 'ok', not_applicable: 'na' };
+  function st(s, text) { return '<span class="st ' + (CLS[s] || 'na') + '">' + esc(text || LABEL[s] || s) + '</span>'; }
+  function fmt(v) { return v === null || v === undefined ? '—' : v.toFixed(2); }
+  function problems(res) { return res.pairs.filter(function (p) { return p.status === 'fail' || p.status === 'needs_review'; }); }
+
+  function evaluate(c) {
+    var bad = A.analyze(c.bad), fixed = A.analyze(c.fixed);
+    var hits = bad.pairs.filter(function (p) { return p.ruleId === c.rule && p.status === c.expect; });
+    var others = problems(bad).filter(function (p) { return !(p.ruleId === c.rule && p.status === c.expect); });
+    var ruleStatuses = bad.pairs.filter(function (p) { return p.ruleId === c.rule || (A.RULE_PART[p.ruleId] === A.RULE_PART[c.rule]); })
+      .map(function (p) { return p.status; });
+    var detected = hits.length === c.count && others.length === 0;
+    var got = hits.length ? c.expect : (problems(bad)[0] ? problems(bad)[0].status : (ruleStatuses.indexOf('pass') >= 0 ? 'pass' : 'not_applicable'));
+    var fixedProblems = problems(fixed);
+    var improved = fixed.score !== null && (bad.score === null || fixed.score > bad.score);
+    var loop = fixedProblems.length === 0 && improved;
+    var auto = null;
+    if (c.expect === 'fail') {
+      var r = F.fixAll(c.bad);
+      auto = { ok: problems(r.after).filter(function (p) { return p.status === 'fail'; }).length === 0 && r.fixedCount > 0,
+        score: r.after.score, fixedCount: r.fixedCount };
+    }
+    return { c: c, bad: bad, fixed: fixed, hits: hits.length, others: others, detected: detected, got: got,
+      loop: loop, improved: improved, fixedProblems: fixedProblems, auto: auto };
+  }
+
+  function evaluateLimit(m) {
+    var res = A.analyze(m.html);
+    var mine = res.pairs.filter(function (p) { return p.ruleId === m.rule; });
+    var flagged = mine.filter(function (p) { return p.status === 'fail' || p.status === 'needs_review'; });
+    var actual = flagged.length ? 'flag' : 'miss';
+    return { m: m, actual: actual, ok: actual === m.behavior, statuses: mine.map(function (p) { return p.status; }) };
+  }
+
+  var t0 = performance.now();
+  var results = B.CASES.map(evaluate);
+  var limits = B.KNOWN_LIMITS.map(evaluateLimit);
+  var ms = performance.now() - t0;
+
+  var n = results.length;
+  var nDetected = results.filter(function (r) { return r.detected; }).length;
+  var nLoop = results.filter(function (r) { return r.loop; }).length;
+  var autoRuns = results.filter(function (r) { return r.auto; });
+  var nAuto = autoRuns.filter(function (r) { return r.auto.ok; }).length;
+  var uniq = {}; B.CASES.forEach(function (c) { uniq[c.bad] = 1; });
+  var nUnique = Object.keys(uniq).length;
+
+  var byRule = {};
+  results.forEach(function (r) {
+    var k = r.c.rule; byRule[k] = byRule[k] || { n: 0, det: 0, loop: 0 };
+    byRule[k].n++; if (r.detected) byRule[k].det++; if (r.loop) byRule[k].loop++;
+  });
+
+  var h = [];
+  h.push('<div class="kpis">' +
+    '<div class="kpi ' + (nDetected === n ? 'good' : 'warn') + '"><b>' + nDetected + ' / ' + n + '</b><span>กรณีที่ตรวจพบตรงตามที่คาด</span></div>' +
+    '<div class="kpi ' + (nLoop === n ? 'good' : 'warn') + '"><b>' + nLoop + ' / ' + n + '</b><span>ตรวจซ้ำหลังแก้แล้วรายการหายและคะแนนเพิ่ม</span></div>' +
+    '<div class="kpi ' + (nAuto === autoRuns.length ? 'good' : 'warn') + '"><b>' + nAuto + ' / ' + autoRuns.length + '</b><span>แก้อัตโนมัติตามตัวอย่างแล้วผ่าน</span></div>' +
+    '<div class="kpi"><b>' + nUnique + '</b><span>รูปแบบโค้ดผิดที่ไม่ซ้ำกัน · รันทั้งหมด ' + ms.toFixed(0) + ' มิลลิวินาที</span></div></div>');
+
+  var misses = results.filter(function (r) { return !r.detected || !r.loop || (r.auto && !r.auto.ok); });
+  if (misses.length) {
+    h.push('<div class="banner bad">มี ' + misses.length + ' กรณีที่ไม่เป็นไปตามที่คาด: ' + misses.map(function (r) {
+      return esc(r.c.id + ' ' + r.c.title); }).join(' · ') + ' (รายละเอียดในตาราง)</div>');
+  } else {
+    h.push('<div class="banner good">ทุกกรณีเป็นไปตามที่คาด</div>');
+  }
+
+  h.push('<h2>สรุปแยกตามกฎตรวจ</h2><div class="table-wrap" tabindex="0" role="region" aria-label="ตารางสรุปแยกตามกฎตรวจ"><table><thead><tr><th scope="col">กฎตรวจ</th><th scope="col">หลักเกณฑ์</th>' +
+    '<th scope="col" class="num">จำนวนกรณี</th><th scope="col" class="num">ตรวจพบ</th><th scope="col" class="num">ตรวจซ้ำหลังแก้ผ่าน</th></tr></thead><tbody>' +
+    Object.keys(byRule).map(function (k) {
+      var b = byRule[k], sc = results.filter(function (r) { return r.c.rule === k; })[0].bad.pairs.filter(function (p) { return p.ruleId === k; })[0];
+      return '<tr><th scope="row"><code>' + esc(k) + '</code></th><td>' + esc(sc ? sc.sc : '') + '</td><td class="num">' + b.n + '</td>' +
+        '<td class="num">' + b.det + '</td><td class="num">' + b.loop + '</td></tr>';
+    }).join('') + '</tbody></table></div>');
+
+  h.push('<h2>ผลรายกรณี</h2>');
+  h.push('<div class="filters" role="group" aria-label="กรองตามกฎตรวจ"><button type="button" data-r="" aria-pressed="true">ทั้งหมด</button>' +
+    Object.keys(byRule).map(function (k) { return '<button type="button" data-r="' + k + '" aria-pressed="false">' + k + '</button>'; }).join('') +
+    '<button type="button" data-r="!ok" aria-pressed="false">เฉพาะที่ไม่เป็นไปตามคาด</button></div>');
+  h.push('<div class="table-wrap" tabindex="0" role="region" aria-label="ตารางผลรายกรณี"><table id="cases"><caption>ผลการรันจริงทุกกรณี</caption><thead><tr><th scope="col">รหัส</th><th scope="col">กฎ</th>' +
+    '<th scope="col">รูปแบบข้อผิดพลาด</th><th scope="col">ตรวจโค้ดผิด</th><th scope="col">ตรวจซ้ำหลังแก้</th><th scope="col" class="num">คะแนน ก่อน → หลัง</th>' +
+    '<th scope="col">แก้อัตโนมัติ</th></tr></thead><tbody>' + results.map(function (r) {
+      var c = r.c, ok = r.detected && r.loop && (!r.auto || r.auto.ok);
+      var det = r.detected ? st(c.expect, LABEL[c.expect] + (c.count > 1 ? ' ' + c.count + ' จุด' : '') + ' ✓')
+        : st(r.got, 'ได้ ' + (LABEL[r.got] || r.got) + ' ✗');
+      var loop = r.loop ? st('pass', 'ผ่าน ✓') : st(r.fixedProblems[0] ? r.fixedProblems[0].status : 'not_applicable',
+        (r.fixedProblems[0] ? LABEL[r.fixedProblems[0].status] : 'ไม่ดีขึ้น') + ' ✗');
+      var auto = !r.auto ? '<span class="st na">ให้คนตัดสิน</span>' : r.auto.ok ? st('pass', 'ผ่าน ✓') : st('fail', 'ไม่สำเร็จ ✗');
+      return '<tr data-r="' + c.rule + '" data-ok="' + ok + '"><th scope="row">' + esc(c.id) + '</th><td><code>' + esc(c.rule) + '</code></td>' +
+        '<td>' + esc(c.title) + '<details><summary>ดูโค้ด</summary><div class="code2"><div>โค้ดผิด<pre>' + esc(c.bad) + '</pre></div>' +
+        '<div>โค้ดหลังแก้<pre>' + esc(c.fixed) + '</pre></div></div></details></td>' +
+        '<td class="res">' + det + '</td><td class="res">' + loop + '</td>' +
+        '<td class="num">' + fmt(r.bad.score) + ' → ' + fmt(r.fixed.score) + '</td><td class="res">' + auto + '</td></tr>';
+    }).join('') + '</tbody></table></div>');
+
+  var limOk = limits.filter(function (l) { return l.ok; }).length;
+  h.push('<h2>รูปแบบนอกขอบเขต (ยืนยันข้อจำกัดที่ประกาศไว้)</h2>');
+  h.push('<p class="sub">กรณีเหล่านี้ไม่นับใน 100 กรณี เพราะอยู่นอกสิ่งที่กฎประกาศว่าตรวจได้ ใช้ยืนยันว่าข้อจำกัดที่เขียนไว้ในหน้า “มาตรฐานที่ตรวจ” ' +
+    'ตรงกับพฤติกรรมจริง ระบบทำตามที่ประกาศ ' + limOk + ' จาก ' + limits.length + ' กรณี</p>');
+  h.push('<div class="table-wrap" tabindex="0" role="region" aria-label="ตารางรูปแบบนอกขอบเขต"><table><thead><tr><th scope="col">รหัส</th><th scope="col">รูปแบบ</th><th scope="col">ที่ประกาศไว้</th>' +
+    '<th scope="col">ผลจริง</th><th scope="col">เหตุผล</th></tr></thead><tbody>' + limits.map(function (l) {
+      var exp = l.m.behavior === 'miss' ? 'ตรวจไม่พบ' : 'แจ้งเกินจริง';
+      return '<tr><th scope="row">' + esc(l.m.id) + '</th><td>' + esc(l.m.title) + '<details><summary>ดูโค้ด</summary><pre>' + esc(l.m.html) + '</pre></details></td>' +
+        '<td>' + exp + '</td><td class="res">' + (l.ok ? st('pass', exp + ' ตามที่ประกาศ') : st('fail', 'ไม่ตรงกับที่ประกาศ')) + '</td><td>' + esc(l.m.why) + '</td></tr>';
+    }).join('') + '</tbody></table></div>');
+
+  h.push('<footer>รันเมื่อ ' + new Date().toLocaleString('th-TH') + ' · ข้อมูลกรณีทดสอบอยู่ในไฟล์ <code>tests/bugcases.js</code></footer>');
+  var out = document.getElementById('output');
+  out.removeAttribute('role');
+  out.innerHTML = h.join('');
+
+  out.addEventListener('click', function (e) {
+    var b = e.target.closest('.filters button');
+    if (!b) return;
+    var r = b.getAttribute('data-r');
+    out.querySelectorAll('.filters button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    out.querySelectorAll('#cases tbody tr').forEach(function (tr) {
+      tr.hidden = r === '!ok' ? tr.getAttribute('data-ok') === 'true' : !!r && tr.getAttribute('data-r') !== r;
+    });
+  });
+
+  window.__BUG_RESULTS__ = { n: n, detected: nDetected, loop: nLoop, auto: nAuto, autoTotal: autoRuns.length, unique: nUnique,
+    limitsOk: limOk, limitsTotal: limits.length, ms: ms,
+    misses: misses.map(function (r) { return { id: r.c.id, title: r.c.title, detected: r.detected, got: r.got, hits: r.hits,
+      others: r.others.map(function (p) { return p.ruleId + ':' + p.status; }), loop: r.loop,
+      fixedProblems: r.fixedProblems.map(function (p) { return p.ruleId + ':' + p.status; }), auto: r.auto }; }),
+    limits: limits.map(function (l) { return { id: l.m.id, ok: l.ok, actual: l.actual, statuses: l.statuses }; }) };
+})();
+</script>
+</body>
+</html>
