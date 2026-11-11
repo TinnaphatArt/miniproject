@@ -274,21 +274,9 @@
   .brand svg { width:30px; height:30px; flex:0 0 auto; }
   .brand-name { font-family:var(--f-head); font-weight:700; font-size:.95rem; line-height:1.35; }
   .brand-name small { display:block; font-weight:400; font-size:.8rem; color:var(--ink-2); }
-  .rail-title { margin:0 0 6px; padding:0 8px; font-size:.82rem; color:var(--ink-2); }
-  .steps, .steps ol, .side-links ul { list-style:none; margin:0; padding:0; }
-  .steps a, .steps .pending, .side-links a { display:flex; gap:10px; align-items:baseline; min-height:34px; padding:6px 8px; border-radius:var(--radius-c); color:var(--ink); text-decoration:none; font-size:.94rem; line-height:1.45; }
-  .steps a:hover, .side-links a:hover { background:var(--paper-3); }
-  .steps .n { flex:0 0 1.1em; color:var(--ink-2); font-variant-numeric:tabular-nums; }
-  .steps a[aria-current="location"] { background:var(--paper-3); font-weight:600; }
-  .steps a[aria-current="location"] .n { color:var(--ink); }
-  .steps .pending { color:var(--ink-2); }
-  .steps .pending small { font-size:.8rem; }
-  .steps .sub { padding:0 0 6px 28px; }
-  .steps .sub a { min-height:28px; padding:3px 8px; font-size:.86rem; color:var(--ink-2); }
-  .steps .sub a:hover { color:var(--ink); }
-  .steps .cnt { margin-left:auto; font-variant-numeric:tabular-nums; }
-  .steps .cnt.bad { color:var(--bad); font-weight:600; }
-  .side-links { margin-top:auto; }
+  .steps, .steps ol { list-style:none; margin:0; padding:0; }
+  .steps a { display:flex; gap:10px; align-items:baseline; min-height:34px; padding:6px 8px; border-radius:var(--radius-c); color:var(--ink); text-decoration:none; font-size:.94rem; line-height:1.45; }
+  .steps a:hover { background:var(--paper-3); }
 
   .canvas { min-width:0; padding:32px clamp(16px, 3vw, 40px) 0; }
   .canvas > * { max-width:1160px; }
@@ -568,7 +556,7 @@
   @media (max-width:960px) {
     .app { display:block; }
     .sidebar { position:static; height:auto; overflow:visible; flex-direction:row; align-items:center; padding:10px 16px; border-right:0; border-bottom:1px solid var(--rule); background:var(--page); }
-    .sidebar .rail, .sidebar .side-links { display:none; }
+    .sidebar .rail { display:none; }
     .canvas { padding:24px 16px 0; }
     .top { grid-template-columns:minmax(0, 1fr); }
     .hero-fig { max-width:520px; }
@@ -709,14 +697,10 @@
   .view > .board-2 { background:none; border:0; padding:0; }
   .next-step { margin:24px 0 0; display:flex; flex-wrap:wrap; gap:10px; }
   .steps a[aria-current="page"] { background:var(--paper-3); font-weight:600; }
-  .steps a[aria-current="page"] .n { color:var(--ink); }
-  .rail .steps + .rail-title { margin-top:18px; }
   .steps-foot { margin-top:18px !important; }
-  #nav-results .cnt { font-size:.78rem; color:var(--ink-2); }
   @media (max-width:960px) {
     .sidebar { flex-wrap:wrap; gap:8px; padding-bottom:6px; }
     .sidebar .rail { display:flex; width:100%; overflow-x:auto; gap:4px; padding-bottom:4px; }
-    .rail .rail-title, .steps .sub, #nav-results .cnt { display:none; }
     .rail .steps { display:flex; gap:4px; flex:none; margin:0 !important; }
     .steps a { white-space:nowrap; min-height:40px; align-items:center; }
   }
@@ -743,12 +727,10 @@
   .brand svg { width:36px; height:36px; }
   .brand svg rect { fill:url(#brand-grad); }
   .sidebar .rail { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
-  .rail .rail-title, .steps .sub, #nav-results .cnt { display:none; }
   .rail .steps { display:flex; gap:2px; margin:0 !important; }
   .steps a { border-radius:999px; padding:6px 14px; min-height:38px; align-items:center; font-size:.93rem; white-space:nowrap; }
   .steps a:hover { background:var(--paper-3); }
   .steps a[aria-current="page"] { background:var(--p1); color:var(--link); font-weight:700; }
-  .steps a[aria-current="page"] .n { color:var(--link); }
   .canvas { max-width:1240px; margin:0 auto; padding:28px clamp(16px, 4vw, 48px) 0; }
   .canvas > * { max-width:none; }
 
@@ -2053,7 +2035,8 @@
   .u-back { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:0 0 8px; font-size:.92rem; color:var(--ink-2); }
   .u-back a { font-weight:700; }
   .u-back [aria-current] { color:var(--ink); font-weight:600; }
-  .u-art { scroll-margin-top:calc(var(--hdr-h) + 16px); }
+  /* ต้องชนะ main [id] { scroll-margin-top:80px } ด้านบน จึงเขียน main .u-art[id] */
+  main .u-art[id] { scroll-margin-top:calc(var(--hdr-h) + 16px); }
   .u-nav { margin:0 0 var(--s-6); }
   .u-nav a[aria-current] { border-color:var(--link); background:var(--p1); box-shadow:0 0 0 1px var(--link); }
   @media (max-width:900px) {
@@ -2066,7 +2049,7 @@
     .u-nav span { font-size:.95rem; }
     .u-nav a[aria-current] { background:var(--link); color:#fff; border-color:var(--link); box-shadow:none; }
     .u-nav a[aria-current] b { color:#fff; }
-    .u-art { scroll-margin-top:calc(var(--hdr-h) + 76px); }
+    main .u-art[id] { scroll-margin-top:calc(var(--hdr-h) + var(--unav-h, 64px) + 12px); }
   }
   @media (max-width:900px) and (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .u-nav a[aria-current], :root:not([data-theme="light"]) .u-nav a[aria-current] b { color:#0a1226; } }
   @media (max-width:900px) { :root[data-theme="dark"] .u-nav a[aria-current], :root[data-theme="dark"] .u-nav a[aria-current] b { color:#0a1226; } }
@@ -2075,11 +2058,12 @@
   .u-next { margin-left:auto; }
   .u-try { margin:10px 0 0 !important; }
   .u-try a { display:inline-flex; align-items:center; min-height:44px; font-weight:700; }
-  .u-cta { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--s-4) var(--s-5);
-    margin-top:var(--s-6); padding:var(--s-5) var(--s-6); border-radius:var(--r-lg); background:var(--tile-dark); color:#fff; }
+  /* เขียน .view > section.u-cta เพื่อชนะกฎ .view > section (พื้นขาว เส้นขอบ) ที่ใช้กับทุก section ในหน้า */
+  .u-cta, .view > section.u-cta { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--s-4) var(--s-5);
+    margin:var(--s-6) 0 0; padding:var(--s-5) var(--s-6); border:0; border-radius:var(--r-lg); background:var(--tile-dark); color:#fff; box-shadow:none; }
   .u-cta h2 { margin:0 0 4px; font-size:1.3rem; color:#fff; }
   .u-cta p { margin:0; color:#d6dbf5; }
-  @media (max-width:600px) { .u-cta { padding:var(--s-5); } .u-cta .btn-y { width:100%; justify-content:center; } }
+  @media (max-width:600px) { .u-cta, .view > section.u-cta { padding:var(--s-5); } .u-cta .btn-y { width:100%; justify-content:center; } }
   .ps-cnt { font-weight:400; font-size:.82rem; opacity:.9; }
 
   /* ---------- การพิมพ์รายงาน ---------- */
@@ -3129,13 +3113,13 @@
       </nav>
     </article>
 
-    <aside class="u-cta" aria-labelledby="u-cta-h">
+    <section class="u-cta" aria-labelledby="u-cta-h">
       <div>
         <h2 id="u-cta-h">พร้อมตรวจหน้าเว็บของคุณแล้วหรือยัง</h2>
         <p>วางโค้ด HTML ระบุลิงก์ หรืออัปโหลดไฟล์ ระบบตรวจทั้ง 3 หลักเกณฑ์นี้ให้ในไม่กี่วินาที</p>
       </div>
       <a class="btn-y" href="#input-section">เริ่มตรวจโค้ด</a>
-    </aside>
+    </section>
   </section>
 
   <!-- ============ ขั้นที่ 1 : รับข้อมูล ============ -->
@@ -3333,8 +3317,8 @@
 </div>
 
 
-<script src="./analyzer.js?v=20261110"></script>
-<script src="./fixer.js?v=20261110"></script>
-<script src="./app.js?v=20261110"></script>
+<script src="./analyzer.js?v=20261111"></script>
+<script src="./fixer.js?v=20261111"></script>
+<script src="./app.js?v=20261111"></script>
 </body>
 </html>

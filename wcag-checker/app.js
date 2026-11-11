@@ -1116,15 +1116,24 @@
    * ================================================================ */
   function initUnderstandNav() {
     var root = document.documentElement, bar = document.querySelector('.sidebar');
-    function setHeaderHeight() {
-      if (!bar || bar.classList.contains('nav-open')) return;
-      root.style.setProperty('--hdr-h', bar.offsetHeight + 'px');
-    }
-    setHeaderHeight();
-    window.addEventListener('resize', setHeaderHeight);
-    window.addEventListener('load', setHeaderHeight);
-
     var nav = document.querySelector('.u-nav');
+    /* --hdr-h = ความสูงจริงของแถบเมนู (จอ 320px สูง 113px เพราะตัดสองแถว) และ --unav-h = ความสูงแถบชิป
+       ใช้ตั้งตำแหน่งแถบชิปที่ติดด้านบน และระยะกันหัวบทความไม่ให้ถูกบังเมื่อกดชิป
+       ไม่วัดตอนเปิดเมนูบนจอแคบ เพราะแถบเมนูยืดลงมาชั่วคราว */
+    function setHeights() {
+      if (bar && !bar.classList.contains('nav-open') && bar.offsetHeight) root.style.setProperty('--hdr-h', bar.offsetHeight + 'px');
+      if (nav && nav.offsetHeight) root.style.setProperty('--unav-h', nav.offsetHeight + 'px');
+    }
+    setHeights();
+    window.addEventListener('resize', setHeights);
+    window.addEventListener('load', setHeights);
+    /* ความสูงเปลี่ยนได้โดยไม่มี resize เช่น ฟอนต์โหลดเสร็จ ซูมตัวอักษร หรือเปิดหน้าคำอธิบายครั้งแรก */
+    if (typeof ResizeObserver !== 'undefined') {
+      var ro = new ResizeObserver(setHeights);
+      if (bar) ro.observe(bar);
+      if (nav) ro.observe(nav);
+    }
+
     var links = nav ? Array.prototype.slice.call(nav.querySelectorAll('a')) : [];
     if (!links.length || typeof IntersectionObserver === 'undefined') return;
     var byId = {};
